@@ -14,7 +14,7 @@ export class LoginPage {
     }
 
     async gotoLoginPage() {
-        await this.page.goto('http://dev-v2.named.net/login');
+        await this.page.goto('/login');
     }
 
     async enterEmail(email: string) {

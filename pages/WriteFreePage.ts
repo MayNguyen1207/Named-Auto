@@ -14,7 +14,7 @@ export class WriteFreePage {
     }
 
     async gotoWriteFreePage() {
-        await this.page.goto('http://dev-v2.named.net/community/create?boardType=free');
+        await this.page.goto('/community/create?boardType=free');
     }
 
     async enterTitle(title: string) {
