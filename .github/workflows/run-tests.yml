@@ -15,7 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # Cài đặt môi trường (Ví dụ này dùng cho Node.js, bạn đổi theo dự án của mình nhé)
+    # Cài đặt môi trường
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
