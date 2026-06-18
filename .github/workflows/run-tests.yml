@@ -53,14 +53,13 @@ jobs:
 
     - name: Copy History to Results
       if: always()
-      shell: bash
       run: |
-        if [ -d "previous-allure-report/history" ]; then
-          cp -r previous-allure-report/history allure-results/
-          echo "History found!"
-        else
-          echo "History not found."
-        fi
+          if (Test-Path "previous-allure-report/history") {
+              Copy-Item -Path "previous-allure-report/history" -Destination "allure-results/" -Recurse -Force
+              Write-Output "History found!"
+          } else {
+              Write-Output "History not found."
+          }
 
     - name: Install Allure Commandline
       if: always()
