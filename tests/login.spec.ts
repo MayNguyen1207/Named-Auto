@@ -7,5 +7,6 @@ test('[Auth] User can login successfully', async ({page}) => {
     await loginPage.gotoLoginPage();
     await loginPage.enterEmail(loginData.email);
     await loginPage.enterPassword(loginData.password);
+    await loginPage.clickLoginButton();
     await expect(page).toHaveURL(/.*home/);
 });
