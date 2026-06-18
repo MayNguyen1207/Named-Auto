@@ -22,7 +22,13 @@ jobs:
       with:
         node-version: '20'
         cache: 'npm'
-
+    
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    
     - name: Install dependencies
       run: npm ci
     
@@ -56,11 +62,6 @@ jobs:
           echo "History not found."
         fi
 
-    - name: Set up Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '17'
     - name: Install Allure Commandline
       if: always()
       run: npm install -g allure-commandline
