@@ -52,23 +52,10 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         workflow: run-tests.yml
         name: allure-history-artifact
-        path: previous-allure-report
+        path: old-history
         check_artifacts: true
         search_artifacts: true
         if_no_artifact_found: warn
-
-    - name: Copy History to Results
-      if: always()
-      run: |
-          if (Test-Path "previous-allure-report/history") {
-              if (!(Test-Path "allure-results/history")) {
-                  New-Item -ItemType Directory -Force -Path "allure-results/history"
-              }
-              Copy-Item -Path "previous-allure-report/history/*" -Destination "allure-results/history/" -Recurse -Force
-              Write-Output "History found and mapped successfully!"
-          } else {
-              Write-Output "History not found."
-          }
 
     - name: Install Allure Commandline & Combiner
       if: always()
@@ -78,7 +65,13 @@ jobs:
 
     - name: Generate Allure Report
       if: always()
-      run: allure generate allure-results --clean -o allure-report
+      shell: powershell
+      run: |
+        if (Test-Path "old-history") {
+            allure generate allure-results --clean -o allure-report --input old-history
+        } else {
+            allure generate allure-results --clean -o allure-report
+        }
     
     - name: Combine Allure Report into Single File
       if: always()
