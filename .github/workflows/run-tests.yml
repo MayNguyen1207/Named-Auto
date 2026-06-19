@@ -83,19 +83,11 @@ jobs:
     - name: Combine Allure Report into Single File
       if: always()
       run: allure-combine allure-report
-
-    - name: Get Current Date
-      if: always()
-      shell: powershell
-      id: date
-      run: |
-        $date = (Get-Date).ToString("dd-MM-yyyy")
-        echo "date=$date" >> $env:GITHUB_OUTPUT
       
     - name: Upload Allure Report Artifact
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: report-${{ github.run_number }}-${{ steps.date.outputs.date }}
+        name: allure-report-artifact
         path: allure-report/complete.html
         retention-days: 30
