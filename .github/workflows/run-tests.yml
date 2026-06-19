@@ -51,7 +51,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         workflow: run-tests.yml
-        name: allure-report-artifact
+        name: allure-history-artifact
         path: previous-allure-report
         check_artifacts: true
         search_artifacts: true
@@ -90,4 +90,12 @@ jobs:
       with:
         name: allure-report-artifact
         path: allure-report/complete.html
+        retention-days: 30
+
+    - name: Save History for Next Run (Internal)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-history-artifact
+        path: allure-report/history
         retention-days: 30
