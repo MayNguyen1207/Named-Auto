@@ -28,6 +28,12 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
+
+    - name: Set up Python
+      if: always()
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
     
     - name: Install dependencies
       run: npm ci
@@ -55,24 +61,33 @@ jobs:
       if: always()
       run: |
           if (Test-Path "previous-allure-report/history") {
-              Copy-Item -Path "previous-allure-report/history" -Destination "allure-results/" -Recurse -Force
-              Write-Output "History found!"
+              if (!(Test-Path "allure-results/history")) {
+                  New-Item -ItemType Directory -Force -Path "allure-results/history"
+              }
+              Copy-Item -Path "previous-allure-report/history/*" -Destination "allure-results/history/" -Recurse -Force
+              Write-Output "History found and mapped successfully!"
           } else {
               Write-Output "History not found."
           }
 
-    - name: Install Allure Commandline
+    - name: Install Allure Commandline & Combiner
       if: always()
-      run: npm install -g allure-commandline
+      run: |
+        npm install -g allure-commandline
+        pip install allure-combine
 
     - name: Generate Allure Report
       if: always()
       run: allure generate allure-results --clean -o allure-report
+    
+    - name: Combine Allure Report into Single File
+      if: always()
+      run: allure-combine allure-report
 
     - name: Upload Allure Report Artifact
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: allure-report-artifact
-        path: allure-report
+        path: allure-report/complete.html
         retention-days: 30
