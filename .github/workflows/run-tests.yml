@@ -73,7 +73,7 @@ jobs:
     - name: Install Allure Commandline & Combiner
       if: always()
       run: |
-        npm install -g allure-commandline
+        npm install -g allure-commandline@2.29.0
         pip install allure-combine
 
     - name: Generate Allure Report
