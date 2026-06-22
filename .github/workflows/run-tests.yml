@@ -10,12 +10,26 @@ on:
 env:
   NODE_TLS_REJECT_UNAUTHORIZED: '0'
 
+permissions:
+  actions: read
+  contents: read
+
 jobs:
   test:
     runs-on: self-hosted
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+    
+    - name: Clean Old Folders on Windows
+      shell: powershell
+      run: |
+        foreach ($folder in @("allure-results", "allure-report", "old-history", "previous-allure-report")) {
+            if (Test-Path $folder) {
+                Remove-Item -Path $folder -Recurse -Force
+                Write-Output "Đã dọn dẹp thư mục rác: $folder"
+            }
+        }
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -52,7 +66,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         workflow: run-tests.yml
         name: allure-history-artifact
-        path: old-history
+        path: allure-results/history
         check_artifacts: true
         search_artifacts: true
         if_no_artifact_found: warn
@@ -65,13 +79,7 @@ jobs:
 
     - name: Generate Allure Report
       if: always()
-      shell: powershell
-      run: |
-        if (Test-Path "old-history") {
-            allure generate allure-results --clean -o allure-report --input old-history
-        } else {
-            allure generate allure-results --clean -o allure-report
-        }
+      run: allure generate allure-results --clean -o allure-report
     
     - name: Combine Allure Report into Single File
       if: always()
