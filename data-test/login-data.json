@@ -1,0 +1,38 @@
+{
+  "valid": {
+    "email": "may@gmail.com",
+    "password": "chau1207@"
+  },
+  "inactive": {
+    "email": "test_account1@yopmail.com",
+    "password": "Named@123"
+  },
+  "unauthorized": {
+    "email": "test_account4@yopmail.com",
+    "password": "Named@123"
+  },
+  "recaptcha": {
+    "email": "sliver3@yopmail.com",
+    "password": "Named@12",
+    "text": "로봇이 아닙니다",
+    "attempts": 3
+  },
+  "passwordReset": {
+    "email": "sliver@yopmail.com",
+    "password": "Named@123"
+  },
+  "invalid": [
+    {
+      "scenario": "Incorrect password",
+      "email": "sliverpack2@yopmail.com",
+      "password": "Named@12",
+      "expectedErrorMsg": "네임드에 등록되지 않은 이메일이거나, 이메일/휴대폰 번호 또는 비밀번호를 잘못 입력하셨습니다.(5회실패시 비밀번호 재설정)"
+    },
+    {
+      "scenario": "Incorrect email",
+      "email": "slive1@yopmail.com",
+      "password": "Named@123",
+      "expectedErrorMsg": "네임드에 등록되지 않은 이메일이거나, 이메일/휴대폰 번호 또는 비밀번호를 잘못 입력하셨습니다.(5회실패시 비밀번호 재설정)"
+    }
+  ]
+}
