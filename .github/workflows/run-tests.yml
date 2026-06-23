@@ -3,7 +3,7 @@ name: Scheduled Automated Tests
 on:
   # Hiện tại đang TẮT tự động chạy. Khi nào muốn chạy thật, bạn chỉ cần xóa dấu # ở 3 dòng dưới này.
   schedule:
-     - cron: '23 4 * * 2,4'   # 11h23 trưa Thứ 3 và Thứ 5 (Giờ VN)
+     - cron: '52 22 * * 2,4'   # 5h52 sáng Thứ 4 và Thứ 6 (Giờ VN)
   
   workflow_dispatch: 
 
