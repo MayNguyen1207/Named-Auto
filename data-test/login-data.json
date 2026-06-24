@@ -3,6 +3,10 @@
     "email": "may@gmail.com",
     "password": "chau1207@"
   },
+  "admin": {
+    "email": "manager_turnover@named.com",
+    "password": "geH2A_tf7hDg2xK"
+  },
   "inactive": {
     "email": "test_account3@yopmail.com",
     "password": "Named@123"
