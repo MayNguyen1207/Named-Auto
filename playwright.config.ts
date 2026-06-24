@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'path';
 
 /**
  * Read environment variables from file.
@@ -37,17 +38,23 @@ export default defineConfig({
   },
 
   /* Configure projects for major browsers */
-  projects: process.env.CI 
-    ? [
-        /* Khi chạy trên GitHub (isCI = true): Chạy cả 3 browser */
-        { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-        { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-        { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-      ]
-    : [
-        /* Khi chạy ở Local (isCI = false): Chỉ chạy duy nhất Chrome cho nhanh */
-        { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+  projects: [
+    { name: 'setup', testMatch: /auth\.setup\.ts/, },
 
+    ...(process.env.CI
+      ? [
+          /* Khi chạy trên GitHub (isCI = true): Chạy cả 3 browser */
+          { name: 'chromium', use: { ...devices['Desktop Chrome'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'),}, dependencies: ['setup'], },
+          { name: 'firefox', use: { ...devices['Desktop Firefox'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'),}, dependencies: ['setup'], },
+          { name: 'webkit', use: { ...devices['Desktop Safari'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'),}, dependencies: ['setup'], },
+        ]
+      : [
+          /* Khi chạy ở Local (isCI = false): Chỉ chạy duy nhất Chrome cho nhanh */
+          { name: 'chromium', use: { ...devices['Desktop Chrome'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'),}, dependencies: ['setup'], },
+        ]
+    )
+    ]
+});
     /* Test against mobile viewports. */
     // {
     //   name: 'Mobile Chrome',
@@ -67,7 +74,6 @@ export default defineConfig({
     //   name: 'Google Chrome',
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
     // },
-      ],
 
   /* Run your local dev server before starting the tests */
   // webServer: {
@@ -75,4 +81,3 @@ export default defineConfig({
   //   url: 'http://localhost:3000',
   //   reuseExistingServer: !process.env.CI,
   // },
-});
