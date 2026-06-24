@@ -4,7 +4,7 @@
     "password": "chau1207@"
   },
   "inactive": {
-    "email": "test_account1@yopmail.com",
+    "email": "test_account3@yopmail.com",
     "password": "Named@123"
   },
   "unauthorized": {
@@ -20,6 +20,14 @@
   "passwordReset": {
     "email": "sliver@yopmail.com",
     "password": "Named@123"
+  },
+  "lockedAccount": {
+    "email": "sliverpack101@yopmail.com",
+    "password": "Named@123",
+    "expectedMessages": [
+      "해킹계정으로 등록되어, 잠김상태가 되었습니다. 2026년 06월 23일에 해킹계정으로 등록되어 잠김상태가 되었습니다.",
+      "을 완료해야 계정을 다시 사용 할 수 있습니다. 궁금하신 사항은 아래 이메일로 문의해 주시기 바랍니다."
+    ]
   },
   "invalid": [
     {
