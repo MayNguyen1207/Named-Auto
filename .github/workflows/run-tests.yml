@@ -109,7 +109,7 @@ jobs:
         $chat_id = "-5572929777"
         
         # 1. Send a notice message
-        $text = "🔔 *Automation Test Report*`n⏱ Time: $(Get-Date -Format 'dd/MM/yyyy HH:mm')`n🚀 Please read the detail report below."
+        $text = "*Automation Test Report*`n Time: $(Get-Date -Format 'dd/MM/yyyy HH:mm')`n Please read the detail report below."
         curl.exe -X POST "https://api.telegram.org/bot$token/sendMessage" `
           -d "chat_id=$chat_id" `
           -d "text=$text" `
