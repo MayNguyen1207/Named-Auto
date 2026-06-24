@@ -101,22 +101,75 @@ jobs:
         path: allure-report/history
         retention-days: 30
 
-    - name: Send Report to Telegram
+    - name: Update Excel Trend on Drive & Send Report to Telegram
       if: always()
       shell: powershell
       run: |
+        $excelPath = ".\Automation_Trend_Report.xlsx"
+        $summaryPath = ".\allure-report\widgets\summary.json"
         $token = "${{ secrets.TELEGRAM_TOKEN }}"
         $chat_id = "-5572929777"
         
-        # 1. Send a notice message
-        $text = "*Automation Test Report*`n Time: $(Get-Date -Format 'dd/MM/yyyy HH:mm')`n Please read the detail report below."
+        # 1. Download file from GG Drive to host machine
+        rclone copy "gdrive:Automation_Reports/Automation_Trend_Report.xlsx" ".\"
+
+        # 2. Automatically install Excel library
+        if (-not (Get-Module -ListAvailable -Name ImportExcel)) {
+            Install-Module ImportExcel -Force -Scope CurrentUser -AllowClobber
+        }
+
+        # 3. Read data from Allure's summary file
+        if (Test-Path $summaryPath) {
+            $summary = Get-Content $summaryPath | ConvertFrom-Json
+            $total  = $summary.statistic.total
+            $passed = $summary.statistic.passed
+            $failed = $summary.statistic.failed
+            $broken = $summary.statistic.broken
+            $skipped = $summary.statistic.skipped
+            $unknown = $summary.statistic.unknown
+            $passRate = [math]::Round(($passed / $total) * 100, 2)
+        } else {
+            $total = $passed = $failed = $broken = $skipped = $unknown = 0
+            $passRate = 0
+        }
+
+        # 4. Add a new row to the downloaded Excel file
+        $newRow = [PSCustomObject]@{
+            "Date Time"   = $(Get-Date -Format 'dd/MM/yyyy HH:mm')
+            "Total Cases" = $total
+            "Passed"      = $passed
+            "Failed"      = $failed
+            "Broken"      = $broken
+            "Skipped"     = $skipped
+            "Unknown"     = $unknown
+            "Pass Rate"   = $passRate
+        }
+        $newRow | Export-Excel -Path $excelPath -Append -WorksheetName "Trend_History"
+
+        # 5. Upload the updated Excel file to Google Drive
+        rclone copy ".\Automation_Trend_Report.xlsx" "gdrive:Automation_Reports"
+
+        # 6. Send a notice message
+        $gdriveLink = "https://docs.google.com/spreadsheets/d/1VeHwr98lM0M-WOMlnxUHjOm8DA2IWHDC/edit?gid=1378902928#gid=1378902928"
+        $text = "*AUTOMATION TEST REPORT*`n" +
+                "------------------------------------`n" +
+                "Time: $(Get-Date -Format 'dd/MM/yyyy HH:mm')`n" +
+                "Total test: *$total*`n" +
+                "Pass: *$passed* |  Fail: *$failed* |  Broken: *$broken*`n" +
+                "Skipped: *$skipped* | Unknown: *$unknown*`n" +
+                "Pass Rate: *$passRate%*`n" +
+                "------------------------------------`n" +
+                "Read the online trend report:`n$gdriveLink`n`n" +
+                "Or read the detail report below."
         curl.exe -X POST "https://api.telegram.org/bot$token/sendMessage" `
           -d "chat_id=$chat_id" `
           -d "text=$text" `
           -d "parse_mode=Markdown"
 
-        # 2. Attach complete.html file
+        # 7. Attach complete.html file
         $filePath = ".\allure-report\complete.html"
-        curl.exe -X POST "https://api.telegram.org/bot$token/sendDocument" `
-          -F "chat_id=$chat_id" `
-          -F "document=@$filePath"
+        if (Test-Path $filePath) {
+            curl.exe -X POST "https://api.telegram.org/bot$token/sendDocument" `
+              -F "chat_id=$chat_id" `
+              -F "document=@$filePath"
+        }
