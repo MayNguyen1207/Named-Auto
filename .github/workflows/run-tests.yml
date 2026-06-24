@@ -115,9 +115,10 @@ jobs:
 
         # 2. Automatically install Excel library
         if (-not (Get-Module -ListAvailable -Name ImportExcel)) {
-            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Confirm:$false
-            Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-            Install-Module ImportExcel -Force -Scope CurrentUser -AllowClobber -Confirm:$false
+            Write-Error "ImportExcel library has not been install in host machine! Please install it manually."
+            exit 1
+        } else {
+            Write-Output "ImportExcel library is already been instal in host machine!"
         }
 
         # 3. Read data from Allure's summary file
