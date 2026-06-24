@@ -103,8 +103,9 @@ jobs:
 
     - name: Send Report to Telegram
       if: always()
+      shell: powershell
       run: |
-        $token = "8306821402:AAGxFzRLLW3pTW5ZN7SKiNN00R9b-ecXnSA"
+        $token = "${{ secrets.TELEGRAM_TOKEN }}"
         $chat_id = "-5572929777"
         
         # 1. Send a notice message
