@@ -100,3 +100,22 @@ jobs:
         name: allure-history-artifact
         path: allure-report/history
         retention-days: 30
+
+    - name: Send Report to Telegram
+      if: always()
+      run: |
+        $token = "8306821402:AAGxFzRLLW3pTW5ZN7SKiNN00R9b-ecXnSA"
+        $chat_id = "-5572929777"
+        
+        # 1. Send a notice message
+        $text = "🔔 *Automation Test Report*`n⏱ Time: $(Get-Date -Format 'dd/MM/yyyy HH:mm')`n🚀 Please read the detail report below."
+        curl.exe -X POST "https://api.telegram.org/bot$token/sendMessage" `
+          -d "chat_id=$chat_id" `
+          -d "text=$text" `
+          -d "parse_mode=Markdown"
+
+        # 2. Attach complete.html file
+        $filePath = ".\allure-report\complete.html"
+        curl.exe -X POST "https://api.telegram.org/bot$token/sendDocument" `
+          -F "chat_id=$chat_id" `
+          -F "document=@$filePath"
