@@ -75,24 +75,19 @@ test.describe('Login Feature Tests', () => {
   test('[Auth] Keep login maintains session after browser restart', async ({ browser, page }) => {
     await loginPage.loginAs(loginData.valid.email, loginData.valid.password, { keepLogin: true });
     await expect(page).toHaveURL('/home');
-
     const storageState = await page.context().storageState();
     await page.context().close();
-
     const newContext = await browser.newContext({ storageState });
     const newPage = await newContext.newPage();
     const homePageAfterRestart = new HomePage(newPage);
-
     await newPage.goto('/home');
-
     await expect(newPage).toHaveURL('/home');
-    await homePageAfterRestart.expectKeepLoginIndicatorVisible();
-
+    const expectedName = loginData.valid.expectedUsername;
+    await homePageAfterRestart.expectKeepLoginIndicatorVisible(expectedName);
     await newContext.close();
   });
 
   test('[Auth] ReCAPTCHA appears after repeated failed login attempts', async ({ page }) => {
-    // Dùng builder data động của đoạn 2 thay vì trỏ thẳng vào raw json như đoạn 1
     const recaptcha = buildRecaptchaData(loginData.recaptcha);
     await loginPage.triggerFailedLoginAttempts(recaptcha.email, recaptcha.password, recaptcha.attempts);
     await loginPage.waitForRecaptchaChallenge(recaptcha.text);

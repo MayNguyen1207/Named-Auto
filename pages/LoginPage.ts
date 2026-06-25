@@ -16,12 +16,13 @@ export class LoginPage {
   readonly verifyIpDialog: Locator;
   readonly recaptchaFrame: FrameLocator;
 
+
   constructor(page: Page) {
     this.page = page;
     this.emailInput = page.getByRole('textbox', { name: '이메일 또는 휴대폰 번호' });
     this.passwordInput = page.getByRole('textbox', { name: '비밀번호' });
     this.loginButton = page.getByRole('button', { name: '로그인', exact: true });
-    this.keepLoginToggle = page.locator('button:has-text("로그인 상태 유지"), div.flex.items-center.p-1.bg-border.rounded-full.h-9');
+    this.keepLoginToggle = page.locator('button:has-text("로그인 상태 유지")');
     this.keepLoginCheckedIcon = page.locator('svg.tabler-icon-square-rounded-check.w-6.h-6');
     this.keepLoginUncheckedIcon = page.locator('svg.tabler-icon-square-rounded.w-6.h-6');
     this.findIdLink = page.getByRole('link', { name: '아이디 찾기' });
@@ -31,6 +32,7 @@ export class LoginPage {
     this.inactiveAccountDialog = page.getByRole('dialog', { name: 'Inactive Account' });
     this.verifyIpDialog = page.getByRole('dialog', { name: 'Unauthorized IP' });
     this.recaptchaFrame = page.frameLocator('iframe[title*="reCAPTCHA"]');
+
   }
 
   async navigate() {
