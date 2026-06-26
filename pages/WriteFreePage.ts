@@ -5,14 +5,24 @@ export class WriteFreePage extends BasePage {
     readonly page:  Page;
     readonly titleInput: Locator;
     readonly contentInput: Locator;
-    readonly writeButton: Locator;
+    readonly emojiBtn: Locator;
+    readonly writeBtn: Locator;
+    readonly cancelBtn: Locator;
+    readonly titleErrorMsg: Locator;
+    readonly termsLnk: Locator;
+    readonly prisonTermsLnk: Locator;
 
     constructor(page: Page) {
         super(page);
         this.page = page;
         this.titleInput = page.getByPlaceholder('글 제목을 입력해주세요.');
         this.contentInput = page.getByRole('textbox', {name: '리치 텍스트 편집기. 편집 영역: main'});
-        this.writeButton = page.getByRole('button', {name: '글쓰기'});
+        this.emojiBtn = page.getByRole('button', { name: 'Emoji 28', exact: true });
+        this.writeBtn = page.getByRole('button', {name: '글쓰기'});
+        this.cancelBtn = page.getByText('취소', { exact: true });
+        this.titleErrorMsg = page.getByText('제목을 입력해 주세요.', { exact: true });
+        this.termsLnk = page.getByRole('link', { name: '이용약관' });
+        this.prisonTermsLnk = page.getByRole('link', { name: '영창/수감규정' });
     }
 
     async navigate() {
@@ -34,10 +44,37 @@ export class WriteFreePage extends BasePage {
             }
         }
     }
+    async clickWriteBtn() {
+        await this.writeBtn.click();
+    }
 
     async writePost(title: string, content: string) {
+        await this.closeMainBannerIfPresent()
         await this.enterTitle(title);
         await this.enterContent(content);
-        await this.writeButton.click();
+    }
+
+    async insertEmoji() {
+        await this.emojiBtn.click();
+    }
+
+    async clickCancelBtn() {
+        await this.cancelBtn.click();
+    }
+
+    async clearTitleInput() {
+        await this.titleInput.clear();
+    }
+
+    async clickTermsLnk() {
+        const newPagePromise = this.page.context().waitForEvent('page');
+        await this.termsLnk.click();
+        return await newPagePromise;
+    }
+
+    async clickPrisonTermsLnk() {
+        const newPagePromise = this.page.context().waitForEvent('page');
+        await this.prisonTermsLnk.click();
+        return await newPagePromise;
     }
 }
