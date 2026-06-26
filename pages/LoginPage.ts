@@ -15,13 +15,19 @@ export class LoginPage {
   readonly inactiveAccountDialog: Locator;
   readonly verifyIpDialog: Locator;
   readonly recaptchaFrame: FrameLocator;
+  readonly passwordVisibilityToggleBtn: Locator;
+  readonly eyeOpenIcon: Locator;
+  readonly eyeOffIcon: Locator;
+  readonly emailValidationMsg: Locator;
+  readonly resetPasswordButton: Locator;
+
 
   constructor(page: Page) {
     this.page = page;
     this.emailInput = page.getByRole('textbox', { name: '이메일 또는 휴대폰 번호' });
     this.passwordInput = page.getByRole('textbox', { name: '비밀번호' });
     this.loginButton = page.getByRole('button', { name: '로그인', exact: true });
-    this.keepLoginToggle = page.locator('button:has-text("로그인 상태 유지"), div.flex.items-center.p-1.bg-border.rounded-full.h-9');
+    this.keepLoginToggle = page.locator('button:has-text("로그인 상태 유지")');
     this.keepLoginCheckedIcon = page.locator('svg.tabler-icon-square-rounded-check.w-6.h-6');
     this.keepLoginUncheckedIcon = page.locator('svg.tabler-icon-square-rounded.w-6.h-6');
     this.findIdLink = page.getByRole('link', { name: '아이디 찾기' });
@@ -31,6 +37,11 @@ export class LoginPage {
     this.inactiveAccountDialog = page.getByRole('dialog', { name: 'Inactive Account' });
     this.verifyIpDialog = page.getByRole('dialog', { name: 'Unauthorized IP' });
     this.recaptchaFrame = page.frameLocator('iframe[title*="reCAPTCHA"]');
+    this.passwordVisibilityToggleBtn = page.locator('div:has(> #password) > button');
+    this.eyeOpenIcon = this.passwordVisibilityToggleBtn.locator('svg.tabler-icon-eye');
+    this.eyeOffIcon = this.passwordVisibilityToggleBtn.locator('svg.tabler-icon-eye-off');
+    this.emailValidationMsg = page.getByText('유효한 이메일 주소를 입력해 주세요.', { exact: true });
+    this.resetPasswordButton = page.getByRole('button', { name: '비밀번호 재설정' });
   }
 
   async navigate() {
@@ -105,5 +116,9 @@ export class LoginPage {
       await this.keepLoginToggle.click();
       await expect(checked ? this.keepLoginCheckedIcon : this.keepLoginUncheckedIcon).toBeVisible();
     }
+  }
+
+  async togglePasswordVisibility() {
+    await this.passwordVisibilityToggleBtn.click();
   }
 }

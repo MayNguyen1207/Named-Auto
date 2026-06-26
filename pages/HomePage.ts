@@ -1,14 +1,13 @@
 import { expect, Locator, Page } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class HomePage {
+export class HomePage{
   readonly page: Page;
   readonly loginLink: Locator;
-  readonly keepLoginIndicator: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.loginLink = page.getByRole('link', { name: '로그인' });
-    this.keepLoginIndicator = page.locator('div.flex.items-center.p-1.bg-border.rounded-full.h-9');
   }
 
   async navigate() {
@@ -25,7 +24,11 @@ export class HomePage {
     await this.openLogin();
   }
 
-  async expectKeepLoginIndicatorVisible() {
-    await expect(this.keepLoginIndicator).toBeVisible();
+  async expectKeepLoginIndicatorVisible(expectedName: string) {
+    const userProfile = this.page.getByText(expectedName, { exact: false });
+    
+    await expect(userProfile).toBeVisible();
+    await expect(this.loginLink).toBeHidden();
   }
+
 }
