@@ -4,7 +4,7 @@ import { LoginPage } from '../pages/LoginPage';
 import loginData from '../data-test/login-data.json';
 import { buildInvalidLoginData, buildRecaptchaData } from '../utils/testRandomDataLogin';
 
-test.describe('Login Feature Tests', () => {
+test.describe('[Auth] Login Feature Tests', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
   
   let loginPage: LoginPage;
@@ -14,8 +14,41 @@ test.describe('Login Feature Tests', () => {
     await loginPage.navigate();
   });
 
-  test('[Auth] User can login successfully', async ({ page }) => {
-    await loginPage.login(loginData.valid.email, loginData.valid.password);
+ test('[Auth] Verify UI Login and successful login flow', async ({ page }) => {
+    // 1. Default state of the login page
+    await expect(loginPage.emailInput).toBeEnabled();
+    await expect(page.getByLabel('이메일 또는 휴대폰 번호')).toBeVisible();
+    await expect(loginPage.passwordInput).toBeEnabled();
+    await expect(page.getByLabel('비밀번호')).toBeVisible();
+    await expect(loginPage.loginButton).toBeDisabled(); 
+
+    // 2. Verify email validation (Enter email without password -> Login button should be disabled)
+    for (const input of loginData.emailValidation.validInputs) {
+      await loginPage.emailInput.fill(input);
+      await expect(loginPage.emailInput).toHaveValue(input);
+      await expect(loginPage.loginButton).toBeDisabled(); 
+    }
+    
+    // Verify invalid email format triggers validation message and disables login button
+    await loginPage.emailInput.fill(loginData.emailValidation.invalidFormat);
+    await loginPage.emailInput.blur(); 
+    await expect(loginPage.emailValidationMsg).toBeVisible();
+    await expect(loginPage.loginButton).toBeDisabled();
+    await loginPage.emailInput.clear();
+
+    // 3. Verify password validation (Enter password without email -> Login button should be disabled)
+    for (const input of loginData.passwordValidation.validInputs) {
+      await loginPage.passwordInput.fill(input);
+      await expect(loginPage.passwordInput).toHaveValue(input);
+      await expect(loginPage.loginButton).toBeDisabled();
+    }
+
+    // 4. Verify successful login flow
+    // Enter both Email and Password correctly
+    await loginPage.emailInput.fill(loginData.valid.email);
+    await loginPage.passwordInput.fill(loginData.valid.password);
+    await expect(loginPage.loginButton).toBeEnabled();
+    await loginPage.loginButton.click();
     await expect(page).toHaveURL('/home');
   });
 
@@ -24,11 +57,30 @@ test.describe('Login Feature Tests', () => {
     await expect(loginPage.inactiveAccountDialog).toBeVisible();
   });
 
-  test('[Auth] Locked account shows hacking block message', async ({ page }) => {
+  test('[Auth] Hacking account shows hacking block message', async ({ page }) => {
     const { email, password, expectedMessages } = loginData.lockedAccount;
     await loginPage.login(email, password);
     for (const message of expectedMessages) {
       await expect(loginPage.loginErrorForm).toContainText(message);
+    }
+    await loginPage.resetPasswordButton.click();
+    const expectedUrl = `/reset-password?email=${encodeURIComponent(email)}`;
+    await expect(page).toHaveURL(expectedUrl);
+  });
+
+  test('[Auth] Blocked account shows block message', async ({ page }) => {
+    const { email, password, expectedMessages } = loginData.blockedAccount;
+    await loginPage.login(email, password);
+    for (const message of expectedMessages) {
+    await expect(loginPage.loginErrorForm).toContainText(message);
+    }
+  });
+
+  test('[Auth] Deleted account shows deletion message', async ({ page }) => {
+    const { email, password, expectedMessages } = loginData.deletedAccount;
+    await loginPage.login(email, password);
+    for (const message of expectedMessages) {
+    await expect(loginPage.loginErrorForm).toContainText(message);
     }
   });
 
@@ -96,7 +148,50 @@ test.describe('Login Feature Tests', () => {
   test('[Auth] Password reset dialog appears after failed attempts', async ({ page }) => {
     await loginPage.login(loginData.passwordReset.email, loginData.passwordReset.password);
     await page.getByRole('button', { name: '확인' }).click();
-    await expect(page.locator('#main-content')).toContainText('비밀번호 재설정');
+    const expectedUrl = `/reset-password?email=${encodeURIComponent(loginData.passwordReset.email)}`;
+    await expect(page).toHaveURL(expectedUrl);
+  });
+
+  test('[Auth] Verify password visibility/hidden toggle', async ({ page }) => {
+    // 1. Sử dụng password hợp lệ từ file JSON
+    await loginPage.passwordInput.fill(loginData.valid.password);
+
+    await expect(loginPage.passwordInput).toHaveAttribute('type', 'password');
+    await expect(loginPage.eyeOffIcon).toBeVisible();
+    await expect(loginPage.eyeOpenIcon).toBeHidden();
+
+    await loginPage.togglePasswordVisibility();
+    await expect(loginPage.passwordInput).toHaveAttribute('type', 'text');
+    await expect(loginPage.eyeOpenIcon).toBeVisible();
+    await expect(loginPage.eyeOffIcon).toBeHidden();
+
+    await loginPage.togglePasswordVisibility();
+    await expect(loginPage.passwordInput).toHaveAttribute('type', 'password');
+    await expect(loginPage.eyeOffIcon).toBeVisible(); 
+    await expect(loginPage.eyeOpenIcon).toBeHidden(); 
+  });
+
+  test('[Auth] Admin login from invalid IP shows error message', async ({ page }) => {
+    const { email, password, fakeIp, expectedErrorMessage } = loginData.adminInvalidIp;
+    await page.setExtraHTTPHeaders({
+      'X-Forwarded-For': fakeIp,
+      'X-Real-IP': fakeIp
+    });
+    await loginPage.navigate();
+    await loginPage.login(email, password);
+    await expect(loginPage.loginErrorForm).toContainText(expectedErrorMessage);
+  });
+
+  test('[Auth] Login with same allowed IP shows success', async ({ page }) => {
+    const { email, password} = loginData.sameallowedIpAccount;
+    await loginPage.navigate();
+    await loginPage.login(email, password);
+    await expect(page).toHaveURL(/.*home/);
+  });
+
+   test('[Auth] Sleep + Unauthorized IP account displays dialog', async ({ page }) => {
+    await loginPage.login(loginData.sleepandunauthorizedIpAccount.email, loginData.sleepandunauthorizedIpAccount.password);
+    await expect(loginPage.inactiveAccountDialog).toBeVisible();
   });
 
   const invalidLoginData = buildInvalidLoginData(loginData.invalid);

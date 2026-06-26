@@ -15,6 +15,11 @@ export class LoginPage {
   readonly inactiveAccountDialog: Locator;
   readonly verifyIpDialog: Locator;
   readonly recaptchaFrame: FrameLocator;
+  readonly passwordVisibilityToggleBtn: Locator;
+  readonly eyeOpenIcon: Locator;
+  readonly eyeOffIcon: Locator;
+  readonly emailValidationMsg: Locator;
+  readonly resetPasswordButton: Locator;
 
 
   constructor(page: Page) {
@@ -32,7 +37,11 @@ export class LoginPage {
     this.inactiveAccountDialog = page.getByRole('dialog', { name: 'Inactive Account' });
     this.verifyIpDialog = page.getByRole('dialog', { name: 'Unauthorized IP' });
     this.recaptchaFrame = page.frameLocator('iframe[title*="reCAPTCHA"]');
-
+    this.passwordVisibilityToggleBtn = page.locator('div:has(> #password) > button');
+    this.eyeOpenIcon = this.passwordVisibilityToggleBtn.locator('svg.tabler-icon-eye');
+    this.eyeOffIcon = this.passwordVisibilityToggleBtn.locator('svg.tabler-icon-eye-off');
+    this.emailValidationMsg = page.getByText('유효한 이메일 주소를 입력해 주세요.', { exact: true });
+    this.resetPasswordButton = page.getByRole('button', { name: '비밀번호 재설정' });
   }
 
   async navigate() {
@@ -107,5 +116,9 @@ export class LoginPage {
       await this.keepLoginToggle.click();
       await expect(checked ? this.keepLoginCheckedIcon : this.keepLoginUncheckedIcon).toBeVisible();
     }
+  }
+
+  async togglePasswordVisibility() {
+    await this.passwordVisibilityToggleBtn.click();
   }
 }
