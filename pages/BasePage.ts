@@ -26,7 +26,7 @@ export class BasePage {
     getToastByType(type: 'error' | 'success'| 'info'): Locator {
         return this.page.locator(`[data-sonner-toast][data-type="${type}"]`);
     }
-    async verifyToastMessage(type: 'error' | 'success'| 'info', expectedText: string) {
+    async verifyToastMsg(type: 'error' | 'success'| 'info', expectedText: string) {
         const toast = this.getToastByType(type);
         await expect(toast).toBeVisible();
         await expect(toast).toContainText(expectedText);

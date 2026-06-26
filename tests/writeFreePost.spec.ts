@@ -34,9 +34,20 @@ test.describe('Normal User Flow', () => {
     })
 
     test('[Community] User can write Free post with valid data', async ({page}) => {
+
+        for (const lnkData of postData.lnkData.valid) {
+            await writeFreePage.insertLink(lnkData.text, lnkData.url);
+            await page.keyboard.press('Enter');
+        }
+
         await writeFreePage.writePost(postData.valid.title, postData.valid.content);
         await page.keyboard.press('Enter');
         await writeFreePage.insertEmoji();
+        await writeFreePage.contentInput.focus();
+        await page.keyboard.press('ArrowUp');
+        await page.keyboard.press('Home');
+        await page.keyboard.press('Shift+End');
+        await writeFreePage.clickBoldBtn();
         await writeFreePage.clickWriteBtn();
 
         const postDetailPage = new PostDetailPage(page);
@@ -44,6 +55,18 @@ test.describe('Normal User Flow', () => {
         await expect(postDetailPage.postTitle).toHaveText(postData.valid.title);
         await expect(postDetailPage.postContent).toContainText(postData.valid.content);
         await expect(postDetailPage.emojiImg.first()).toBeVisible();
+        
+        const innerHTML = await postDetailPage.postContent.innerHTML();
+        console.log(innerHTML); 
+        expect(innerHTML).toContain('<strong>업종별로는 반도체 제조업의 배당금 규모가 5조 6924억 원으로 전체의 15.1%를 차지하며 가장 많았다.</strong>');
+
+        const txtLink = postDetailPage.postContent.getByRole('link', { name: 'Google Search' });
+        await expect(txtLink).toBeVisible();
+        await expect(txtLink).toHaveAttribute('href', "https://www.google.com");
+
+        const plainLink = postDetailPage.postContent.getByRole('link', { name: 'https://mail.google.com' });
+        await expect(plainLink).toBeVisible();
+        await expect(plainLink).toHaveAttribute('href', "https://mail.google.com");
     });
 
     for (const data of postData.invalid) {      
@@ -65,9 +88,24 @@ test.describe('Normal User Flow', () => {
                     break;
             }
             if (data.toastMsg) {
-                await writeFreePage.verifyToastMessage('error', data.toastMsg);
+                await writeFreePage.verifyToastMsg('error', data.toastMsg);
             }
         });    
+    }
+
+    for (const data of postData.lnkData.invalid) {
+        test(`[Community] ${data.name}`, async ({ page }) => {
+            await writeFreePage.closeMainBannerIfPresent();
+            await writeFreePage.insertLink(data.text, data.url);
+            switch (data.id) {
+                case 'onlyTxt':
+                    await expect(writeFreePage.errorLnkMsg).toBeVisible();
+                    break;
+                case 'invalidLnk':
+                    await writeFreePage.verifyToastMsg('error', data.errorMsg);
+                    break;
+            }
+        });
     }
 
     test('[Community] User can click 이용약관 to open Terms in new tab', async () => {
