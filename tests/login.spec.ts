@@ -153,7 +153,6 @@ test.describe('[Auth] Login Feature Tests', () => {
   });
 
   test('[Auth] Verify password visibility/hidden toggle', async ({ page }) => {
-    // 1. Sử dụng password hợp lệ từ file JSON
     await loginPage.passwordInput.fill(loginData.valid.password);
 
     await expect(loginPage.passwordInput).toHaveAttribute('type', 'password');
