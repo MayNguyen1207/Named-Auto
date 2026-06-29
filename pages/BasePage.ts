@@ -23,12 +23,11 @@ export class BasePage {
     }
 
     // To check toast message
-    getToastByType(type: 'error' | 'success'| 'info'): Locator {
+    getToastByType(type: 'error' | 'success' | 'info'): Locator {
         return this.page.locator(`[data-sonner-toast][data-type="${type}"]`);
     }
-    async verifyToastMsg(type: 'error' | 'success'| 'info', expectedText: string) {
-        const toast = this.getToastByType(type);
+    async verifyToastMsg(type: 'error' | 'success' | 'info', expectedText: string) {
+        const toast = this.getToastByType(type).filter({ hasText: expectedText });
         await expect(toast).toBeVisible();
-        await expect(toast).toContainText(expectedText);
     }
 }
