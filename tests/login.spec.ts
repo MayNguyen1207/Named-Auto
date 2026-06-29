@@ -4,7 +4,7 @@ import { LoginPage } from '../pages/LoginPage';
 import loginData from '../data-test/login-data.json';
 import { buildInvalidLoginData, buildRecaptchaData } from '../utils/testRandomDataLogin';
 
-test.describe('[Auth] Login Feature Tests', () => {
+test.describe('[Auth] Normal User Login Feature Tests', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
   
   let loginPage: LoginPage;
@@ -14,7 +14,7 @@ test.describe('[Auth] Login Feature Tests', () => {
     await loginPage.navigate();
   });
 
- test('[Auth] Verify UI Login and successful login flow', async ({ page }) => {
+  test('[Auth] Verify UI Login and successful login flow', async ({ page }) => {
     // 1. Default state of the login page
     await expect(loginPage.emailInput).toBeEnabled();
     await expect(page.getByLabel('이메일 또는 휴대폰 번호')).toBeVisible();
@@ -52,9 +52,65 @@ test.describe('[Auth] Login Feature Tests', () => {
     await expect(page).toHaveURL('/home');
   });
 
-  test('[Auth] Sleep account displays an sleep dialog', async ({ page }) => {
+  test('[Auth] Sleep account displays an sleep dialog and email verification flow', async ({ page }) => {
     await loginPage.login(loginData.inactive.email, loginData.inactive.password);
-    await expect(loginPage.inactiveAccountDialog).toBeVisible();
+    
+    // 1. Inactive account dialog opens
+    await loginPage.verifyInactiveAccountDialog(loginData.inactive.expectedTexts);
+
+    // 1.1 Check [메인페이지로 이동하기] button
+    await loginPage.goToMainPageButton.click();
+    await expect(page).toHaveURL('/home');
+
+    // Re-login to continue the email verification flow
+    await loginPage.navigate();
+    await loginPage.login(loginData.inactive.email, loginData.inactive.password);
+    await loginPage.verifyInactiveAccountDialog(loginData.inactive.expectedTexts);
+
+    // 2. Click [이메일 인증] button → opens Phone or Email verification dialog
+    await loginPage.proceedToEmailVerification();
+
+    // 3. Default UI: email input pre-filled (readonly) + [인증번호 받기] button visible
+    await loginPage.verifyEmailVerificationDefaultUI(loginData.inactive.email);
+
+    // 4. Click [인증번호 받기] → alert shown → click 확인 → move to OTP input screen
+    await loginPage.sendOtpAndProceedToInputScreen();
+
+    // 5. OTP screen default UI (including dynamic countdown text)
+    await loginPage.verifyOtpScreenDefaultUI();
+
+    // 5.1 Click [뒤로 가기] button -> Move back to Email input screen
+    await loginPage.goBackButton.click();
+    await loginPage.verifyEmailVerificationDefaultUI(loginData.inactive.email);
+    
+    // Proceed to OTP screen again to continue the test flow
+    // On the second attempt, the confirmation alert might not appear due to rate limiting
+    await loginPage.sendOtpButton.click();
+    try {
+      await expect(loginPage.confirmButton).toBeVisible({ timeout: 3000 });
+      await loginPage.confirmButton.click();
+    } catch (e) {
+      // Ignored if alert does not appear
+    }
+
+    // 6. OTP Input Restrictions Validations
+    await loginPage.verifyOtpInputRestrictions();
+
+    // 6.1 Check what happens when clicking the button: Incorrect verification code
+    await loginPage.enterIncorrectOtpAndVerifyAlert('123549');
+
+    // 7. Enter OTP & complete verification
+    await loginPage.enterOtpAndVerifyComplete('123456');
+
+    // 8. An alert dialog appears: "계정이 다시 활성화되었습니다. 로그인해 주세요."
+    await loginPage.handleReactivationSuccessAlert();
+    await expect(page).toHaveURL(/.*login/);
+    
+    // 9. Login after completing the verification process → Can login like normal account
+    // Email is preserved, only password needs to be re-entered
+    await loginPage.passwordInput.fill(loginData.inactive.password);
+    await loginPage.loginButton.click();
+    await expect(page).toHaveURL('/home');
   });
 
   test('[Auth] Hacking account shows hacking block message', async ({ page }) => {
@@ -170,27 +226,18 @@ test.describe('[Auth] Login Feature Tests', () => {
     await expect(loginPage.eyeOpenIcon).toBeHidden(); 
   });
 
-  test('[Auth] Admin login from invalid IP shows error message', async ({ page }) => {
-    const { email, password, fakeIp, expectedErrorMessage } = loginData.adminInvalidIp;
-    await page.setExtraHTTPHeaders({
-      'X-Forwarded-For': fakeIp,
-      'X-Real-IP': fakeIp
-    });
-    await loginPage.navigate();
-    await loginPage.login(email, password);
-    await expect(loginPage.loginErrorForm).toContainText(expectedErrorMessage);
-  });
-
   test('[Auth] Login with same allowed IP shows success', async ({ page }) => {
     const { email, password} = loginData.sameallowedIpAccount;
     await loginPage.navigate();
     await loginPage.login(email, password);
-    await expect(page).toHaveURL(/.*home/);
+    await expect(page).toHaveURL('/home');
   });
 
-   test('[Auth] Sleep + Unauthorized IP account displays dialog', async ({ page }) => {
+  test('[Auth] Sleep + Unauthorized IP account displays dialog and allows moving to main page', async ({ page }) => {
     await loginPage.login(loginData.sleepandunauthorizedIpAccount.email, loginData.sleepandunauthorizedIpAccount.password);
     await expect(loginPage.inactiveAccountDialog).toBeVisible();
+    await loginPage.goToMainPageButton.click();
+    await expect(page).toHaveURL('/home');
   });
 
   const invalidLoginData = buildInvalidLoginData(loginData.invalid);
@@ -200,5 +247,28 @@ test.describe('[Auth] Login Feature Tests', () => {
       await expect(loginPage.loginErrorForm).toContainText(data.expectedErrorMsg);
     });
   }
+});
 
+test.describe('[Auth] Admin Login Tests', () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+  
+  let loginPage: LoginPage;
+
+  test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page);
+    await loginPage.navigate();
+  });
+
+  test('[Auth] Admin login from invalid IP shows error message', async ({ page }) => {
+    const { email, password, fakeIp, expectedErrorMessage } = loginData.adminInvalidIp;
+    
+    await page.setExtraHTTPHeaders({
+      'X-Forwarded-For': fakeIp,
+      'X-Real-IP': fakeIp
+    });
+    
+    await loginPage.navigate();
+    await loginPage.login(email, password);
+    await expect(loginPage.loginErrorForm).toContainText(expectedErrorMessage);
+  });
 });

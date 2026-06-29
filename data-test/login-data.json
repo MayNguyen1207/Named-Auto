@@ -32,11 +32,18 @@
 
   "inactive": {
     "email": "test_account3@yopmail.com",
-    "password": "Named@123"
+    "password": "Named@123",
+    "verificationAlertText": "등록된 이메일 주소로 인증번호가 발송 되었습니다.",
+    "expectedTexts": [
+      "장기 미접속 상태 해제를 위한 본인 인증",
+      "회원님은 6개월 이상 접속하지 않아",
+      "장기 미접속 계정 상태에서는 서비스 이용이 불가능하오니, 아래의 휴대폰 또는 이메일 인증을 진행해 주세요.",
+      "회원님의 소중한 개인정보를 보호하기 위해, 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 제29조(시행령 제16조)에 따라"
+    ]
   },
 
   "unauthorized": {
-    "email": "test_account4@yopmail.com",
+    "email": "test_account6@yopmail.com",
     "password": "Named@123",
     "otp": "123456"
   },
