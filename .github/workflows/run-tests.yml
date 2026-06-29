@@ -153,7 +153,7 @@ jobs:
         rclone copyto ".\Automation_Trend_Report.xlsx" "gdrive:Automation_Reports/Automation_Trend_Report.xlsx"
 
         # 6. Send a notice message
-        $gdriveLink = "https://docs.google.com/spreadsheets/d/1VeHwr98lM0M-WOMlnxUHjOm8DA2IWHDC/edit?gid=1378902928#gid=1378902928"
+        $gdriveLink = "https://docs.google.com/spreadsheets/d/1VjLlHVaUluVJe7i2Wy6K1sgn79dkTQXOJqFwakG7H38/edit"
         $text = "*AUTOMATION TEST REPORT*`n" +
                 "------------------------------------`n" +
                 "Time: $(Get-Date -Format 'dd/MM/yyyy HH:mm')`n" +
@@ -162,7 +162,7 @@ jobs:
                 "Skipped: *$skipped* | Unknown: *$unknown*`n" +
                 "Pass Rate: *$passRate%*`n" +
                 "------------------------------------`n" +
-                "Read the online trend report:`n$gdriveLink`n`n" +
+                "Read the online test history [here]($gdriveLink)`n" +
                 "Or read the detail report below."
         curl.exe -X POST "https://api.telegram.org/bot$token/sendMessage" `
           -d "chat_id=$chat_id" `

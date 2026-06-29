@@ -6,6 +6,7 @@ export class PostDetailPage extends BasePage {
     readonly postTitle: Locator;
     readonly postContent: Locator;
     readonly emojiImg: Locator;
+    readonly postContentImg: Locator;
 
     constructor(page: Page) {
         super(page);
@@ -13,5 +14,6 @@ export class PostDetailPage extends BasePage {
         this.postTitle = page.locator('h1:visible');
         this.postContent = page.getByLabel('게시글 내용');
         this.emojiImg = page.locator('.postContent img[src*="/editor/smileys/28.png"]');
+        this.postContentImg = page.locator('.postContent img')
     }
 }

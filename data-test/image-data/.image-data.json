@@ -1,0 +1,17 @@
+{
+  "valid": {
+    "path": "https://imgnews.pstatic.net/image/138/2026/06/22/0002231651_001_20260622143506588.png?type=w860"
+  },
+  "tooLarge": {
+    "path": "data-test\/image-data\/toolarge-img.jpg",
+    "errorMsg": "이미지 크기가 너무 큽니다. 최대 30MB까지 업로드 가능합니다."
+  },
+  "invalidFormat": {
+    "path": "data-test\/image-data\/invalid-format-img.tif",
+    "errorMsg": "jpeg, png, gif, webp 파일만 업로드 가능합니다."
+  },
+  "invalidUrl": {
+    "path": "https://imgnews.pstatic.net/image/138/2026/06/22/0002231651_001_20260622143506588",
+    "errorMsg": "허용되지 않은 URL입니다."
+  }
+}
