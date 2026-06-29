@@ -3,7 +3,7 @@
     "title": "불장에 국내 상장사 배당금 38조 육박 '역대 최대'",
     "content": "국내 상장사들의 지난해 12월 결산 배당금 규모가 38조 원에 육박하며 역대 최대 수준을 기록했다.\n\n지난해 불어닥친 증시 활황과 기업 실적 개선이 맞물리면서 개인 투자자와 외국인 모두 배당 수령액이 크게 늘어난 것으로 나타났다.\n\n한국예탁결제원이 28일 내놓은 ‘2025년 12월 결산 상장법인 배당금 지급 현황’에 따르면 코스피와 코스닥 상장사 가운데 결산 배당(분기·중간배당과 주식·현물배당 제외)을 한 1246개사의 총배당금은 37조 7519억 원으로 집계됐다.\n\n시장별로는 코스피 상장사 577개사가 전년 대비 15.6% 늘어난 34조 6802억 원을 배당했다.\n\n결산 배당이 크게 늘어난 데에는 증시 활황이 영향을 미쳤다.\n\n업종별로는 반도체 제조업의 배당금 규모가 5조 6924억 원으로 전체의 15.1%를 차지하며 가장 많았다."
   },
-
+  
   "invalid": [
     {
       "id": "emptyTitle",
@@ -26,7 +26,7 @@
       "content": "국내 상장사들의 지난해 12월 결산 배당금 규모가 38조 원에 육박하며 역대 최대 수준을 기록했다.\n\n지난해 불어닥친 증시 활황과 기업 실적 개선이 맞물리면서 개인 투자자와 외국인 모두 배당 수령액이 크게 늘어난 것으로 나타났다.\n\n한국예탁결제원이 28일 내놓은 ‘2025년 12월 결산 상장법인 배당금 지급 현황’에 따르면 코스피와 코스닥 상장사 가운데 결산 배당(분기·중간배당과 주식·현물배당 제외)을 한 1246개사의 총배당금은 37조 7519억 원으로 집계됐다.\n\n시장별로는 코스피 상장사 577개사가 전년 대비 15.6% 늘어난 34조 6802억 원을 배당했다.\n\n결산 배당이 크게 늘어난 데에는 증시 활황이 영향을 미쳤다.\n\n업종별로는 반도체 제조업의 배당금 규모가 5조 6924억 원으로 전체의 15.1%를 차지하며 가장 많았다.",
       "toastMsg": "제목에 [~, !, /, ^, ', \", ?, (, ), [, ], <, >, ;, %, +, :, -, 쉼표, 마침표]를 제외한 특수 문자는 사용하실 수 없습니다. 제목을 돋보이기 위해 특수 문자를 반복 사용할 경우 제재될 수 있습니다."
     },
-    
+
     {
       "id": "emptyContent",
       "name": "Write button should be disabled if content is empty",
@@ -57,5 +57,41 @@
       "content": "국내 상장사들의 지난해 12월 결산 배당금 규모가 38조 원에 육박하며 역대 최대 수준을 기록했다.<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\" />",
       "toastMsg": "Base64 이미지 업로드는 허용되지 않습니다."
     }
-  ]
+  ],
+
+  "lnkData": {
+    "fullData": {
+      "text": "Google Search",
+      "url": "https://www.google.com"
+    },
+
+    "onlyUrl": {
+      "id": "onlyUrl",
+      "text": "",
+      "url": "https://mail.google.com"
+    },
+
+    "invalid": [
+      {
+        "id": "onlyTxt",
+        "name": "An alert message should be shown when user does not insert link",
+        "text": "Google Search",
+        "url": "",
+        "errorMsg": "링크 URL은 비워둘 수 없습니다."
+      },
+
+      {
+        "id": "invalidLnk",
+        "name": "A toast message should be shown when user insert an invalid link",
+        "text": "",
+        "url": "kkkkkk",
+        "errorMsg": "허용되지 않은 URL입니다."
+      }
+    ],
+    
+    "newLnk": {
+      "text": "Google Mail",
+      "url": "https://mail.google.com"
+    }
+  }
 }
