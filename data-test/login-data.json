@@ -1,8 +1,8 @@
 {
   "valid": {
-    "email": "may@gmail.com",
-    "password": "chau1207@",
-    "expectedUsername": "May@gmail"
+    "email": "autotest01@yopmail.com",
+    "password": "Named@123",
+    "expectedUsername": "회원_6a420d12ec38a"
   },
 
   "emailValidation": {
