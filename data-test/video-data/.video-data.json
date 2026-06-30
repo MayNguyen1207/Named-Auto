@@ -1,0 +1,22 @@
+{
+  "valid": {
+    "path": "https://youtu.be/aSte18D2_YE?si=HXonTx8efNE9oE-g",
+    "embedCode": "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/EngW7tLk6R8?si=VXQkCoJXkp0yB2Dn\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>",
+    "embedVideoId": "EngW7tLk6R8"
+  },
+
+  "invalidUrl": {
+    "path": "https://youtu.be/aSte18D2_?si=HXonTx8efNE9oE-g",
+    "errorMsg": "허용되지 않은 URL입니다."
+  },
+
+  "toolarge": {
+    "path": "data-test\/video-data\/toolarge-video.mp4",
+    "errorMsg": "파일 크기가 너무 큽니다. 최대 30MB까지 업로드 가능합니다."
+  },
+
+  "invalidFormat": {
+    "path": "data-test\/video-data\/invalid-format-video.mov",
+    "errorMsg": "mp4 파일만 업로드 가능합니다."
+  }
+}
