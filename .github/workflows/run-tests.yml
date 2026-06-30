@@ -171,8 +171,10 @@ jobs:
 
         # 7. Attach complete.html file
         $filePath = ".\allure-report\complete.html"
+        $zipPath = ".\allure-report\complete.zip"
         if (Test-Path $filePath) {
+            Compress-Archive -Path $filePath -DestinationPath $zipPath -Force
             curl.exe -X POST "https://api.telegram.org/bot$token/sendDocument" `
               -F "chat_id=$chat_id" `
-              -F "document=@$filePath"
+              -F "document=@$zipPath"
         }
