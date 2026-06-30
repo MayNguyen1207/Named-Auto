@@ -3,6 +3,7 @@ import { WriteFreePage } from '../pages/WriteFreePage';
 import { PostDetailPage } from '../pages/PostDetailPage';
 import postData from '../data-test/write-post-data.json';
 import imageData from '../data-test/image-data/.image-data.json';
+import videoData from '../data-test/video-data/.video-data.json';
 
 test.describe('Guest Flow', () => {
     test.use({ storageState: { cookies: [], origins: [] } });
@@ -10,7 +11,6 @@ test.describe('Guest Flow', () => {
     let writeFreePage: WriteFreePage;
 
     test.beforeEach(async ({ page }) => {
-        test.setTimeout(30000);
         writeFreePage = new WriteFreePage(page);
         await writeFreePage.navigate();
     });
@@ -26,6 +26,7 @@ test.describe('Normal User Flow', () => {
     test.beforeEach(async ({ page }) => {
         writeFreePage = new WriteFreePage(page);
         await writeFreePage.navigate();
+        await writeFreePage.closeMainBannerIfPresent();
     });
 
     test('[Community] User can go back when clicking Cancel button', async ({ page }) => {
@@ -74,44 +75,6 @@ test.describe('Normal User Flow', () => {
         expect(innerHTML).toContain('<strong>업종별로는 반도체 제조업의 배당금 규모가 5조 6924억 원으로 전체의 15.1%를 차지하며 가장 많았다.</strong>');
     });
 
-    /*TODO: Update after dev update Bypass ReCaptcha
-    test('[Community] User can insert valid image into post content', async ({page}) => {
-        await writeFreePage.enterTitle("이미지");
-        await writeFreePage.uploadImageFromMainButton('data-test/image-data/valid-img.png');
-        await page.keyboard.press('ArrowRight');
-        await page.keyboard.press('Enter');
-        await writeFreePage.uploadImageFromSubButton('data-test/image-data/valid-gif.gif');
-        await page.keyboard.press('ArrowRight');
-        await page.keyboard.press('Enter');
-        await writeFreePage.insertImageByUrl(imageData.valid.path);
-        await writeFreePage.writeBtn.click();
-
-        const postDetailPage = new PostDetailPage(page);
-        await expect(page).toHaveURL(/.*community\/free/, { timeout: 15000 });
-
-        await expect(postDetailPage.postContentImg).toHaveCount(3);
-        const count = await postDetailPage.postContentImg.count();
-        for (let i = 0; i < count; i++) {
-            await expect(postDetailPage.postContentImg.nth(i)).toHaveJSProperty('complete', true);
-            const width = await postDetailPage.postContentImg.nth(i).evaluate((img: HTMLImageElement) => img.naturalWidth);
-            expect(width).toBeGreaterThan(0);
-        }
-    });*/
-
-    test('[Community] Image should not be added when user clicks X button or Cancel button', async ({ page }) => {
-        await writeFreePage.insertImgBtn.click();
-        await writeFreePage.addImgLnkBtn.click();
-        await writeFreePage.imgLnkInput.fill(imageData.valid.path);
-        await writeFreePage.closeAddImgLnkBtn.click();
-        await expect(page.locator('img[src*="20260622143506588"]')).not.toBeVisible();
-
-        await writeFreePage.insertImgBtn.click();
-        await writeFreePage.addImgLnkBtn.click();
-        await writeFreePage.imgLnkInput.fill(imageData.valid.path);
-        await writeFreePage.cancelAddImgLnkBtn.click();
-        await expect(page.locator('img[src*="20260622143506588"]')).not.toBeVisible();
-    });
-
     //Invalid titles and contents
     for (const data of postData.invalid) {
         test(`[Community] ${data.name}`, async ({ page }) => {
@@ -140,7 +103,6 @@ test.describe('Normal User Flow', () => {
     // Invalid links
     for (const data of postData.lnkData.invalid) {
         test(`[Community] ${data.name}`, async ({ page }) => {
-            await writeFreePage.closeMainBannerIfPresent();
             await writeFreePage.insertLink(data.text, data.url);
             switch (data.id) {
                 case 'onlyTxt':
@@ -179,10 +141,55 @@ test.describe('Normal User Flow', () => {
         await expect(writeFreePage.toggleTabBtn).toHaveAttribute('aria-pressed', 'false');
     });
 
-    //Invalid images
+    test('[Community] User can insert valid image into post content', async ({ page }) => {
+        await writeFreePage.uploadImageFromMainButton('data-test/image-data/valid-img.png');
+        await page.keyboard.press('ArrowRight');
+        await page.keyboard.press('Enter');
+
+        await writeFreePage.uploadImageFromSubButton('data-test/image-data/valid-gif.gif');
+        await page.keyboard.press('ArrowRight');
+        await page.keyboard.press('Enter');
+
+        await writeFreePage.insertImageByUrl(imageData.valid.path);
+
+        await writeFreePage.enterTitle("이미지");
+        await writeFreePage.writeBtn.click();
+
+        const postDetailPage = new PostDetailPage(page);
+        await expect(page).toHaveURL(/.*community\/free/, { timeout: 15000 });
+
+        await expect(postDetailPage.postContentImg).toHaveCount(3);
+        const count = await postDetailPage.postContentImg.count();
+        for (let i = 0; i < count; i++) {
+            await expect(postDetailPage.postContentImg.nth(i)).toHaveJSProperty('complete', true);
+            const width = await postDetailPage.postContentImg.nth(i).evaluate((img: HTMLImageElement) => img.naturalWidth);
+            expect(width).toBeGreaterThan(0);
+        }
+    });
+
+    test('[Community] Image should not be added when user clicks X button or Cancel button', async ({ page }) => {
+        await writeFreePage.insertImgBtn.click();
+        await writeFreePage.addImgLnkBtn.click();
+        await writeFreePage.imgLnkInput.fill(imageData.valid.path);
+        await writeFreePage.dialogCloseBtn.click();
+        await expect(page.locator('img[src*="20260622143506588"]')).not.toBeVisible();
+
+        await writeFreePage.insertImgBtn.click();
+        await writeFreePage.addImgLnkBtn.click();
+        await writeFreePage.imgLnkInput.fill(imageData.valid.path);
+        await writeFreePage.dialogCancelBtn.click();
+        await expect(page.locator('img[src*="20260622143506588"]')).not.toBeVisible();
+    });
+
+    test('[Community] User can add alt text, link for inserted image', async ({ page }) => {
+        await writeFreePage.uploadImageFromMainButton('data-test/image-data/valid-img.png');
+        await writeFreePage.addImgAltTxt("alt text");
+        await writeFreePage.addImgLnk(postData.lnkData.fullData.url);
+        await expect(writeFreePage.imgArea.locator('img')).toHaveAttribute('alt', 'alt text');
+        await expect(writeFreePage.imgArea.locator('a')).toHaveAttribute('href', postData.lnkData.fullData.url);
+    });
+
     test('[Community] User cannot upload invalid image', async ({ page }) => {
-        await writeFreePage.closeMainBannerIfPresent();
-        
         await writeFreePage.uploadImageFromMainButton(imageData.tooLarge.path);
         await writeFreePage.verifyToastMsg('error', imageData.tooLarge.errorMsg);
         await expect(writeFreePage.imgArea).not.toBeVisible();
@@ -194,6 +201,62 @@ test.describe('Normal User Flow', () => {
         await writeFreePage.insertImageByUrl(imageData.invalidUrl.path);
         await writeFreePage.verifyToastMsg('error', imageData.invalidUrl.errorMsg);
         await expect(writeFreePage.imgArea).not.toBeVisible();
+    });
+
+    test('[Community] User can insert valid video into post content by embed code, URL and uploading from device', async ({ page }) => {
+        await writeFreePage.pasteVideoEmbedCode(videoData.valid.embedCode);
+        await expect(page.locator(`iframe[src*="${videoData.valid.embedVideoId}"]`)).toBeVisible();
+        await page.keyboard.press('Enter');
+
+        await writeFreePage.insertVideoByUrl(videoData.valid.path);
+        await expect(page.locator('iframe[src*="aSte18D2_YE"]')).toBeVisible();
+        await page.keyboard.press('Enter');
+
+        await writeFreePage.uploadVideoFile('data-test/video-data/valid-video.mp4');
+        await expect(page.locator("video[controls='controls']")).toBeVisible();
+
+        await writeFreePage.enterTitle("동영상");
+        await writeFreePage.writeBtn.click();
+
+        const postDetailPage = new PostDetailPage(page);
+        await expect(page).toHaveURL(/.*community\/free/, { timeout: 15000 });
+
+        await expect(postDetailPage.postVideoIframe).toHaveCount(2);
+        await expect(postDetailPage.postVideoIframe.nth(0)).toHaveAttribute('src', /EngW7tLk6R8/);
+        await expect(postDetailPage.postVideoIframe.nth(1)).toHaveAttribute('src', /aSte18D2_YE/);
+
+        await expect(postDetailPage.postContentVideo).toBeVisible();
+        await expect(postDetailPage.postContentVideo).not.toHaveJSProperty('readyState', 0);
+        const videoWidth = await postDetailPage.postContentVideo.evaluate((vid: HTMLVideoElement) => vid.videoWidth);
+        expect(videoWidth).toBeGreaterThan(0);
+    });
+
+    test('[Community] Video should not be added when user clicks X button or Cancel button', async ({ page }) => {
+        await writeFreePage.videoMenuBtn.click();
+        await writeFreePage.insertVideoLnkBtn.click();
+        await writeFreePage.videoLnkInput.fill(videoData.valid.path);
+        await writeFreePage.dialogCloseBtn.click();
+        await expect(page.locator('iframe[src*="aSte18D2_YE"]')).not.toBeVisible();
+
+        await writeFreePage.videoMenuBtn.click();
+        await writeFreePage.insertVideoLnkBtn.click();
+        await writeFreePage.videoLnkInput.fill(videoData.valid.path);
+        await writeFreePage.dialogCancelBtn.click();
+        await expect(page.locator('iframe[src*="aSte18D2_YE"]')).not.toBeVisible();
+    });
+
+    test('[Community] User cannot upload invalid video', async ({ page }) => {
+        await writeFreePage.insertVideoByUrl(videoData.invalidUrl.path);
+        await writeFreePage.verifyToastMsg('error', videoData.invalidUrl.errorMsg);
+        await expect(page.locator('figure.media')).not.toBeVisible();
+
+        await writeFreePage.uploadVideoFile(videoData.toolarge.path);
+        await writeFreePage.verifyToastMsg('error', videoData.toolarge.errorMsg);
+        await expect(page.locator('figure.video')).not.toBeVisible();
+
+        await writeFreePage.uploadVideoFile(videoData.invalidFormat.path);
+        await writeFreePage.verifyToastMsg('error', videoData.invalidFormat.errorMsg);
+        await expect(page.locator('figure.video')).not.toBeVisible();
     });
 
     test('[Community] User can click 이용약관 to open Terms in new tab', async () => {

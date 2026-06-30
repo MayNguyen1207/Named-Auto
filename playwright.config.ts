@@ -23,7 +23,7 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 4 : 2,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: process.env.CI 
+  reporter: process.env.CI
     ? [['allure-playwright', { outputFolder: 'allure-results' }]]
     : [['html', { open: 'always' }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -43,41 +43,41 @@ export default defineConfig({
 
     ...(process.env.CI
       ? [
-          /* Khi chạy trên GitHub (isCI = true): Chạy cả 3 browser */
-          { name: 'chromium', use: { ...devices['Desktop Chrome'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'),}, dependencies: ['setup'], },
-          { name: 'firefox', use: { ...devices['Desktop Firefox'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'),}, dependencies: ['setup'], },
-          { name: 'webkit', use: { ...devices['Desktop Safari'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'),}, dependencies: ['setup'], },
-        ]
+        /* Khi chạy trên GitHub (isCI = true): Chạy cả 3 browser */
+        { name: 'chromium', use: { ...devices['Desktop Chrome'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'), }, dependencies: ['setup'], },
+        { name: 'firefox', use: { ...devices['Desktop Firefox'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'), }, dependencies: ['setup'], },
+        { name: 'webkit', use: { ...devices['Desktop Safari'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'), }, dependencies: ['setup'], },
+      ]
       : [
-          /* Khi chạy ở Local (isCI = false): Chỉ chạy duy nhất Chrome cho nhanh */
-          { name: 'chromium', use: { ...devices['Desktop Chrome'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'),}, dependencies: ['setup'], },
-        ]
+        /* Khi chạy ở Local (isCI = false): Chỉ chạy duy nhất Chrome cho nhanh */
+        { name: 'chromium', use: { ...devices['Desktop Chrome'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'), }, dependencies: ['setup'], },
+      ]
     )
-    ]
+  ]
 });
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
+/* Test against mobile viewports. */
+// {
+//   name: 'Mobile Chrome',
+//   use: { ...devices['Pixel 5'] },
+// },
+// {
+//   name: 'Mobile Safari',
+//   use: { ...devices['iPhone 12'] },
+// },
 
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+/* Test against branded browsers. */
+// {
+//   name: 'Microsoft Edge',
+//   use: { ...devices['Desktop Edge'], channel: 'msedge' },
+// },
+// {
+//   name: 'Google Chrome',
+//   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+// },
 
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+/* Run your local dev server before starting the tests */
+// webServer: {
+//   command: 'npm run start',
+//   url: 'http://localhost:3000',
+//   reuseExistingServer: !process.env.CI,
+// },
