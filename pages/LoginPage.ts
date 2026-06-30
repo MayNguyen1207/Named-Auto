@@ -25,12 +25,14 @@ export class LoginPage {
   readonly otpInput: Locator;
   readonly verifyCompleteButton: Locator;
   readonly goBackButton: Locator;
+  readonly otpForm: Locator;
   readonly recaptchaFrame: FrameLocator;
   readonly passwordVisibilityToggleBtn: Locator;
   readonly eyeOpenIcon: Locator;
   readonly eyeOffIcon: Locator;
   readonly emailValidationMsg: Locator;
   readonly resetPasswordButton: Locator;
+  readonly phoneCountryCode: Locator;
 
 
   constructor(page: Page) {
@@ -58,13 +60,14 @@ export class LoginPage {
     this.otpInput = page.getByTestId('input-otp-root');
     this.verifyCompleteButton = page.getByRole('button', { name: '인증 완료' });
     this.goBackButton = page.getByRole('button', { name: '뒤로 가기' });
+    this.otpForm = page.getByLabel('Phone or Email verification').locator('form');
     this.recaptchaFrame = page.frameLocator('iframe[title*="reCAPTCHA"]');
     this.passwordVisibilityToggleBtn = page.locator('div:has(> #password) > button');
     this.eyeOpenIcon = this.passwordVisibilityToggleBtn.locator('svg.tabler-icon-eye');
     this.eyeOffIcon = this.passwordVisibilityToggleBtn.locator('svg.tabler-icon-eye-off');
     this.emailValidationMsg = page.getByText('유효한 이메일 주소를 입력해 주세요.', { exact: true });
     this.resetPasswordButton = page.getByRole('button', { name: '비밀번호 재설정' });
-  }
+    this.phoneCountryCode = this.page.locator('div').filter({ hasText: /^US\+1$/ }).first();  }
 
   async navigate() {
     await this.page.goto('/login');
@@ -153,15 +156,22 @@ export class LoginPage {
     await expect(this.goToMainPageButton).toBeVisible();
   }
 
-  async proceedToEmailVerification() {
+  async proceedToVerification(type: 'email' | 'phone') {
     await this.inactiveAccountActivateButton.click();
     await expect(this.emailVerificationDialog).toBeVisible();
-    await expect(this.emailVerificationDialogContent).toContainText('이메일 인증');
+    
+    const expectedTitle = type === 'email' ? '이메일 인증' : '휴대폰 인증';
+    await expect(this.emailVerificationDialogContent).toContainText(expectedTitle);
   }
 
-  async verifyEmailVerificationDefaultUI(email: string) {
-    await expect(this.verificationEmailInput).toHaveValue(email);
-    await expect(this.verificationEmailInput).toBeDisabled();
+  async verifyVerificationDefaultUI(type: 'email' | 'phone', email?: string) {
+    if (type === 'email') {
+      await expect(this.verificationEmailInput).toHaveValue(email!);
+      await expect(this.verificationEmailInput).toBeDisabled();
+    } else if (type === 'phone') {
+      await expect(this.emailVerificationDialogContent).toContainText('본인 명의의 휴대폰으로 본인 인증을 완료한 회원의 경우');
+      await expect(this.phoneCountryCode).toBeVisible();
+    }
     await expect(this.sendOtpButton).toBeVisible();
   }
 
@@ -184,23 +194,23 @@ export class LoginPage {
   async verifyOtpInputRestrictions() {
     await this.otpInput.fill('   ');
     await expect(this.otpInput).toHaveValue('');
-    
+
     await this.otpInput.fill('!@#$%^');
     await expect(this.otpInput).toHaveValue('');
-    
+
     await this.otpInput.fill('abcdef');
     await expect(this.otpInput).toHaveValue('');
-    
+
     await this.otpInput.fill('12345678');
     await expect(this.otpInput).toHaveValue('123456');
-    
+
     await this.otpInput.fill('');
   }
 
   async enterIncorrectOtpAndVerifyAlert(otp: string) {
     await this.otpInput.fill(otp);
     await this.verifyCompleteButton.click();
-    
+
     const errorDialog = this.page.getByRole('dialog', { name: '알림' });
     try {
       await expect(errorDialog).toBeVisible({ timeout: 3000 });
@@ -215,7 +225,7 @@ export class LoginPage {
   async enterOtpAndVerifyComplete(otp: string) {
     await this.otpInput.fill(otp.slice(0, 3));
     await expect(this.verifyCompleteButton).toBeDisabled();
-    
+
     await this.otpInput.fill(otp);
     await expect(this.verifyCompleteButton).toBeEnabled();
     await this.verifyCompleteButton.click();
@@ -225,5 +235,47 @@ export class LoginPage {
     const successDialog = this.page.getByRole('dialog', { name: '알림' });
     await expect(successDialog).toBeVisible();
     await successDialog.getByRole('button', { name: '확인' }).click();
+  }
+
+  async enterExpiredOtpAndVerifyAlert(otp: string, expectedMsg: string) {
+    await this.otpInput.fill(otp);
+    await expect(this.verifyCompleteButton).toBeEnabled();
+    await this.verifyCompleteButton.click();
+
+    const errorDialog = this.page.getByRole('dialog', { name: '알림' });
+    await expect(errorDialog).toBeVisible({ timeout: 5000 });
+    await expect(errorDialog).toContainText(expectedMsg);
+
+    await errorDialog.getByRole('button', { name: '확인' }).click();
+    await expect(errorDialog).toBeHidden();
+  }
+
+  async sendOtpFromEmailScreen() {
+    await this.sendOtpButton.click();
+    try {
+      await expect(this.confirmButton).toBeVisible({ timeout: 3000 });
+      await this.confirmButton.click();
+    } catch (e) {
+      // Ignored if alert does not appear
+    }
+  }
+
+  async verifyOtpResendUI() {
+    await expect(this.otpForm).toContainText('OTP를 받지 못하셨나요?');
+    await expect(this.otpForm).toContainText('인증번호 재발송');
+  }
+
+  async verifyCountdownIsDecrementing() {
+    await expect(this.emailVerificationDialogContent).toContainText(/OTP 재전송은 \d+분 \d+초 후에 가능합니다/);
+    const before = await this.emailVerificationDialogContent.textContent();
+    await this.page.waitForTimeout(2000);
+    const after = await this.emailVerificationDialogContent.textContent();
+    expect(before).not.toEqual(after);
+  }
+
+  async resendOtp() {
+    await this.emailVerificationDialogContent.getByText('인증번호 재발송').click({ force: true });
+    await this.page.getByRole('button', { name: '확인' }).click();
+    await expect(this.emailVerificationDialogContent).toContainText(/OTP 재전송은 \d+분 \d+초 후에 가능합니다/);
   }
 }

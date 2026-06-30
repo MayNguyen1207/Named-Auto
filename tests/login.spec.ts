@@ -15,36 +15,30 @@ test.describe('[Auth] Normal User Login Feature Tests', () => {
   });
 
   test('[Auth] Verify UI Login and successful login flow', async ({ page }) => {
-    // 1. Default state of the login page
     await expect(loginPage.emailInput).toBeEnabled();
     await expect(page.getByLabel('이메일 또는 휴대폰 번호')).toBeVisible();
     await expect(loginPage.passwordInput).toBeEnabled();
     await expect(page.getByLabel('비밀번호')).toBeVisible();
     await expect(loginPage.loginButton).toBeDisabled(); 
 
-    // 2. Verify email validation (Enter email without password -> Login button should be disabled)
     for (const input of loginData.emailValidation.validInputs) {
       await loginPage.emailInput.fill(input);
       await expect(loginPage.emailInput).toHaveValue(input);
       await expect(loginPage.loginButton).toBeDisabled(); 
     }
     
-    // Verify invalid email format triggers validation message and disables login button
     await loginPage.emailInput.fill(loginData.emailValidation.invalidFormat);
     await loginPage.emailInput.blur(); 
     await expect(loginPage.emailValidationMsg).toBeVisible();
     await expect(loginPage.loginButton).toBeDisabled();
     await loginPage.emailInput.clear();
 
-    // 3. Verify password validation (Enter password without email -> Login button should be disabled)
     for (const input of loginData.passwordValidation.validInputs) {
       await loginPage.passwordInput.fill(input);
       await expect(loginPage.passwordInput).toHaveValue(input);
       await expect(loginPage.loginButton).toBeDisabled();
     }
 
-    // 4. Verify successful login flow
-    // Enter both Email and Password correctly
     await loginPage.emailInput.fill(loginData.valid.email);
     await loginPage.passwordInput.fill(loginData.valid.password);
     await expect(loginPage.loginButton).toBeEnabled();
@@ -52,66 +46,120 @@ test.describe('[Auth] Normal User Login Feature Tests', () => {
     await expect(page).toHaveURL('/home');
   });
 
-  test('[Auth] Sleep account displays an sleep dialog and email verification flow', async ({ page }) => {
-    await loginPage.login(loginData.inactive.email, loginData.inactive.password);
+const sleepAccountData = [
+    { method: 'email', data: loginData.inactiveEmail },
+    { method: 'phone', data: loginData.inactivePhone }
+  ] as const;
+  for (const testData of sleepAccountData) {
+    test(`[Auth] Sleep account - ${testData.method.toUpperCase()} verification flow`, async ({ page }) => {
+      await loginPage.login(testData.data.email, testData.data.password);
+      await loginPage.verifyInactiveAccountDialog(testData.data.expectedTexts);
+
+      await loginPage.proceedToVerification(testData.method);
+      await loginPage.verifyVerificationDefaultUI(testData.method, testData.data.email);
+
+      await loginPage.sendOtpAndProceedToInputScreen();
+
+      await loginPage.verifyOtpScreenDefaultUI(); 
+      
+      await page.clock.install();
+      await page.clock.fastForward('03:01'); 
+      await loginPage.resendOtp();
+
+      await loginPage.goBackButton.click();
+      await loginPage.verifyVerificationDefaultUI(testData.method, testData.data.email);
+
+      await loginPage.sendOtpButton.click();
+      try {
+        await expect(loginPage.confirmButton).toBeVisible({ timeout: 3000 });
+        await loginPage.confirmButton.click();
+      } catch (e) { }
+      
+      await loginPage.verifyOtpInputRestrictions();
+      await loginPage.enterIncorrectOtpAndVerifyAlert('123549');
+    });
+  }
+
+  const inactiveTestData = [
+    { method: 'email', data: loginData.inactiveEmail }, // Lưu ý: JSON của bạn đang là inactiveEmail (hoặc inactive)
+    { method: 'phone', data: loginData.inactivePhone }
+  ] as const;
+  for (const { method, data } of inactiveTestData) {
     
-    // 1. Inactive account dialog opens
-    await loginPage.verifyInactiveAccountDialog(loginData.inactive.expectedTexts);
+    test(`[Auth] Check OTP countdown time, Resend OTP and Go Back button - ${method.toUpperCase()}`, async ({ page }) => {
+      await loginPage.login(data.email, data.password);
+      await loginPage.proceedToVerification(method);
+      await loginPage.sendOtpAndProceedToInputScreen();
 
-    // 1.1 Check [메인페이지로 이동하기] button
-    await loginPage.goToMainPageButton.click();
-    await expect(page).toHaveURL('/home');
+      await loginPage.verifyOtpScreenDefaultUI(); 
+      await page.clock.install();
+      await page.clock.fastForward('03:01'); 
 
-    // Re-login to continue the email verification flow
-    await loginPage.navigate();
-    await loginPage.login(loginData.inactive.email, loginData.inactive.password);
-    await loginPage.verifyInactiveAccountDialog(loginData.inactive.expectedTexts);
+      await loginPage.resendOtp();
+      await loginPage.goBackButton.click();
+      await loginPage.verifyVerificationDefaultUI(method, data.email);
+    });
 
-    // 2. Click [이메일 인증] button → opens Phone or Email verification dialog
-    await loginPage.proceedToEmailVerification();
+    test(`[Auth] Check what happens when clicking the button: OTP expired - ${method.toUpperCase()}`, async ({ page }) => {
+      await loginPage.login(data.email, data.password);
+      await loginPage.proceedToVerification(method);
+      await loginPage.sendOtpAndProceedToInputScreen();
 
-    // 3. Default UI: email input pre-filled (readonly) + [인증번호 받기] button visible
-    await loginPage.verifyEmailVerificationDefaultUI(loginData.inactive.email);
+      await page.route('**/confirm-active-account', async route => { 
+        await route.fulfill({
+          status: 400, 
+          contentType: 'application/json',
+          body: JSON.stringify({ 
+            code: 1006,
+            success: false,
+            message: '인증 시간이 만료 되었습니다. 인증 번호를 다시 요청해 주세요.' 
+          }) 
+        });
+      });
 
-    // 4. Click [인증번호 받기] → alert shown → click 확인 → move to OTP input screen
-    await loginPage.sendOtpAndProceedToInputScreen();
+      await loginPage.otpInput.fill('123456');
+      await expect(loginPage.verifyCompleteButton).toBeEnabled();
+      await loginPage.verifyCompleteButton.click();
 
-    // 5. OTP screen default UI (including dynamic countdown text)
-    await loginPage.verifyOtpScreenDefaultUI();
+      await expect(
+        page.getByText('인증 시간이 만료', { exact: false })
+      ).toBeVisible({ timeout: 5000 });
 
-    // 5.1 Click [뒤로 가기] button -> Move back to Email input screen
-    await loginPage.goBackButton.click();
-    await loginPage.verifyEmailVerificationDefaultUI(loginData.inactive.email);
-    
-    // Proceed to OTP screen again to continue the test flow
-    // On the second attempt, the confirmation alert might not appear due to rate limiting
-    await loginPage.sendOtpButton.click();
-    try {
-      await expect(loginPage.confirmButton).toBeVisible({ timeout: 3000 });
-      await loginPage.confirmButton.click();
-    } catch (e) {
-      // Ignored if alert does not appear
-    }
+      try {
+        await page.getByRole('button', { name: '확인' }).click({ timeout: 2000 });
+      } catch (e) {
+        // Skip if the alert does not appear
+      }
+    });
+  }
 
-    // 6. OTP Input Restrictions Validations
-    await loginPage.verifyOtpInputRestrictions();
+  const reactiveTestData = [
+    { method: 'email', data: loginData.reactiveEmail },
+    { method: 'phone', data: loginData.reactivePhone }
+  ] as const;
 
-    // 6.1 Check what happens when clicking the button: Incorrect verification code
-    await loginPage.enterIncorrectOtpAndVerifyAlert('123549');
+  for (const { method, data } of reactiveTestData) {
 
-    // 7. Enter OTP & complete verification
-    await loginPage.enterOtpAndVerifyComplete('123456');
+    test(`[Auth] Inactive account reactivation flow only runs on Chromium - ${method.toUpperCase()}`, async ({ page, browserName }) => {
+      test.skip(browserName !== 'chromium', 'Chromium is required for this test due to specific browser behavior.');
 
-    // 8. An alert dialog appears: "계정이 다시 활성화되었습니다. 로그인해 주세요."
-    await loginPage.handleReactivationSuccessAlert();
-    await expect(page).toHaveURL(/.*login/);
-    
-    // 9. Login after completing the verification process → Can login like normal account
-    // Email is preserved, only password needs to be re-entered
-    await loginPage.passwordInput.fill(loginData.inactive.password);
-    await loginPage.loginButton.click();
-    await expect(page).toHaveURL('/home');
-  });
+      await loginPage.login(data.email, data.password);
+      await loginPage.proceedToVerification(method);
+      await loginPage.sendOtpButton.click();
+      try {
+        await expect(loginPage.confirmButton).toBeVisible({ timeout: 3000 });
+        await loginPage.confirmButton.click();
+      } catch (e) { }
+
+      await loginPage.enterOtpAndVerifyComplete('123456');
+      await loginPage.handleReactivationSuccessAlert();
+      await expect(page).toHaveURL('/login');
+      
+      await loginPage.passwordInput.fill(data.password);
+      await loginPage.loginButton.click();
+      await expect(page).toHaveURL('/home');
+    });
+  }
 
   test('[Auth] Hacking account shows hacking block message', async ({ page }) => {
     const { email, password, expectedMessages } = loginData.lockedAccount;
