@@ -4,32 +4,40 @@
     "password": "Named@123",
     "expectedUsername": "회원_6a420d12ec38a"
   },
-
   "emailValidation": {
-    "validInputs": ["abc", "123456", "!@#$%^", "   "],
+    "validInputs": [
+      "abc",
+      "123456",
+      "!@#$%^",
+      "   "
+    ],
     "invalidFormat": "invalidemail_format.com",
     "expectedFormatErrorMsg": "유효한 이메일 주소를 입력해 주세요."
   },
-
   "sameallowedIpAccount": {
     "email": "sliverpack107@yopmail.com",
     "password": "Named@123"
   },
-
-  "sleepandunauthorizedIpAccount": {
+  "sleepAndUnauthorizedEmail": {
+    "email": "test_account9@yopmail.com",
+    "password": "Named@123"
+  },
+  "sleepAndUnauthorizedPhone": {
     "email": "sliverpack108@yopmail.com",
     "password": "Named@123"
   },
-
   "passwordValidation": {
-    "validInputs": ["abc", "123456", "!@#$%^", "   "]
+    "validInputs": [
+      "abc",
+      "123456",
+      "!@#$%^",
+      "   "
+    ]
   },
-
   "admin": {
     "email": "manager_turnover@named.com",
     "password": "geH2A_tf7hDg2xK"
   },
-
   "inactiveEmail": {
     "email": "test_account3@yopmail.com",
     "password": "Named@123",
@@ -42,7 +50,6 @@
       "회원님의 소중한 개인정보를 보호하기 위해, 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 제29조(시행령 제16조)에 따라"
     ]
   },
-
   "inactivePhone": {
     "email": "test_account7@yopmail.com",
     "password": "Named@123",
@@ -53,8 +60,7 @@
       "회원님의 소중한 개인정보를 보호하기 위해, 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 제29조(시행령 제16조)에 따라"
     ]
   },
- 
-    "reactiveEmail": {
+  "reactiveEmail": {
     "email": "test_account5@yopmail.com",
     "password": "Named@123",
     "verificationAlertText": "등록된 이메일 주소로 인증번호가 발송 되었습니다.",
@@ -65,7 +71,6 @@
       "회원님의 소중한 개인정보를 보호하기 위해, 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 제29조(시행령 제16조)에 따라"
     ]
   },
-
   "reactivePhone": {
     "email": "test_account8@yopmail.com",
     "password": "Named@123",
@@ -76,26 +81,21 @@
       "회원님의 소중한 개인정보를 보호하기 위해, 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 제29조(시행령 제16조)에 따라"
     ]
   },
-
-
   "unauthorized": {
     "email": "test_account6@yopmail.com",
     "password": "Named@123",
     "otp": "123456"
   },
-
   "recaptcha": {
     "email": "sliver3@yopmail.com",
     "password": "Named@12",
     "text": "로봇이 아닙니다",
     "attempts": 3
   },
-
   "passwordReset": {
     "email": "sliver@yopmail.com",
     "password": "Named@123"
   },
-
   "lockedAccount": {
     "email": "sliverpack101@yopmail.com",
     "password": "Named@123",
@@ -104,7 +104,6 @@
       "을 완료해야 계정을 다시 사용 할 수 있습니다. 궁금하신 사항은 아래 이메일로 문의해 주시기 바랍니다."
     ]
   },
-
   "blockedAccount": {
     "email": "sliverpack104@yopmail.com",
     "password": "Named@123",
@@ -113,8 +112,7 @@
       "help@named.com"
     ]
   },
-
-    "deletedAccount": {
+  "deletedAccount": {
     "email": "sliverpack103@yopmail.com",
     "password": "Named@123",
     "expectedMessages": [
@@ -122,14 +120,12 @@
       "help@named.com"
     ]
   },
-
   "adminInvalidIp": {
     "email": "manager_turnover@named.com",
     "password": "geH2A_tf7hDg2xK",
     "fakeIp": "203.119.34.12",
     "expectedErrorMessage": "관리자 로그인이 허용되지 않은 IP입니다."
   },
-
   "invalid": [
     {
       "scenario": "Incorrect password",

@@ -6,7 +6,7 @@ import { buildInvalidLoginData, buildRecaptchaData } from '../utils/testRandomDa
 
 test.describe('[Auth] Normal User Login Feature Tests', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
-  
+
   let loginPage: LoginPage;
 
   test.beforeEach(async ({ page }) => {
@@ -19,16 +19,16 @@ test.describe('[Auth] Normal User Login Feature Tests', () => {
     await expect(page.getByLabel('이메일 또는 휴대폰 번호')).toBeVisible();
     await expect(loginPage.passwordInput).toBeEnabled();
     await expect(page.getByLabel('비밀번호')).toBeVisible();
-    await expect(loginPage.loginButton).toBeDisabled(); 
+    await expect(loginPage.loginButton).toBeDisabled();
 
     for (const input of loginData.emailValidation.validInputs) {
       await loginPage.emailInput.fill(input);
       await expect(loginPage.emailInput).toHaveValue(input);
-      await expect(loginPage.loginButton).toBeDisabled(); 
+      await expect(loginPage.loginButton).toBeDisabled();
     }
-    
+
     await loginPage.emailInput.fill(loginData.emailValidation.invalidFormat);
-    await loginPage.emailInput.blur(); 
+    await loginPage.emailInput.blur();
     await expect(loginPage.emailValidationMsg).toBeVisible();
     await expect(loginPage.loginButton).toBeDisabled();
     await loginPage.emailInput.clear();
@@ -46,7 +46,7 @@ test.describe('[Auth] Normal User Login Feature Tests', () => {
     await expect(page).toHaveURL('/home');
   });
 
-const sleepAccountData = [
+  const sleepAccountData = [
     { method: 'email', data: loginData.inactiveEmail },
     { method: 'phone', data: loginData.inactivePhone }
   ] as const;
@@ -60,10 +60,10 @@ const sleepAccountData = [
 
       await loginPage.sendOtpAndProceedToInputScreen();
 
-      await loginPage.verifyOtpScreenDefaultUI(); 
-      
+      await loginPage.verifyOtpScreenDefaultUI();
+
       await page.clock.install();
-      await page.clock.fastForward('03:01'); 
+      await page.clock.fastForward('03:01');
       await loginPage.resendOtp();
 
       await loginPage.goBackButton.click();
@@ -74,26 +74,26 @@ const sleepAccountData = [
         await expect(loginPage.confirmButton).toBeVisible({ timeout: 3000 });
         await loginPage.confirmButton.click();
       } catch (e) { }
-      
+
       await loginPage.verifyOtpInputRestrictions();
       await loginPage.enterIncorrectOtpAndVerifyAlert('123549');
     });
   }
 
   const inactiveTestData = [
-    { method: 'email', data: loginData.inactiveEmail }, // Lưu ý: JSON của bạn đang là inactiveEmail (hoặc inactive)
+    { method: 'email', data: loginData.inactiveEmail },
     { method: 'phone', data: loginData.inactivePhone }
   ] as const;
   for (const { method, data } of inactiveTestData) {
-    
+
     test(`[Auth] Check OTP countdown time, Resend OTP and Go Back button - ${method.toUpperCase()}`, async ({ page }) => {
       await loginPage.login(data.email, data.password);
       await loginPage.proceedToVerification(method);
       await loginPage.sendOtpAndProceedToInputScreen();
 
-      await loginPage.verifyOtpScreenDefaultUI(); 
+      await loginPage.verifyOtpScreenDefaultUI();
       await page.clock.install();
-      await page.clock.fastForward('03:01'); 
+      await page.clock.fastForward('03:01');
 
       await loginPage.resendOtp();
       await loginPage.goBackButton.click();
@@ -105,15 +105,15 @@ const sleepAccountData = [
       await loginPage.proceedToVerification(method);
       await loginPage.sendOtpAndProceedToInputScreen();
 
-      await page.route('**/confirm-active-account', async route => { 
+      await page.route('**/confirm-active-account', async route => {
         await route.fulfill({
-          status: 400, 
+          status: 400,
           contentType: 'application/json',
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             code: 1006,
             success: false,
-            message: '인증 시간이 만료 되었습니다. 인증 번호를 다시 요청해 주세요.' 
-          }) 
+            message: '인증 시간이 만료 되었습니다. 인증 번호를 다시 요청해 주세요.'
+          })
         });
       });
 
@@ -137,7 +137,6 @@ const sleepAccountData = [
     { method: 'email', data: loginData.reactiveEmail },
     { method: 'phone', data: loginData.reactivePhone }
   ] as const;
-
   for (const { method, data } of reactiveTestData) {
 
     test(`[Auth] Inactive account reactivation flow only runs on Chromium - ${method.toUpperCase()}`, async ({ page, browserName }) => {
@@ -154,7 +153,7 @@ const sleepAccountData = [
       await loginPage.enterOtpAndVerifyComplete('123456');
       await loginPage.handleReactivationSuccessAlert();
       await expect(page).toHaveURL('/login');
-      
+
       await loginPage.passwordInput.fill(data.password);
       await loginPage.loginButton.click();
       await expect(page).toHaveURL('/home');
@@ -176,7 +175,7 @@ const sleepAccountData = [
     const { email, password, expectedMessages } = loginData.blockedAccount;
     await loginPage.login(email, password);
     for (const message of expectedMessages) {
-    await expect(loginPage.loginErrorForm).toContainText(message);
+      await expect(loginPage.loginErrorForm).toContainText(message);
     }
   });
 
@@ -184,7 +183,7 @@ const sleepAccountData = [
     const { email, password, expectedMessages } = loginData.deletedAccount;
     await loginPage.login(email, password);
     for (const message of expectedMessages) {
-    await expect(loginPage.loginErrorForm).toContainText(message);
+      await expect(loginPage.loginErrorForm).toContainText(message);
     }
   });
 
@@ -270,23 +269,39 @@ const sleepAccountData = [
 
     await loginPage.togglePasswordVisibility();
     await expect(loginPage.passwordInput).toHaveAttribute('type', 'password');
-    await expect(loginPage.eyeOffIcon).toBeVisible(); 
-    await expect(loginPage.eyeOpenIcon).toBeHidden(); 
+    await expect(loginPage.eyeOffIcon).toBeVisible();
+    await expect(loginPage.eyeOpenIcon).toBeHidden();
   });
 
   test('[Auth] Login with same allowed IP shows success', async ({ page }) => {
-    const { email, password} = loginData.sameallowedIpAccount;
+    const { email, password } = loginData.sameallowedIpAccount;
     await loginPage.navigate();
     await loginPage.login(email, password);
     await expect(page).toHaveURL('/home');
   });
 
-  test('[Auth] Sleep + Unauthorized IP account displays dialog and allows moving to main page', async ({ page }) => {
-    await loginPage.login(loginData.sleepandunauthorizedIpAccount.email, loginData.sleepandunauthorizedIpAccount.password);
-    await expect(loginPage.inactiveAccountDialog).toBeVisible();
-    await loginPage.goToMainPageButton.click();
-    await expect(page).toHaveURL('/home');
-  });
+  const sleepAndUnauthorizedData = [
+    { method: 'email', data: loginData.sleepAndUnauthorizedEmail },
+    { method: 'phone', data: loginData.sleepAndUnauthorizedPhone }
+  ] as const;
+  for (const { method, data } of sleepAndUnauthorizedData) {
+    test(`[Auth] Sleep + Unauthorized IP account reactivation flow - ${method.toUpperCase()}`, async ({ page }) => {
+      await loginPage.login(data.email, data.password);
+      await loginPage.proceedToVerification(method);
+      await loginPage.sendOtpButton.click();
+      try {
+        await expect(loginPage.confirmButton).toBeVisible({ timeout: 3000 });
+        await loginPage.confirmButton.click();
+      } catch (e) { }
+      await loginPage.enterOtpAndVerifyComplete('123456');
+      await loginPage.handleReactivationSuccessAlert();
+      await expect(page).toHaveURL('/login');
+      await loginPage.passwordInput.fill(data.password);
+      await loginPage.loginButton.click();
+      await expect(loginPage.verifyIpDialog).toBeVisible();
+    });
+
+  }
 
   const invalidLoginData = buildInvalidLoginData(loginData.invalid);
   for (const data of invalidLoginData) {
@@ -299,7 +314,7 @@ const sleepAccountData = [
 
 test.describe('[Auth] Admin Login Tests', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
-  
+
   let loginPage: LoginPage;
 
   test.beforeEach(async ({ page }) => {
@@ -309,12 +324,12 @@ test.describe('[Auth] Admin Login Tests', () => {
 
   test('[Auth] Admin login from invalid IP shows error message', async ({ page }) => {
     const { email, password, fakeIp, expectedErrorMessage } = loginData.adminInvalidIp;
-    
+
     await page.setExtraHTTPHeaders({
       'X-Forwarded-For': fakeIp,
       'X-Real-IP': fakeIp
     });
-    
+
     await loginPage.navigate();
     await loginPage.login(email, password);
     await expect(loginPage.loginErrorForm).toContainText(expectedErrorMessage);
