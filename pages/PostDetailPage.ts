@@ -9,6 +9,7 @@ export class PostDetailPage extends BasePage {
     readonly postContentImg: Locator;
     readonly postVideoIframe: Locator;
     readonly postContentVideo: Locator;
+    readonly postAuthor: Locator;
 
     constructor(page: Page) {
         super(page);
@@ -19,5 +20,6 @@ export class PostDetailPage extends BasePage {
         this.postContentImg = page.locator('.postContent img')
         this.postVideoIframe = page.locator("//figure[@class='media']//iframe");
         this.postContentVideo = page.locator('.postContent video');
+        this.postAuthor = page.locator('article [data-testid="dropdown-menu-trigger"]').first();
     }
 }

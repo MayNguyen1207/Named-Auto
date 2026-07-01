@@ -143,5 +143,16 @@
       "password": "Named@123",
       "expectedErrorMsg": "네임드에 등록되지 않은 이메일이거나, 이메일/휴대폰 번호 또는 비밀번호를 잘못 입력하셨습니다.(5회실패시 비밀번호 재설정)"
     }
-  ]
+  ],
+
+  "prisoner": {
+    "email": "autotest02@yopmail.com",
+    "password": "Named@123",
+    "expectedUsername": "회원_6a4374b7c1ac7"
+  },
+
+  "nonverifiedUser": {
+    "email": "ruistpwjd148@yopmail.com",
+    "password": "Named@123"
+  }
 }
