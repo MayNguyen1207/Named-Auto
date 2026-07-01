@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
 import { WriteFreePage } from '../pages/WriteFreePage';
 import { PostDetailPage } from '../pages/PostDetailPage';
+import loginData from '../data-test/login-data.json';
 import postData from '../data-test/write-post-data.json';
 import imageData from '../data-test/image-data/.image-data.json';
 import videoData from '../data-test/video-data/.video-data.json';
@@ -8,15 +10,64 @@ import videoData from '../data-test/video-data/.video-data.json';
 test.describe('Guest Flow', () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
-    let writeFreePage: WriteFreePage;
-
-    test.beforeEach(async ({ page }) => {
+    test('[Community] Guest is navigated to Login page when accessing Write Post page', async ({ page }) => {
+        let writeFreePage: WriteFreePage;
         writeFreePage = new WriteFreePage(page);
         await writeFreePage.navigate();
-    });
-
-    test('[Community] Guest is navigated to Login page when accessing Write Post page', async ({ page }) => {
         await expect(page).toHaveURL(/\/login\?callbackUrl=\/community\/create\?boardType=free/);
+
+        const loginPage = new LoginPage(page);
+        await loginPage.login(loginData.valid.email, loginData.valid.password);
+        await expect(page).toHaveURL('/community\/create\?boardType=free');
+    });
+});
+
+test.describe('Prison Flow', () => {
+    test.use({ storageState: { cookies: [], origins: [] } });
+
+    test('[Community] A modal should be shown when prisoner accesses Write Post page', async ({ page }) => {
+        let writeFreePage: WriteFreePage;
+        writeFreePage = new WriteFreePage(page);
+        await writeFreePage.navigate();
+
+        const loginPage = new LoginPage(page);
+        await loginPage.login(loginData.prisoner.email, loginData.prisoner.password);
+        await expect(writeFreePage.jailPoster).toBeVisible();
+        await expect(writeFreePage.prisonNotice).toContainText(
+            "서비스 이용 제한 안내" +
+            loginData.prisoner.expectedUsername + "님은 비매너의 죄명으로 영창에 수감되어 네임드의 서비스를 이용하실 수 없습니다.");
+
+        await writeFreePage.previousPageBtn.click();
+        await expect(page).not.toHaveURL('/community\/create\?boardType=free');
+    });
+});
+
+test.describe('Phone number Non-verified User Flow', () => {
+    test.use({ storageState: { cookies: [], origins: [] } });
+
+    test('[Community] Non-verified user should be prevented from writing Free post', async ({ page }) => {
+        let writeFreePage: WriteFreePage;
+        writeFreePage = new WriteFreePage(page);
+        await writeFreePage.navigate();
+
+        const loginPage = new LoginPage(page);
+        await loginPage.login(loginData.nonverifiedUser.email, loginData.nonverifiedUser.password);
+        await writeFreePage.closeVerificationPopup();
+
+        await writeFreePage.writePost(postData.valid.title, postData.valid.content);
+        await writeFreePage.writeBtn.click();
+        await expect(writeFreePage.noticeDialog).toContainText(
+            "본인 인증을 거치지 않은 경우 글쓰기가 제한됩니다." +
+            "본인인증을 진행하시겠습니까?"
+        );
+
+        await writeFreePage.noticeDialogCancelBtn.click();
+        await expect(page).toHaveURL('/community\/create\?boardType=free');
+
+        await writeFreePage.writeBtn.click();
+        await writeFreePage.verifyBtn.click();
+        await expect(page.getByRole('heading', { name: '핸드폰 인증받기' })).toBeVisible(); //TODO: Edit locator after creating My Info page
+        await expect(page).toHaveURL(/.*mypage\/info/);
     });
 });
 
@@ -26,7 +77,17 @@ test.describe('Normal User Flow', () => {
     test.beforeEach(async ({ page }) => {
         writeFreePage = new WriteFreePage(page);
         await writeFreePage.navigate();
-        await writeFreePage.closeMainBannerIfPresent();
+    });
+
+    test('[Community] BO Explain Text should be displayed correctly and link opens in new tab', async ({ page }) => {
+        await expect(writeFreePage.boExplainText).toBeVisible();
+        const [newTab] = await Promise.all([
+            page.context().waitForEvent('page'),
+            writeFreePage.boExplainLnk.click(),
+        ]);
+        await newTab.waitForLoadState();
+        expect(newTab.url()).not.toBe('about:blank');
+        await newTab.close();
     });
 
     test('[Community] User can go back when clicking Cancel button', async ({ page }) => {
@@ -34,6 +95,7 @@ test.describe('Normal User Flow', () => {
         await writeFreePage.cancelBtn.click();
         await expect(page).not.toHaveURL(currentUrl);
     })
+
 
     test('[Community] User can write Free post with valid data, add emoji, format text, insert link and insert valid image', async ({ page }) => {
         await writeFreePage.insertLink(postData.lnkData.fullData.text, postData.lnkData.fullData.url);
@@ -269,5 +331,28 @@ test.describe('Normal User Flow', () => {
         const newTab = await writeFreePage.clickPrisonTermsLnk();
         await newTab.waitForLoadState();
         await expect(newTab).toHaveURL('/customercenter\/prison\/regulation');
+    });
+});
+
+test.describe('Admin Flow', () => {
+    test.use({ storageState: 'playwright/.auth/admin.json' });
+
+    let writeFreePage: WriteFreePage;
+
+    test.beforeEach(async ({ page }) => {
+        writeFreePage = new WriteFreePage(page);
+        await writeFreePage.navigate();
+    });
+
+    test('[Community] Admin can assign author for the post', async ({ page }) => {
+        const selectedAuthor = await writeFreePage.selectFirstAuthor();
+        expect(selectedAuthor).not.toBe('');
+
+        await writeFreePage.writePost(postData.valid.title, postData.valid.content);
+        await writeFreePage.writeBtn.click();
+
+        const postDetailPage = new PostDetailPage(page);
+        await expect(page).toHaveURL(/.*community\/free/, { timeout: 15000 });
+        await expect(postDetailPage.postAuthor).toContainText(selectedAuthor);
     });
 });

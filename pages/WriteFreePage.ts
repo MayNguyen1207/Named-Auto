@@ -3,6 +3,8 @@ import { BasePage } from './BasePage';
 
 export class WriteFreePage extends BasePage {
     readonly page: Page;
+    readonly boExplainText: Locator;
+    readonly boExplainLnk: Locator;
     readonly titleInput: Locator;
     readonly contentInput: Locator;
     readonly boldBtn: Locator;
@@ -48,10 +50,21 @@ export class WriteFreePage extends BasePage {
     readonly videoLnkInput: Locator;
     readonly uploadVideoBtn: Locator;
 
+    //Prisoner
+    readonly jailPoster: Locator;
+    readonly prisonNotice: Locator;
+    readonly previousPageBtn: Locator;
+
+    //Admin - Author picker
+    readonly authorPickerTrigger: Locator;
+    readonly authorCommandRoot: Locator;
+    readonly authorFirstItem: Locator;
 
     constructor(page: Page) {
         super(page);
         this.page = page;
+        this.boExplainText = page.locator('section[aria-label="bo_explain_text"]');
+        this.boExplainLnk = this.boExplainText.locator('a[target="_blank"]');
         this.titleInput = page.getByPlaceholder('글 제목을 입력해주세요.');
         this.contentInput = page.getByRole('textbox', { name: '리치 텍스트 편집기. 편집 영역: main' });
         this.boldBtn = page.getByRole('button', { name: '굵게' });
@@ -92,6 +105,14 @@ export class WriteFreePage extends BasePage {
         this.insertVideoLnkBtn = page.getByRole('button', { name: '미디어 삽입' });
         this.videoLnkInput = page.getByRole('textbox', { name: '미디어 URL' });
         this.uploadVideoBtn = page.locator('button.ck-file-dialog-button[data-cke-tooltip-text="동영상 업로드"]');
+
+        this.jailPoster = page.getByRole('img', { name: 'jailed-poster' });
+        this.prisonNotice = page.locator("//div[@role='alert']");
+        this.previousPageBtn = page.getByRole('button', { name: '이전 페이지' });
+
+        this.authorPickerTrigger = page.locator('[data-testid="popover-trigger"]').nth(2);
+        this.authorCommandRoot = page.locator('[data-testid="command-root"]');
+        this.authorFirstItem = this.authorCommandRoot.locator('[data-testid="command-item"]').first();
     }
 
     async navigate() {
@@ -209,5 +230,15 @@ export class WriteFreePage extends BasePage {
         const newPagePromise = this.page.context().waitForEvent('page');
         await this.prisonTermsLnk.click();
         return await newPagePromise;
+    }
+
+    async selectFirstAuthor(): Promise<string> {
+        await this.authorPickerTrigger.click();
+        await expect(this.authorCommandRoot).toBeVisible();
+        const firstItem = this.authorFirstItem;
+        const fullText = (await firstItem.textContent())?.trim() ?? '';
+        const authorName = fullText.split('(')[0].trim();
+        await firstItem.click();
+        return authorName;
     }
 }
