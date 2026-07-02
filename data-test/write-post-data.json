@@ -59,6 +59,12 @@
     }
   ],
 
+  "continuousRule": {
+    "title": "불장에 국내 상장사 배당금 38조 육박 '역대 최대'",
+    "content": "국내 상장사들의 지난해 12월 결산 배당금 규모가 38조 원에 육박하며 역대 최대 수준을 기록했다.",
+    "toastMsg": "너무 빠른 시간 내에 게시물을 연속해서 올릴 수 없습니다."
+  },
+
   "lnkData": {
     "fullData": {
       "text": "Google Search",
