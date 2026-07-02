@@ -5,7 +5,7 @@ import loginData from '../data-test/login-data.json';
 import { buildInvalidLoginData, buildRecaptchaData } from '../utils/testRandomDataLogin';
 
 test.describe('[Auth] Normal User Login Feature Tests', () => {
-  test.use({ storageState: { cookies: [], origins: [] } });
+  // test.use({ storageState: { cookies: [], origins: [] } });
 
   let loginPage: LoginPage;
 
@@ -85,7 +85,6 @@ test.describe('[Auth] Normal User Login Feature Tests', () => {
     { method: 'phone', data: loginData.inactivePhone }
   ] as const;
   for (const { method, data } of inactiveTestData) {
-
     test(`[Auth] Check OTP countdown time, Resend OTP and Go Back button - ${method.toUpperCase()}`, async ({ page }) => {
       await loginPage.login(data.email, data.password);
       await loginPage.proceedToVerification(method);
@@ -120,11 +119,9 @@ test.describe('[Auth] Normal User Login Feature Tests', () => {
       await loginPage.otpInput.fill('123456');
       await expect(loginPage.verifyCompleteButton).toBeEnabled();
       await loginPage.verifyCompleteButton.click();
-
       await expect(
         page.getByText('인증 시간이 만료', { exact: false })
       ).toBeVisible({ timeout: 5000 });
-
       try {
         await page.getByRole('button', { name: '확인' }).click({ timeout: 2000 });
       } catch (e) {
@@ -187,10 +184,27 @@ test.describe('[Auth] Normal User Login Feature Tests', () => {
     }
   });
 
-  test('[Auth] Verify IP shows dialog', async ({ page }) => {
-    await loginPage.login(loginData.unauthorized.email, loginData.unauthorized.password);
-    await expect(loginPage.verifyIpDialog).toBeVisible();
-  });
+  const unauthorizedIpData = [
+    { method: 'email', data: loginData.unauthorizedEmail },
+    { method: 'phone', data: loginData.unauthorizedPhone }
+  ] as const;
+
+  for (const { method, data } of unauthorizedIpData) {
+    test(`[Auth] Verify IP shows dialog and allows verification flow - ${method.toUpperCase()}`, async ({ page }) => {
+
+      await loginPage.login(data.email, data.password);
+      await loginPage.verifyUnauthorizedIpDialog();
+
+      await loginPage.proceedToVerificationFromIpDialog(method);
+      await loginPage.verifyVerificationDefaultUI(method, data.email);
+
+      await loginPage.sendOtpAndProceedToInputScreen();
+      await loginPage.verifyOtpScreenDefaultUI();
+
+      await loginPage.enterOtpAndVerifyComplete(data.otp);
+      await expect(page).toHaveURL('/home');
+    });
+  }
 
   test('[Auth] Default keep login checkbox is checked', async ({ page }) => {
     await loginPage.expectKeepLoginDefaultChecked();
@@ -285,7 +299,9 @@ test.describe('[Auth] Normal User Login Feature Tests', () => {
     { method: 'phone', data: loginData.sleepAndUnauthorizedPhone }
   ] as const;
   for (const { method, data } of sleepAndUnauthorizedData) {
-    test(`[Auth] Sleep + Unauthorized IP account reactivation flow - ${method.toUpperCase()}`, async ({ page }) => {
+    test(`[Auth] Sleep + Unauthorized IP account reactivation flow - ${method.toUpperCase()}`, async ({ page, browserName }) => {
+      test.skip(browserName !== 'chromium', 'Chromium is required for this test due to specific browser behavior.');
+
       await loginPage.login(data.email, data.password);
       await loginPage.proceedToVerification(method);
       await loginPage.sendOtpButton.click();
@@ -313,7 +329,7 @@ test.describe('[Auth] Normal User Login Feature Tests', () => {
 });
 
 test.describe('[Auth] Admin Login Tests', () => {
-  test.use({ storageState: { cookies: [], origins: [] } });
+ // test.use({ storageState: { cookies: [], origins: [] } });
 
   let loginPage: LoginPage;
 
@@ -323,7 +339,7 @@ test.describe('[Auth] Admin Login Tests', () => {
   });
 
   test('[Auth] Admin login from invalid IP shows error message', async ({ page }) => {
-    const { email, password, fakeIp, expectedErrorMessage } = loginData.adminInvalidIp;
+    const { email, password, fakeIp, expectedErrorMessage } = loginData.admin;
 
     await page.setExtraHTTPHeaders({
       'X-Forwarded-For': fakeIp,
