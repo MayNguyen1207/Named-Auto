@@ -44,13 +44,13 @@ export default defineConfig({
     ...(process.env.CI
       ? [
         /* Khi chạy trên GitHub (isCI = true): Chạy cả 3 browser */
-        { name: 'chromium', use: { ...devices['Desktop Chrome'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'), }, dependencies: ['setup'], },
-        { name: 'firefox', use: { ...devices['Desktop Firefox'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'), }, dependencies: ['setup'], },
-        { name: 'webkit', use: { ...devices['Desktop Safari'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'), }, dependencies: ['setup'], },
+        { name: 'chromium', use: { ...devices['Desktop Chrome'], storageState: path.resolve(__dirname, 'playwright/.auth/guest.json'), }, dependencies: ['setup'], },
+        { name: 'firefox', use: { ...devices['Desktop Firefox'], storageState: path.resolve(__dirname, 'playwright/.auth/guest.json'), }, dependencies: ['setup'], },
+        { name: 'webkit', use: { ...devices['Desktop Safari'], storageState: path.resolve(__dirname, 'playwright/.auth/guest.json'), }, dependencies: ['setup'], },
       ]
       : [
         /* Khi chạy ở Local (isCI = false): Chỉ chạy duy nhất Chrome cho nhanh */
-        { name: 'chromium', use: { ...devices['Desktop Chrome'], storageState: path.resolve(__dirname, 'playwright/.auth/user.json'), }, dependencies: ['setup'], },
+        { name: 'chromium', use: { ...devices['Desktop Chrome'], storageState: path.resolve(__dirname, 'playwright/.auth/guest.json'), }, dependencies: ['setup'], },
       ]
     )
   ]

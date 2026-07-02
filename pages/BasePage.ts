@@ -10,21 +10,18 @@ export class BasePage {
     //Verification requirement popup
     readonly verifyBtn: Locator;
 
+    //Tool-tip shown when hovering
+    readonly hoverTooltip: Locator;
+
     constructor(page: Page) {
         this.page = page;
-        
-        this.noticeDialog = page.getByRole('dialog').filter({ hasText: '알림' });;
-        this.noticeDialogCancelBtn = this.noticeDialog.getByRole('button', { name: '취소' });
-        this.verifyBtn = this.noticeDialog.getByRole('button', { name: '본인 인증' });
-    }
 
-    // To close the main banner
-    async closeMainBannerIfPresent() {
-        const bannerDialog = this.page.getByRole('dialog').filter({ hasText: '오늘 하루 닫기' });
-        const closeButton = bannerDialog.getByRole('button', { name: '오늘 하루 닫기' });
-        await this.page.addLocatorHandler(bannerDialog, async () => {
-            await closeButton.click({ force: true });
-        });
+        this.noticeDialog = page.getByRole('dialog').filter({ hasText: '알림' });
+        this.noticeDialogCancelBtn = this.noticeDialog.getByRole('button', { name: '취소' });
+
+        this.verifyBtn = this.noticeDialog.getByRole('button', { name: '본인 인증' });
+
+        this.hoverTooltip = page.getByTestId('tooltip-content');
     }
 
     // To close Verification campaign popup

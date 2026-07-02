@@ -117,11 +117,14 @@ export class WriteFreePage extends BasePage {
 
     async navigate() {
         await this.page.goto('/community/create?boardType=free');
-        await this.closeMainBannerIfPresent();
     }
 
     async enterTitle(title: string) {
         await this.titleInput.fill(title);
+        await this.page.waitForTimeout(3000);
+        if ((await this.titleInput.inputValue()) === '') {
+            await this.titleInput.fill(title);
+        }
     }
 
     async enterContent(content: string) {
