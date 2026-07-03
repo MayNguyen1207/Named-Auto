@@ -5,8 +5,6 @@ import loginData from '../data-test/login-data.json';
 import { buildInvalidLoginData, buildRecaptchaData } from '../utils/testRandomDataLogin';
 
 test.describe('[Auth] Normal User Login Feature Tests', () => {
-  // test.use({ storageState: { cookies: [], origins: [] } });
-
   let loginPage: LoginPage;
 
   test.beforeEach(async ({ page }) => {
@@ -56,6 +54,18 @@ test.describe('[Auth] Normal User Login Feature Tests', () => {
       await loginPage.verifyInactiveAccountDialog(testData.data.expectedTexts);
 
       await loginPage.proceedToVerification(testData.method);
+      if (testData.method === 'email') {
+        await expect(loginPage.verificationEmailInput).toHaveValue(testData.data.email);
+        await expect(loginPage.verificationEmailInput).not.toBeEditable();
+      } else if (testData.method === 'phone') {
+        await expect(loginPage.verificationPhoneInput).not.toHaveValue('');
+        await expect(loginPage.verificationPhoneInput).not.toBeEditable();
+
+        const countryDropdown = page.getByRole('button', { name: '+1' });
+        await expect(countryDropdown).toBeVisible();
+        await expect(countryDropdown.locator('svg').first()).toBeVisible();
+        await expect(countryDropdown).toBeDisabled();
+      }
       await loginPage.verifyVerificationDefaultUI(testData.method, testData.data.email);
 
       await loginPage.sendOtpAndProceedToInputScreen();
@@ -329,8 +339,6 @@ test.describe('[Auth] Normal User Login Feature Tests', () => {
 });
 
 test.describe('[Auth] Admin Login Tests', () => {
- // test.use({ storageState: { cookies: [], origins: [] } });
-
   let loginPage: LoginPage;
 
   test.beforeEach(async ({ page }) => {

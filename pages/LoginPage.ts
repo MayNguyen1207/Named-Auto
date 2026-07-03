@@ -42,6 +42,7 @@ export class LoginPage {
   readonly emailVerificationDialog: Locator;
   readonly emailVerificationDialogContent: Locator;
   readonly verificationEmailInput: Locator;
+  readonly verificationPhoneInput: Locator;
   readonly phoneCountryCode: Locator;
   readonly sendOtpButton: Locator;
   readonly confirmButton: Locator;
@@ -95,6 +96,7 @@ export class LoginPage {
     this.emailVerificationDialog = page.getByRole('dialog', { name: 'Phone or Email verification' });
     this.emailVerificationDialogContent = page.getByLabel('Phone or Email verification');
     this.verificationEmailInput = this.emailVerificationDialogContent.getByRole('textbox');
+    this.verificationPhoneInput = this.emailVerificationDialogContent.getByRole('textbox');
     this.phoneCountryCode = page.locator('div').filter({ hasText: /^US\+1$/ }).first();
     this.sendOtpButton = this.emailVerificationDialogContent.getByTestId('button-root').first();
     this.confirmButton = page.getByRole('button', { name: '확인' });
