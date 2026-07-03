@@ -130,7 +130,7 @@ jobs:
             $broken = $summary.statistic.broken
             $skipped = $summary.statistic.skipped
             $unknown = $summary.statistic.unknown
-            $passRate = [math]::Round(($passed / $total) * 100, 2)
+            $passRate = [math]::Round((($passed + $skipped) / $total) * 100, 2)
         } else {
             $total = $passed = $failed = $broken = $skipped = $unknown = 0
             $passRate = 0
@@ -145,7 +145,7 @@ jobs:
             "Broken"      = $broken
             "Skipped"     = $skipped
             "Unknown"     = $unknown
-            "Pass Rate"   = $passRate
+            "Pass Rate"   = $passRate / 100
         }
         $newRow | Export-Excel -Path $excelPath -Append -WorksheetName "Trend_History"
 
