@@ -14,6 +14,11 @@ export class BasePage {
 
     readonly hoverTooltip: Locator; //Tool-tip shown when hovering
 
+    // Login form
+    readonly emailInput: Locator;
+    readonly passwordInput: Locator;
+    readonly loginButton: Locator;
+
     constructor(page: Page) {
         this.page = page;
 
@@ -26,6 +31,16 @@ export class BasePage {
         this.moveLoginCancelBtn = this.moveLogin.getByRole('button', { name: '취소' });
 
         this.hoverTooltip = page.getByTestId('tooltip-content');
+
+        this.emailInput = page.getByRole('textbox', { name: '이메일 또는 휴대폰 번호' });
+        this.passwordInput = page.getByRole('textbox', { name: '비밀번호' });
+        this.loginButton = page.getByRole('button', { name: '로그인', exact: true });
+    }
+
+    async login(email: string, pass: string) {
+        await this.emailInput.fill(email);
+        await this.passwordInput.fill(pass);
+        await this.loginButton.click();
     }
 
     // To close Verification campaign popup
