@@ -141,5 +141,13 @@
   "nonverifiedUser": {
     "email": "ruistpwjd148@yopmail.com",
     "password": "Named@123"
+  },
+  "userB": {
+    "email": "qavn10@yopmail.com",
+    "password": "Named@123"
+  },
+  "userC": {
+    "email": "qavn9@yopmail.com",
+    "password": "Named@123"
   }
 }

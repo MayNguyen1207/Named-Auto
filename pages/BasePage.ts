@@ -4,27 +4,29 @@ export class BasePage {
     protected page: Page;
 
     //System Notice dialog
-    readonly noticeDialog: Locator;
+    readonly noticeDialog: Locator; //Notice popup
     readonly noticeDialogCancelBtn: Locator;
+    readonly verifyBtn: Locator; //Verification requirement notice popup
 
-    //Verification requirement popup
-    readonly verifyBtn: Locator;
+    readonly moveLogin: Locator; //Move to Login popup
+    readonly moveLoginCfBtn: Locator;
+    readonly moveLoginCancelBtn: Locator;
 
-    //Tool-tip shown when hovering
-    readonly hoverTooltip: Locator;
+    readonly hoverTooltip: Locator; //Tool-tip shown when hovering
 
     constructor(page: Page) {
         this.page = page;
 
         this.noticeDialog = page.getByRole('dialog').filter({ hasText: '알림' });
         this.noticeDialogCancelBtn = this.noticeDialog.getByRole('button', { name: '취소' });
-
         this.verifyBtn = this.noticeDialog.getByRole('button', { name: '본인 인증' });
+
+        this.moveLogin = page.getByRole('dialog').filter({ hasText: '로그인 화면으로 이동' });
+        this.moveLoginCfBtn = this.moveLogin.getByRole('button', { name: '확인' });
+        this.moveLoginCancelBtn = this.moveLogin.getByRole('button', { name: '취소' });
 
         this.hoverTooltip = page.getByTestId('tooltip-content');
     }
-
-
 
     // To close Verification campaign popup
     async closeVerificationPopup() {
