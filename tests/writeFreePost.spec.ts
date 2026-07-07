@@ -398,7 +398,7 @@ test.describe('Admin Flow', () => {
         const selectedAuthor = await writeFreePage.selectFirstAuthor();
         expect(selectedAuthor).not.toBe('');
 
-        await writeFreePage.writePost(postData.valid.title, postData.valid.content);
+        await writeFreePage.writePost(`${Date.now()}` + postData.valid.title, postData.valid.content);
         await writeFreePage.writeBtn.click();
 
         const detailFreePage = new DetailFreePage(page);

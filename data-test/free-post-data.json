@@ -1,7 +1,20 @@
 {
     "postUrl": {
         "normalPost": "/community/free/10412679",
+        "noticePost": "/community/free/10417408",
         "reportedFiveTimePost": "/community/free/10412678",
         "reportedTenTimePost": "/community/free/10412650"
+    },
+    "likeMsg": {
+        "success": "추천되었습니다.",
+        "duplicateLike": "이미 추천하여 더이상 추천이 불가능 합니다.",
+        "likeMyOwnPost": "본인 글에는 추천 할 수 없습니다."
+    },
+    "reportMsg": {
+        "success": "신고가 완료되었습니다.",
+        "duplicateReport": "이미 신고된 글입니다."
+    },
+    "cmtSuccessMsg": {
+        "success": "댓글이 등록되었습니다."
     }
 }

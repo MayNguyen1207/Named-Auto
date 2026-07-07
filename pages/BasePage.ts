@@ -28,8 +28,6 @@ export class BasePage {
         this.hoverTooltip = page.getByTestId('tooltip-content');
     }
 
-
-
     // To close Verification campaign popup
     async closeVerificationPopup() {
         const verificationCampaignPopup = this.page.getByRole('dialog').filter({ hasText: '휴대전화 인증하시고 3,000 포인트를 놓치지 마세요!' });
