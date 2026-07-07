@@ -81,11 +81,13 @@
   },
   "sleepAndUnauthorizedEmail": {
     "email": "test_account9@yopmail.com",
-    "password": "Named@123"
+    "password": "Named@123",
+    "otp": "123456"
   },
   "sleepAndUnauthorizedPhone": {
     "email": "sliverpack108@yopmail.com",
-    "password": "Named@123"
+    "password": "Named@123",
+    "otp": "123456"
   },
   "lockedAccount": {
     "email": "sliverpack101@yopmail.com",
