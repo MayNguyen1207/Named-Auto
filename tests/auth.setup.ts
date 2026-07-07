@@ -4,11 +4,10 @@ import loginData from '../data-test/login-data.json';
 import path from 'path';
 
 async function injectBannerBypass(page: Page) {
-  const todayStr = new Date().toLocaleDateString('en-CA');
-
-  await page.evaluate(({ key, value }: { key: string, value: string }) => {
-    localStorage.setItem(key, value);
-  }, { key: 'modalSeenDate', value: todayStr });
+  await page.evaluate(() => {
+    const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+    localStorage.setItem('modalSeenDate', todayStr);
+  });
 
   await page.waitForTimeout(300);
 }
