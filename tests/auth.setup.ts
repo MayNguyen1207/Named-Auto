@@ -5,7 +5,7 @@ import path from 'path';
 
 async function injectBannerBypass(page: Page) {
   await page.evaluate(() => {
-    const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+    const todayStr = new Date().toLocaleDateString('en-CA');
     localStorage.setItem('modalSeenDate', todayStr);
   });
 

@@ -1,7 +1,15 @@
 {
     "postUrl": {
         "normalPost": "/community/free/10412679",
-        "noticePost": "/community/free/10417408",
+        "noticePost": "/community/free/10417406",
+        "myPost": "/community/free/10417982",
+        "editMyPost": "/community/edit/free/10417982",
+        "blockedPost": "/community/free/10417001",
+        "commentPost": "/community/free/10418021",
+        "myPostOtherUserCmt": "/community/free/10418057",
+        "editMyPostOtherUserCmt": "/community/edit/free/10418057",
+        "prisonerPost": "/community/free/10418058",
+        "editPrisonerPost": "/community/edit/free/10418058",
         "reportedFiveTimePost": "/community/free/10412678",
         "reportedTenTimePost": "/community/free/10412650"
     },
@@ -14,7 +22,27 @@
         "success": "신고가 완료되었습니다.",
         "duplicateReport": "이미 신고된 글입니다."
     },
-    "cmtSuccessMsg": {
-        "success": "댓글이 등록되었습니다."
-    }
+    "editPostMsg": {
+        "unableEdit": "이 글과 관련된 코멘트가 존재하므로 수정할 수 없습니다. 코멘트가 1건 이상 달린 원글은 수정할 수 없습니다.",
+        "prisonerUnableEdit": "수감 상태에서는 글을 수정할 수 없습니다."
+    },
+    "cmtMsg": {
+        "success": "댓글이 등록되었습니다.",
+        "prisoner": "수감 상태에서는 댓글 작성이 불가능합니다.",
+        "block": "해당 게시글 작성자로부터 댓글 작성이 차단되었습니다."
+    },
+    "invalidCmt": [
+        {
+            "id": "onlySpace",
+            "name": "User cannot submit a comment that contains only space",
+            "content": "        ",
+            "errorMsg": "댓글 내용을 입력해 주세요."
+        },
+        {
+            "id": "harmfulCmt",
+            "name": "User cannot submit a comment that contains more than 50 '&#'",
+            "content": "&#65;&#66;&#67;&#68;&#69;&#70;&#71;&#72;&#73;&#74;&#75;&#76;&#77;&#78;&#79;&#80;&#81;&#82;&#83;&#84;&#85;&#86;&#87;&#88;&#89;&#90;&#97;&#98;&#99;&#100;&#101;&#102;&#103;&#104;&#105;&#106;&#107;&#108;&#109;&#110;&#111;&#112;&#113;&#114;&#115;&#116;&#117;&#118;&#119;&#120;&#121;&#122;",
+            "errorMsg": "보안에 위험을 야기할 수 있는 문자가 다수 포함되어 있습니다."
+        }
+    ]
 }

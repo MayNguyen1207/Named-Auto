@@ -12,6 +12,8 @@ export class DetailFreePage extends BasePage {
     readonly postAuthor: Locator;
     readonly postCreationTime: Locator;
     readonly editNumTxt: Locator;
+    readonly editPostBtn: Locator;
+    readonly deletePostBtn: Locator;
     readonly likeBtn: Locator;
     readonly reportBtn: Locator;
     readonly cmtInput: Locator;
@@ -55,6 +57,8 @@ export class DetailFreePage extends BasePage {
         this.postAuthor = page.locator('article [data-testid="dropdown-menu-trigger"]').first();
         this.postCreationTime = page.getByRole('button', { name: 'Toggle date format' }).first();
         this.editNumTxt = page.locator('span[data-testid="tooltip-trigger"]').filter({ hasText: '수정' });
+        this.editPostBtn = page.getByLabel('수정', { exact: true });
+        this.deletePostBtn = page.getByLabel('삭제', { exact: true })
         this.likeBtn = page.locator('section').nth(2).locator('button[data-testid="button-root"]'); //Need to update
         this.reportBtn = page.getByRole('button', { name: '신고' });
         this.cmtInput = page.locator('[id="comment-textarea"]');
@@ -91,12 +95,31 @@ export class DetailFreePage extends BasePage {
         await this.page.waitForTimeout(3000);
     }
 
+    async writeCmt(content: string) {
+        await this.cmtInput.fill(content);
+        await this.submitCmtBtn.click();
+    }
+
     getPostIdFromUrl(url: string): string {
         return url.split('/').pop() || '';
     }
     async getCurrentPostId(page: Page): Promise<string> {
         const currentUrl = page.url();
         return this.getPostIdFromUrl(currentUrl);
+    }
+
+    getCmtElements(index: number) {
+        const cmtItem = this.cmtItems.nth(index);
+        return {
+            item: cmtItem,
+            authorLabel: cmtItem.getByText('작성자', { exact: true }),
+            myCmtLabel: cmtItem.getByText('내 댓글', { exact: true }),
+            editLabel: cmtItem.getByText('수정됨', { exact: true }),
+            replyBtn: cmtItem.getByText('답글', { exact: true }),
+            reportBtn: cmtItem.getByText('신고', { exact: true }),
+            editBtn: cmtItem.getByText('수정', { exact: true }),
+            deleteBtn: cmtItem.getByText('삭제', { exact: true }),
+        };
     }
 
     get reportRadioGroup() { return this.popupRadioGroup; }

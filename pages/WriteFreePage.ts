@@ -50,11 +50,6 @@ export class WriteFreePage extends BasePage {
     readonly videoLnkInput: Locator;
     readonly uploadVideoBtn: Locator;
 
-    //Prisoner
-    readonly jailPoster: Locator;
-    readonly prisonNotice: Locator;
-    readonly previousPageBtn: Locator;
-
     //Admin - Author picker
     readonly authorPickerTrigger: Locator;
     readonly authorCommandRoot: Locator;
@@ -105,10 +100,6 @@ export class WriteFreePage extends BasePage {
         this.insertVideoLnkBtn = page.getByRole('button', { name: '미디어 삽입' });
         this.videoLnkInput = page.getByRole('textbox', { name: '미디어 URL' });
         this.uploadVideoBtn = page.locator('button.ck-file-dialog-button[data-cke-tooltip-text="동영상 업로드"]');
-
-        this.jailPoster = page.getByRole('img', { name: 'jailed-poster' });
-        this.prisonNotice = page.locator("//div[@role='alert']");
-        this.previousPageBtn = page.getByRole('button', { name: '이전 페이지' });
 
         this.authorPickerTrigger = page.locator('[data-testid="popover-trigger"]').nth(2);
         this.authorCommandRoot = page.locator('[data-testid="command-root"]');
