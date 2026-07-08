@@ -69,70 +69,78 @@ test.describe('Phone number Non-verified User Flow', () => {
     });
 });
 
-test.describe('Normal User Flow; Write Post and submit', () => {    //To avoid running parallel tests and violating system rules
-    test.use({ storageState: 'playwright/.auth/user.json' });
-    test.describe.configure({ mode: 'serial' });
+test.describe('Normal User Flow; Write Post and submit', () => {
 
-    let writeFreePage: WriteFreePage;
+    test.describe.serial('Using valid account', () => {
+        test.use({ storageState: 'playwright/.auth/user.json' });
 
-    test.beforeEach(async ({ page }) => {
-        writeFreePage = new WriteFreePage(page);
-        await writeFreePage.navigate();
-    });
+        let writeFreePage: WriteFreePage;
 
-    test('[Community] User can write Free post with valid data, add emoji, format text, insert link', async ({ page, browserName }) => {
-        test.skip(browserName !== 'chromium', 'Specific error in initializing the Editor on the WebKit emulator');
+        test.beforeEach(async ({ page }) => {
+            writeFreePage = new WriteFreePage(page);
+            await writeFreePage.navigate();
+        });
 
-        await writeFreePage.insertLink(postData.lnkData.fullData.text, postData.lnkData.fullData.url);
-        await page.keyboard.press('Enter');
-        await writeFreePage.insertLink(postData.lnkData.onlyUrl.text, postData.lnkData.onlyUrl.url);
-        await page.keyboard.press('Enter');
+        test('[Community] User can write Free post with valid data, add emoji, format text, insert link', async ({ page, browserName }) => {
+            test.skip(browserName !== 'chromium', 'Specific error in initializing the Editor on the WebKit emulator');
 
-        await writeFreePage.writePost(postData.valid.title, postData.valid.content);
-        await page.keyboard.press('Enter');
+            await writeFreePage.insertLink(postData.lnkData.fullData.text, postData.lnkData.fullData.url);
+            await page.keyboard.press('Enter');
+            await writeFreePage.insertLink(postData.lnkData.onlyUrl.text, postData.lnkData.onlyUrl.url);
+            await page.keyboard.press('Enter');
 
-        await writeFreePage.emojiBtn.click();
+            await writeFreePage.writePost(postData.valid.title, postData.valid.content);
+            await page.keyboard.press('Enter');
 
-        await writeFreePage.contentInput.focus();
-        await page.keyboard.press('ArrowUp');
-        await page.keyboard.press('Home');
-        await page.keyboard.press('Shift+End');
-        await writeFreePage.boldBtn.click();
+            await writeFreePage.emojiBtn.click();
 
-        await writeFreePage.writeBtn.click();
+            await writeFreePage.contentInput.focus();
+            await page.keyboard.press('ArrowUp');
+            await page.keyboard.press('Home');
+            await page.keyboard.press('Shift+End');
+            await writeFreePage.boldBtn.click();
 
-        const detailFreePage = new DetailFreePage(page);
-        await expect(page).toHaveURL(/.*community\/free/, { timeout: 15000 });
+            await writeFreePage.writeBtn.click();
 
-        const txtLink = detailFreePage.postContent.getByRole('link', { name: 'Google Search' });
-        await expect(txtLink).toBeVisible();
-        await expect(txtLink).toHaveAttribute('href', "https://www.google.com");
+            const detailFreePage = new DetailFreePage(page);
+            await expect(page).toHaveURL(/.*community\/free/, { timeout: 15000 });
 
-        const plainLink = detailFreePage.postContent.getByRole('link', { name: 'https://mail.google.com' });
-        await expect(plainLink).toBeVisible();
-        await expect(plainLink).toHaveAttribute('href', "https://mail.google.com");
+            const txtLink = detailFreePage.postContent.getByRole('link', { name: 'Google Search' });
+            await expect(txtLink).toBeVisible();
+            await expect(txtLink).toHaveAttribute('href', "https://www.google.com");
 
-        await expect(detailFreePage.postTitle).toHaveText(postData.valid.title);
-        await expect(detailFreePage.postContent).toContainText(postData.valid.content);
+            const plainLink = detailFreePage.postContent.getByRole('link', { name: 'https://mail.google.com' });
+            await expect(plainLink).toBeVisible();
+            await expect(plainLink).toHaveAttribute('href', "https://mail.google.com");
 
-        await expect(detailFreePage.emojiImg.first()).toBeVisible();
+            await expect(detailFreePage.postTitle).toHaveText(postData.valid.title);
+            await expect(detailFreePage.postContent).toContainText(postData.valid.content);
 
-        const innerHTML = await detailFreePage.postContent.innerHTML();
-        console.log(innerHTML);
-        expect(innerHTML).toContain('<strong>업종별로는 반도체 제조업의 배당금 규모가 5조 6924억 원으로 전체의 15.1%를 차지하며 가장 많았다.</strong>');
-    });
+            await expect(detailFreePage.emojiImg.first()).toBeVisible();
 
-    test('[Community] User cannot write post continuously in 1 minute', async ({ page, browserName }) => {
-        test.skip(browserName !== 'chromium', 'Specific error in initializing the Editor on the WebKit emulator');
+            const innerHTML = await detailFreePage.postContent.innerHTML();
+            console.log(innerHTML);
+            expect(innerHTML).toContain('<strong>업종별로는 반도체 제조업의 배당금 규모가 5조 6924억 원으로 전체의 15.1%를 차지하며 가장 많았다.</strong>');
+        });
 
-        await writeFreePage.writePost(postData.continuousRule.title, postData.continuousRule.content);
-        await writeFreePage.writeBtn.click();
-        await writeFreePage.verifyToastMsg("error", postData.continuousRule.toastMsg);
+        test('[Community] User cannot write post continuously in 1 minute', async ({ browserName }) => {
+            test.skip(browserName !== 'chromium', 'Specific error in initializing the Editor on the WebKit emulator');
+
+            await writeFreePage.writePost(postData.continuousRule.title, postData.continuousRule.content);
+            await writeFreePage.writeBtn.click();
+            await writeFreePage.verifyToastMsg("error", postData.continuousRule.toastMsg);
+        });
     });
 
     test('[Community] User can insert valid image into post content', async ({ page, browserName }) => {
-        test.setTimeout(75000);
-        test.skip(browserName !== 'chromium', 'Specific error in initializing the Editor on the WebKit emulator');
+        test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
+
+        const loginPage = new LoginPage(page);
+        await loginPage.navigate();
+        await loginPage.login(loginData.userB.email, loginData.userB.password);
+
+        const writeFreePage = new WriteFreePage(page);
+        await writeFreePage.navigate();
 
         await writeFreePage.uploadImageFromMainButton('data-test/image-data/valid-img.png');
         await page.keyboard.press('ArrowRight');
@@ -146,8 +154,6 @@ test.describe('Normal User Flow; Write Post and submit', () => {    //To avoid r
 
         await writeFreePage.enterTitle("이미지");
         await writeFreePage.writeBtn.scrollIntoViewIfNeeded();
-        await page.evaluate(() => window.scrollBy(0, 200));
-        await page.waitForTimeout(60000);
         await writeFreePage.writeBtn.click();
 
         const detailFreePage = new DetailFreePage(page);
@@ -163,8 +169,14 @@ test.describe('Normal User Flow; Write Post and submit', () => {    //To avoid r
     });
 
     test('[Community] User can insert valid video into post content by embed code, URL and uploading from device', async ({ page, browserName }) => {
-        test.setTimeout(75000);
-        test.skip(browserName !== 'chromium', 'Specific error in initializing the Editor on the WebKit emulator');
+        test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
+
+        const loginPage = new LoginPage(page);
+        await loginPage.navigate();
+        await loginPage.login(loginData.userC.email, loginData.userC.password);
+
+        const writeFreePage = new WriteFreePage(page);
+        await writeFreePage.navigate();
 
         await writeFreePage.pasteVideoEmbedCode(videoData.valid.embedCode);
         await expect(page.locator(`iframe[src*="${videoData.valid.embedVideoId}"]`)).toBeVisible();
@@ -179,8 +191,6 @@ test.describe('Normal User Flow; Write Post and submit', () => {    //To avoid r
 
         await writeFreePage.enterTitle("동영상");
         await writeFreePage.writeBtn.scrollIntoViewIfNeeded();
-        await page.evaluate(() => window.scrollBy(0, 200));
-        await page.waitForTimeout(60000);
         await writeFreePage.writeBtn.click();
 
         const detailFreePage = new DetailFreePage(page);

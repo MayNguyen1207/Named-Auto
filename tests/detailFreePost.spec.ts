@@ -1,9 +1,10 @@
 import { test, expect } from '../utils/fixtures';
 import { LoginPage } from '../pages/LoginPage';
 import { DetailFreePage } from '../pages/DetailFreePage';
+import { WriteFreePage } from '../pages/WriteFreePage';
 import loginData from '../data-test/login-data.json';
 import freePostData from '../data-test/free-post-data.json';
-import { getExpectedRelativeTime, getExpectedDetailTime } from '../utils/testRelativeTime';
+import { getExpectedRelativeTime } from '../utils/testRelativeTime';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -208,7 +209,6 @@ test.describe('Guest Flow', () => {
 
 
     test('[Community] Writer Other Post Tab should be shown', async ({ page }) => {
-
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
         await detailFreePage.otherPostTab.scrollIntoViewIfNeeded();
         await expect(detailFreePage.otherPostTab).toHaveAttribute('aria-selected', 'false');
@@ -254,6 +254,103 @@ test.describe('Guest Flow', () => {
         await loginPage.login(loginData.valid.email, loginData.valid.password);
         await expect(page).toHaveURL(freePostData.postUrl.normalPost);
     });
+
+    test('[Community] Reply and Report Cmt button should be shown in guest view', async () => {
+        await detailFreePage.navigate(freePostData.postUrl.commentPost);
+
+        const firstCmt = detailFreePage.getCmtElements(0);
+        await expect(firstCmt.authorLabel).toBeVisible();
+        await expect(firstCmt.myCmtLabel).toBeHidden();
+        await expect(firstCmt.replyBtn).toBeVisible();
+        await expect(firstCmt.reportBtn).toBeVisible();
+        await expect(firstCmt.editBtn).toBeHidden();
+        await expect(firstCmt.deleteBtn).toBeHidden();
+
+        const secondCmt = detailFreePage.getCmtElements(1);
+        await expect(secondCmt.authorLabel).toBeHidden();
+        await expect(secondCmt.myCmtLabel).toBeHidden();
+        await expect(secondCmt.replyBtn).toBeVisible();
+        await expect(secondCmt.reportBtn).toBeVisible();
+        await expect(secondCmt.editBtn).toBeHidden();
+        await expect(secondCmt.deleteBtn).toBeHidden();
+
+        const thirdCmt = detailFreePage.getCmtElements(2);
+        await expect(thirdCmt.authorLabel).toBeHidden();
+        await expect(thirdCmt.myCmtLabel).toBeHidden();
+        await expect(thirdCmt.replyBtn).toBeVisible();
+        await expect(thirdCmt.reportBtn).toBeHidden();
+        await expect(thirdCmt.editBtn).toBeHidden();
+        await expect(thirdCmt.deleteBtn).toBeHidden();
+    });
+
+    test('[Community] Edit Label should be shown for comment that has been edited', async () => {
+        await detailFreePage.navigate(freePostData.postUrl.commentPost);
+        const secondCmt = detailFreePage.getCmtElements(1);
+        await expect(secondCmt.editLabel).toBeVisible();
+        await secondCmt.editLabel.hover();
+        await expect(detailFreePage.hoverTooltip).toContainText('2026.07.07 18:57:23');
+    });
+});
+
+test.describe('Prisoner Flow', () => {
+    let detailFreePage: DetailFreePage;
+
+    test.beforeEach(async ({ page }) => {
+        const loginPage = new LoginPage(page);
+        await loginPage.navigate();
+        await page.waitForTimeout(500);
+        await loginPage.login(loginData.prisoner.email, loginData.prisoner.password);
+        detailFreePage = new DetailFreePage(page);
+    });
+
+    test('[Community] Prisoner cannot comment on a Free post', async ({ page }) => {
+        await detailFreePage.navigate(freePostData.postUrl.normalPost);
+        await detailFreePage.writeCmt(`${Date.now()}`);
+        await detailFreePage.verifyToastMsg("error", freePostData.cmtMsg.prisoner);
+    });
+
+    test('[Community] Prisoner cannot edit Free post', async ({ page }) => {
+        await detailFreePage.navigate(freePostData.postUrl.prisonerPost);
+        await detailFreePage.editPostBtn.click();
+        await expect(detailFreePage.jailPoster).toBeVisible();
+        await expect(detailFreePage.prisonNotice).toContainText(
+            "서비스 이용 제한 안내" +
+            loginData.prisoner.expectedUsername + "님은 비매너의 죄명으로 영창에 수감되어 네임드의 서비스를 이용하실 수 없습니다.");
+        await detailFreePage.previousPageBtn.click();
+        await expect(detailFreePage.jailPoster).toBeHidden();
+
+        await detailFreePage.navigate(freePostData.postUrl.editPrisonerPost);
+        const writeFreePage = new WriteFreePage(page);
+        await writeFreePage.writeBtn.click();
+        await writeFreePage.verifyToastMsg("error", freePostData.editPostMsg.prisonerUnableEdit);
+    });
+});
+
+test.describe('Non-verified User Flow', () => {
+    test('[Community] Non-verified user cannot comment on a Free post', async ({ page }) => {
+        const loginPage = new LoginPage(page);
+        await loginPage.navigate();
+        await page.waitForTimeout(500);
+        await loginPage.login(loginData.nonverifiedUser.email, loginData.nonverifiedUser.password);
+
+        let detailFreePage: DetailFreePage;
+        detailFreePage = new DetailFreePage(page);
+        await detailFreePage.navigate(freePostData.postUrl.normalPost);
+        await page.waitForTimeout(1000);
+        await detailFreePage.writeCmt(`${Date.now}`);
+        await expect(detailFreePage.noticeDialog).toContainText(
+            "댓글은 본인 인증을 해야만 쓰실 수 있습니다." +
+            "본인인증을 진행하시겠습니까?"
+        );
+
+        await detailFreePage.noticeDialogCancelBtn.click();
+        await expect(page).toHaveURL(freePostData.postUrl.normalPost);
+
+        await detailFreePage.writeCmt(`${Date.now}`);
+        await detailFreePage.verifyBtn.click();
+        await expect(page.getByRole('heading', { name: '핸드폰 인증받기' })).toBeVisible(); //TODO: Edit locator after creating My Info page
+        await expect(page).toHaveURL(/.*mypage\/info/);
+    });
 });
 
 test.describe('Normal User Flow', () => {
@@ -265,120 +362,104 @@ test.describe('Normal User Flow', () => {
         detailFreePage = new DetailFreePage(page);
     });
 
-    test('[Community] Normal user can like a post only 1 time', async ({ page, request, apiBaseURL }) => {
-        // Login by another account and create a post
-        const loginResponse = await request.post(`${apiBaseURL}/login`, {
-            form: {
-                email: loginData.userB.email,
-                password: loginData.userB.password,
-            }
+    test.describe('Tests that need a brand new post', () => {
+        let sharedPostUrl = '';
+        let sharedPostId = '';
+        let dynamicTokenUserB = '';
+
+        test.beforeAll(async ({ apiBaseURL, request }) => {
+            const loginResponse = await request.post(`${apiBaseURL}/login`, {
+                form: {
+                    email: loginData.userB.email,
+                    password: loginData.userB.password,
+                }
+            });
+            expect(loginResponse.ok()).toBeTruthy();
+
+            const loginJson = await loginResponse.json();
+            dynamicTokenUserB = loginJson.session_id;
+
+            const createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
+                headers: { 'NAMED-SESSION': `${dynamicTokenUserB}` },
+                form: {
+                    board_type: 'free',
+                    subject: `Auto Test Shared Post ${Date.now()}`,
+                    content: '<p>Bài viết dùng chung để test Like, Report và Comment Pagination...</p>',
+                    is_notice: 'false',
+                    comment_allowed: 'true'
+                }
+            });
+            expect(createPostResponse.ok()).toBeTruthy();
+            const postJson = await createPostResponse.json();
+            sharedPostId = postJson.wr_id;
+            sharedPostUrl = `/community/free/${sharedPostId}`;
         });
 
-        expect(loginResponse.ok()).toBeTruthy();
+        test('[Community] Normal user can like a post only 1 time', async ({ page }) => {
+            await detailFreePage.navigate(sharedPostUrl);
+            await page.waitForTimeout(500);
+            await detailFreePage.likeBtn.click();
+            await detailFreePage.verifyToastMsg("success", freePostData.likeMsg.success);
+            await expect(detailFreePage.likeBtn.locator('span')).toHaveText('1');
 
-        const loginJson = await loginResponse.json();
-        const dynamicTokenUserB = loginJson.session_id;
-        const createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
-            headers: { 'NAMED-SESSION': `${dynamicTokenUserB}` },
-            form: {
-                board_type: 'free',
-                subject: `Auto Test Dynamic Token ${Date.now()}`,
-                content: '<p>Nội dung bài viết dùng để test...</p>',
-                is_notice: 'false',
-                comment_allowed: 'true'
-            }
+            await detailFreePage.likeBtn.click();
+            await detailFreePage.verifyToastMsg("error", freePostData.likeMsg.duplicateLike);
+            await expect(detailFreePage.likeBtn.locator('span')).toHaveText('1');
         });
-        expect(createPostResponse.ok()).toBeTruthy();
-        const postJson = await createPostResponse.json();
-        const newPostUrl = `/community/free/${postJson.wr_id}`;
 
-        await detailFreePage.navigate(newPostUrl);
-        await page.waitForTimeout(500);
-        await detailFreePage.likeBtn.click();
-        await detailFreePage.verifyToastMsg("success", freePostData.likeMsg.success);
-        await expect(detailFreePage.likeBtn.locator('span')).toHaveText('1');
+        test('[Community] Normal user can report another user\'s post only 1 time', async ({ page }) => {
+            await detailFreePage.navigate(sharedPostUrl);
+            await page.waitForTimeout(500);
+            await detailFreePage.reportBtn.click();
+            await detailFreePage.verifyReportPopupOptions();
+            await expect(detailFreePage.reportTextArea).toBeHidden();
+            const reasonText = '이 게시물은 커뮤니티 규정을 위반합니다.';
+            await detailFreePage.selectReportOptionAndFillReason('기타 부정행위', reasonText);
+            await detailFreePage.popupReportBtn.click();
+            await detailFreePage.verifyToastMsg("success", freePostData.reportMsg.success);
+            await page.waitForTimeout(500);
 
-        await detailFreePage.likeBtn.click();
-        await detailFreePage.verifyToastMsg("error", freePostData.likeMsg.duplicateLike);
-        await expect(detailFreePage.likeBtn.locator('span')).toHaveText('1');
+            await detailFreePage.reportBtn.click();
+            await detailFreePage.selectReportOptionAndFillReason('비매너');
+            await detailFreePage.popupReportBtn.click();
+            await detailFreePage.verifyToastMsg("error", freePostData.reportMsg.duplicateReport);
+        });
+
+        test('[Community] Verify comment chronological order and pagination (Oldest first, Newest last)', async ({ page, apiBaseURL, request }) => {
+            const totalCommentsToCreate = 25;
+            for (let i = 1; i <= totalCommentsToCreate; i++) {
+                await request.post(`${apiBaseURL}/community/board/${sharedPostId}/comment`, {
+                    headers: { 'NAMED-SESSION': `${dynamicTokenUserB}` },
+                    form: {
+                        wr_id: sharedPostId,
+                        board_type: 'free',
+                        content: `Auto comment number ${i}`,
+                        comment_type: 'new'
+                    }
+                });
+            }
+
+            await detailFreePage.navigate(sharedPostUrl);
+            await page.waitForTimeout(500);
+
+            const lastCommentOnDefaultPage = detailFreePage.cmtItems.last();
+            await expect(lastCommentOnDefaultPage).toContainText(`Auto comment number ${totalCommentsToCreate}`);
+
+            await detailFreePage.cmtFirstPageBtn.click();
+            await page.waitForTimeout(500);
+            const firstCommentOnFirstPage = detailFreePage.cmtItems.first();
+            await expect(firstCommentOnFirstPage).toContainText('Auto comment number 1');
+        });
     });
 
-    test('[Community] Normal user cannot like my own post, [Report] button is hidden in my own post', async ({ page, request, apiBaseURL }) => {
-        // Create a post by my account
-        const loginResponse = await request.post(`${apiBaseURL}/login`, {
-            form: {
-                email: loginData.valid.email,
-                password: loginData.valid.password,
-            }
-        });
-
-        expect(loginResponse.ok()).toBeTruthy();
-
-        const loginJson = await loginResponse.json();
-        const dynamicTokenSeft = loginJson.session_id;
-        const createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
-            headers: { 'NAMED-SESSION': `${dynamicTokenSeft}` },
-            form: {
-                board_type: 'free',
-                subject: `Auto Test Self Like ${Date.now()}`,
-                content: '<p>Nội dung bài viết dùng để test...</p>',
-                is_notice: 'false',
-                comment_allowed: 'true'
-            }
-        });
-        expect(createPostResponse.ok()).toBeTruthy();
-        const postJson = await createPostResponse.json();
-        const newPostUrl = `/community/free/${postJson.wr_id}`;
-
-        await detailFreePage.navigate(newPostUrl);
+    test('[Community] Normal user cannot like my own post, [Report] button is hidden in my own post', async ({ page }) => {
+        await detailFreePage.navigate(freePostData.postUrl.myPost);
         await page.waitForTimeout(500);
+        const likeNumber = await detailFreePage.likeBtn.locator('span').textContent() ?? '';
         await detailFreePage.likeBtn.click();
         await detailFreePage.verifyToastMsg("error", freePostData.likeMsg.likeMyOwnPost);
-        await expect(detailFreePage.likeBtn.locator('span')).toHaveText('0');
+        await expect(detailFreePage.likeBtn.locator('span')).toHaveText(likeNumber);
         await expect(detailFreePage.reportBtn).toBeHidden();
-    });
-
-    test('[Community] Normal user can report another user\'s post only 1 time', async ({ page, request, apiBaseURL }) => {
-        const loginResponse = await request.post(`${apiBaseURL}/login`, {
-            form: {
-                email: loginData.userB.email,
-                password: loginData.userB.password,
-            }
-        });
-        expect(loginResponse.ok()).toBeTruthy();
-
-        const loginJson = await loginResponse.json();
-        const dynamicTokenUserB = loginJson.session_id;
-        const createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
-            headers: { 'NAMED-SESSION': `${dynamicTokenUserB}` },
-            form: {
-                board_type: 'free',
-                subject: `Auto Test Report Flow ${Date.now()}`,
-                content: '<p>Bài viết dùng để test tính năng report...</p>',
-                is_notice: 'false',
-                comment_allowed: 'true'
-            }
-        });
-        expect(createPostResponse.ok()).toBeTruthy();
-
-        const postJson = await createPostResponse.json();
-        const newPostUrl = `/community/free/${postJson.wr_id}`;
-
-        await detailFreePage.navigate(newPostUrl);
-        await page.waitForTimeout(500);
-        await detailFreePage.reportBtn.click();
-        await detailFreePage.verifyReportPopupOptions();
-        await expect(detailFreePage.reportTextArea).toBeHidden();
-        const reasonText = '이 게시물은 커뮤니티 규정을 위반합니다.';
-        await detailFreePage.selectReportOptionAndFillReason('기타 부정행위', reasonText);
-        await detailFreePage.popupReportBtn.click();
-        await detailFreePage.verifyToastMsg("success", freePostData.reportMsg.success);
-        await page.waitForTimeout(500);
-
-        await detailFreePage.reportBtn.click();
-        await detailFreePage.selectReportOptionAndFillReason('비매너');
-        await detailFreePage.popupReportBtn.click();
-        await detailFreePage.verifyToastMsg("error", freePostData.reportMsg.duplicateReport);
     });
 
     test('[Community] Report button is hidden in Notice post', async () => {
@@ -386,17 +467,94 @@ test.describe('Normal User Flow', () => {
         await expect(detailFreePage.reportBtn).toBeHidden();
     });
 
-    test('[Community] Normal user can write a comment successfully', async ({ page, request, apiBaseURL }) => {
+    test('[Community] User can edit post when post has author\'s comment only', async ({ page }) => {
+        await detailFreePage.navigate(freePostData.postUrl.myPost);
+        await page.waitForTimeout(500);
+        const titleBefore = await detailFreePage.postTitle.textContent() as string;
+        const contentBefore = await detailFreePage.postContent.textContent() as string;
+        await detailFreePage.editPostBtn.click();
+
+        const writeFreePage = new WriteFreePage(page);
+        await expect(page).toHaveURL(freePostData.postUrl.editMyPost);
+        await expect(writeFreePage.titleInput).toHaveValue(titleBefore);
+        await expect(writeFreePage.contentInput).toHaveText(contentBefore);
+        const titleAfter = titleBefore + `${Date.now()}`;
+        await writeFreePage.titleInput.fill(titleAfter);
+        await writeFreePage.writeBtn.click();
+        await page.waitForTimeout(500);
+
+        await expect(page).toHaveURL(freePostData.postUrl.myPost);
+        await expect(detailFreePage.postTitle).toHaveText(titleAfter);
+    });
+
+    test('[Community] User cannot edit a post that has other user\'s comment', async ({ page }) => {
+        await detailFreePage.navigate(freePostData.postUrl.myPostOtherUserCmt);
+        await page.waitForTimeout(500);
+        await detailFreePage.editPostBtn.click();
+        await detailFreePage.verifyToastMsg("error", freePostData.editPostMsg.unableEdit);
+
+        await detailFreePage.navigate(freePostData.postUrl.editMyPostOtherUserCmt);
+        const writeFreePage = new WriteFreePage(page);
+        await writeFreePage.writeBtn.click();
+        await writeFreePage.verifyToastMsg("error", freePostData.editPostMsg.unableEdit);
+    });
+
+    test('[Community] User can delete a post when post has author\'s comment only', async ({ page, apiBaseURL, request }) => {
         const loginResponse = await request.post(`${apiBaseURL}/login`, {
             form: {
-                email: loginData.userB.email,
-                password: loginData.userB.password,
+                email: loginData.valid.email,
+                password: loginData.valid.password,
+            }
+        });
+        expect(loginResponse.ok()).toBeTruthy();
+
+        const loginJson = await loginResponse.json();
+        const dynamicToken = loginJson.session_id;
+
+        const createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
+            headers: { 'NAMED-SESSION': `${dynamicToken}` },
+            form: {
+                board_type: 'free',
+                subject: `Auto Test Delete Post ${Date.now()}`,
+                content: '<p>Bài viết dùng để xóa...</p>',
+                is_notice: 'false',
+                comment_allowed: 'true'
+            }
+        });
+        expect(createPostResponse.ok()).toBeTruthy();
+        const postJson = await createPostResponse.json();
+        const postId = postJson.wr_id;
+        const postUrl = `/community/free/${postId}`;
+
+        await detailFreePage.navigate(postUrl);
+        await detailFreePage.deletePostBtn.click();
+        await expect(detailFreePage.noticeDialog).toHaveText(
+            "한번 삭제한 게시물은 복구할 방법이 없습니다." +
+            "정말 삭제하시겠습니까?"
+        );
+        await detailFreePage.noticeDialogCancelBtn.click();
+        await expect(detailFreePage.noticeDialog).toBeHidden();
+        await expect(page).toHaveURL(postUrl);
+
+        await detailFreePage.deletePostBtn.click();
+        await detailFreePage.noticeDialogConfirmBtn.click();
+        await detailFreePage.verifyToastMsg("success", "삭제되었습니다.");
+        await detailFreePage.navigate(postUrl);
+        await expect(detailFreePage.noDataLogo).toBeVisible();
+    });
+
+    test('[Community] Normal user can write a comment successfully', async ({ page, apiBaseURL, playwright }) => {
+        const apiContext = await playwright.request.newContext();
+        const loginResponse = await apiContext.post(`${apiBaseURL}/login`, {
+            form: {
+                email: loginData.valid.email,
+                password: loginData.valid.password,
             }
         });
         const loginJson = await loginResponse.json();
         const dynamicToken = loginJson.session_id;
 
-        const createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
+        const createPostResponse = await apiContext.post(`${apiBaseURL}/community/board`, {
             headers: { 'NAMED-SESSION': `${dynamicToken}` },
             form: {
                 board_type: 'free',
@@ -419,58 +577,52 @@ test.describe('Normal User Flow', () => {
         await detailFreePage.cmtInput.fill(myCommentText);
         await detailFreePage.submitCmtBtn.click();
 
-        await detailFreePage.verifyToastMsg("success", freePostData.cmtSuccessMsg.success);
+        await detailFreePage.verifyToastMsg("success", freePostData.cmtMsg.success);
         await expect(detailFreePage.cmtItems.first()).toContainText(myCommentText);
         await expect(detailFreePage.noCommentTxt).toBeHidden();
         await expect(detailFreePage.cmtCount).toHaveText("1");
     });
 
-    test('[Community] Verify comment chronological order and pagination (Oldest first, Newest last)', async ({ page, request, apiBaseURL }) => {
-        const loginResponse = await request.post(`${apiBaseURL}/login`, {
-            form: {
-                email: loginData.userC.email,
-                password: loginData.userC.password,
-            }
+    for (const data of freePostData.invalidCmt) {
+        test(`[Community] ${data.name}`, async () => {
+            await detailFreePage.navigate(freePostData.postUrl.normalPost);
+            await detailFreePage.writeCmt(data.content);
+            await detailFreePage.verifyToastMsg("error", data.errorMsg)
         });
-        const loginJson = await loginResponse.json();
-        const dynamicToken = loginJson.session_id;
+    }
 
-        const createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
-            headers: { 'NAMED-SESSION': `${dynamicToken}` },
-            form: {
-                board_type: 'free',
-                subject: `Post for Comment Pagination Test ${Date.now()}`,
-                content: '<p>Bài viết dùng để test phân trang comment...</p>',
-                is_notice: 'false',
-                comment_allowed: 'true'
-            }
-        });
-        const postJson = await createPostResponse.json();
-        const targetPostUrl = `/community/free/${postJson.wr_id}`;
+    test('[Community] User cannot comment in a post whose author has blocked the user', async () => {
+        await detailFreePage.navigate(freePostData.postUrl.blockedPost);
+        await detailFreePage.writeCmt(`${Date.now}`);
+        await detailFreePage.verifyToastMsg("error", freePostData.cmtMsg.block)
+    });
 
-        const totalCommentsToCreate = 25;      
-        for (let i = 1; i <= totalCommentsToCreate; i++) {
-            await request.post(`${apiBaseURL}/community/board/${postJson.wr_id}/comment`, {
-                headers: { 'NAMED-SESSION': `${dynamicToken}` },
-                form: {
-                    wr_id: postJson.wr_id,
-                    board_type: 'free',
-                    content: `Auto comment number ${i}`,
-                    comment_type: 'new'
-                }
-            });
-        }
+    test('[Community] Check the display of comment in normal user view', async () => {
+        await detailFreePage.navigate(freePostData.postUrl.commentPost);
 
-        await detailFreePage.navigate(targetPostUrl);
-        await page.waitForTimeout(500);
+        const firstCmt = detailFreePage.getCmtElements(0);
+        await expect(firstCmt.authorLabel).toBeVisible();
+        await expect(firstCmt.myCmtLabel).toBeHidden();
+        await expect(firstCmt.replyBtn).toBeVisible();
+        await expect(firstCmt.reportBtn).toBeVisible();
+        await expect(firstCmt.editBtn).toBeHidden();
+        await expect(firstCmt.deleteBtn).toBeHidden();
 
-        const lastCommentOnDefaultPage = detailFreePage.cmtItems.last();
-        await expect(lastCommentOnDefaultPage).toContainText(`Auto comment number ${totalCommentsToCreate}`);
+        const secondCmt = detailFreePage.getCmtElements(1);
+        await expect(secondCmt.authorLabel).toBeHidden();
+        await expect(secondCmt.myCmtLabel).toBeVisible();
+        await expect(secondCmt.replyBtn).toBeVisible();
+        await expect(secondCmt.reportBtn).toBeHidden();
+        await expect(secondCmt.editBtn).toBeVisible();
+        await expect(secondCmt.deleteBtn).toBeVisible();
 
-        await detailFreePage.cmtFirstPageBtn.click();
-        await page.waitForTimeout(500);
-        const firstCommentOnFirstPage = detailFreePage.cmtItems.first();
-        await expect(firstCommentOnFirstPage).toContainText('Auto comment number 1');
+        const thirdCmt = detailFreePage.getCmtElements(2);
+        await expect(thirdCmt.authorLabel).toBeHidden();
+        await expect(thirdCmt.myCmtLabel).toBeHidden();
+        await expect(thirdCmt.replyBtn).toBeVisible();
+        await expect(thirdCmt.reportBtn).toBeHidden();
+        await expect(thirdCmt.editBtn).toBeHidden();
+        await expect(thirdCmt.deleteBtn).toBeHidden();
     });
 });
 
@@ -544,10 +696,13 @@ test.describe('Verify post creation date time display', () => {
 
             await detailFreePage.postCreationTime.hover();
             const expectedDetailText = dayjs(mockCreatedTime).tz('Asia/Seoul').format('YYYY.MM.DD HH:mm');
+            await page.waitForTimeout(500);
             await expect(detailFreePage.hoverTooltip).toContainText(expectedDetailText);
 
             await detailFreePage.postCreationTime.click();
             await expect(detailFreePage.postCreationTime).toContainText(expectedDetailText);
+            await page.mouse.move(0, 0);
+            await page.waitForTimeout(200);
             await detailFreePage.postCreationTime.hover();
             await expect(detailFreePage.hoverTooltip).toContainText(expectedRelativeText);
 

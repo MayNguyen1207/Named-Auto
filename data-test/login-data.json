@@ -147,6 +147,10 @@
     "password": "Named@123"
   },
   "userC": {
+    "email": "qavn8@yopmail.com",
+    "password": "Named@123"
+  },
+  "userD": {
     "email": "qavn9@yopmail.com",
     "password": "Named@123"
   }
