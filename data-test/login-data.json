@@ -10,7 +10,7 @@
   "valid": {
     "email": "autotest01@yopmail.com",
     "password": "Named@123",
-    "expectedUsername": "회원_6a420d12ec38a"
+    "expectedUsername": "회원_6a4f116913831"
   },
   "invalid": [
     {
@@ -136,7 +136,7 @@
   "prisoner": {
     "email": "autotest02@yopmail.com",
     "password": "Named@123",
-    "expectedUsername": "회원_6a4374b7c1ac7"
+    "expectedUsername": "회원_6a4f142f0aabd"
   },
   "nonverifiedUser": {
     "email": "ruistpwjd148@yopmail.com",

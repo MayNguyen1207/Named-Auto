@@ -29,7 +29,7 @@ export class BasePage {
     readonly pagPreviousBtn: Locator;
     readonly pagNextBtn: Locator;
     readonly pagComboList: Locator;
-    readonly pagOption: Locator;
+    readonly pagOptions: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -57,7 +57,7 @@ export class BasePage {
         this.pagPreviousBtn = page.locator('[data-slot="pagination-item"]').first();
         this.pagNextBtn = page.locator('[data-slot="pagination-item"]').last();
         this.pagComboList = page.getByRole('listbox');
-        this.pagOption = page.getByRole('option');
+        this.pagOptions = page.getByRole('option');
     }
 
     // To close Verification campaign popup
@@ -82,9 +82,25 @@ export class BasePage {
     async clickPageNumber(num: number) {
         await this.page.locator('[data-slot="pagination-item"]').filter({ hasText: `"${num}"` }).click();
     }
-    
+
     async goToPageViaInput(num: string) {
         await this.pagInput.fill(num);
         await this.pagInput.press('Enter');
+    }
+
+    async verifySelectedOption(num: number) {
+        await expect(this.pagSelectedValue).toHaveText("10개씩 보기");
+        await this.pagCombo.click();
+        await this.page.waitForTimeout(200);
+        await this.pagOptions.filter({ hasText: `${num}`}).click();
+        await expect(this.pagSelectedValue).toHaveText(`${num}`+"개씩 보기");
+    }
+    async verifyListItemsNumber() {
+        await this.pagCombo.click();
+        await this.page.waitForTimeout(200);
+        const actualOptions = await this.pagOptions.allInnerTexts();
+        const cleanedOptions = actualOptions.map(text => text.trim());
+        const expectedOptions = ['10', '20', '30', '40', '50'];
+        expect(cleanedOptions).toEqual(expectedOptions);
     }
 }
