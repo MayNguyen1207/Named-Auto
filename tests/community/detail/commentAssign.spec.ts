@@ -1,0 +1,34 @@
+import { test, expect } from '../../../utils/fixtures';
+import { DetailFreePage } from '../../../pages/DetailFreePage';
+import freePostData from '../../../data-test/free-post-data.json';
+
+test.describe('Guest Flow', () => {
+    test.use({ storageState: 'playwright/.auth/admin.json' });
+
+    let detailFreePage: DetailFreePage;
+
+    test.beforeEach(async ({ page }) => {
+        detailFreePage = new DetailFreePage(page);
+    });
+
+    test('[Community] Admin can assign author to the comment', async ({ page }) => {
+        await detailFreePage.navigate(freePostData.postUrl.blockedPost);
+        await page.waitForTimeout(500);
+
+        const authorName = await detailFreePage.selectFirstCmtAuthor();
+
+        const commentContent = `Assigned Comment ${Date.now()}`;
+        await detailFreePage.writeCmt(commentContent);
+        await detailFreePage.verifyToastMsg("success", freePostData.cmtMsg.success);
+        await page.waitForTimeout(500);
+
+        const cmtEl = detailFreePage.getCmtElementByText(commentContent);
+        const actualAuthor = await cmtEl.authorLabel.textContent();
+        expect(actualAuthor?.trim()).toBe(authorName);
+
+        await cmtEl.deleteCmtBtn.click();
+        await detailFreePage.dialogConfirmBtn.click();
+        await detailFreePage.verifyToastMsg("success", freePostData.deleteCmtMsg.success);
+        await page.waitForTimeout(500);
+    });
+})

@@ -4,9 +4,10 @@ export class BasePage {
     protected page: Page;
 
     //System Notice dialog
+    readonly dialog: Locator;
     readonly noticeDialog: Locator; //Notice popup
-    readonly noticeDialogCancelBtn: Locator;
-    readonly noticeDialogConfirmBtn: Locator;
+    readonly dialogCancelBtn: Locator;
+    readonly dialogConfirmBtn: Locator;
     readonly verifyBtn: Locator; //Verification requirement notice popup
 
     readonly moveLogin: Locator; //Move to Login popup
@@ -34,10 +35,11 @@ export class BasePage {
     constructor(page: Page) {
         this.page = page;
 
-        this.noticeDialog = page.getByRole('dialog').filter({ hasText: '알림' });
-        this.noticeDialogCancelBtn = this.noticeDialog.getByRole('button', { name: '취소' });
-        this.noticeDialogConfirmBtn = this.noticeDialog.getByRole('button', { name: '확인' });
-        this.verifyBtn = this.noticeDialog.getByRole('button', { name: '본인 인증' });
+        this.dialog = page.getByRole('dialog')
+        this.noticeDialog = this.dialog.filter({ hasText: '알림' });
+        this.dialogCancelBtn = this.dialog.getByRole('button', { name: '취소' });
+        this.dialogConfirmBtn = this.dialog.getByRole('button', { name: '확인' });
+        this.verifyBtn = this.dialog.getByRole('button', { name: '본인 인증' });
 
         this.moveLogin = page.getByRole('dialog').filter({ hasText: '로그인 화면으로 이동' });
         this.moveLoginCfBtn = this.moveLogin.getByRole('button', { name: '확인' });
@@ -74,7 +76,7 @@ export class BasePage {
         return this.page.locator(`[data-sonner-toast][data-type="${type}"]`);
     }
     async verifyToastMsg(type: 'error' | 'success' | 'info', expectedText: string) {
-        const toast = this.getToastByType(type).filter({ hasText: expectedText });
+        const toast = this.getToastByType(type).filter({ hasText: expectedText }).first();
         await expect(toast).toBeVisible();
     }
 

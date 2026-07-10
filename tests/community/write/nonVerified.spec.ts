@@ -23,7 +23,7 @@ test.describe('Phone number Non-verified User Flow', () => {
             "본인인증을 진행하시겠습니까?"
         );
 
-        await writeFreePage.noticeDialogCancelBtn.click();
+        await writeFreePage.dialogCancelBtn.click();
         await expect(page).toHaveURL('/community\/create\?boardType=free');
 
         await writeFreePage.writeBtn.click();

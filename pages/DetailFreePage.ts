@@ -18,11 +18,17 @@ export class DetailFreePage extends BasePage {
     readonly reportBtn: Locator;
     readonly cmtInput: Locator;
     readonly submitCmtBtn: Locator;
-    readonly assignCmtAuthor: Locator;
     readonly cmtCount: Locator;
     readonly noCommentTxt: Locator;
     readonly cmtItems: Locator;
+    readonly cmtText: Locator;
+    readonly replyCmtInput: Locator;
     readonly cmtFirstPageBtn: Locator;
+
+    // Author picker
+    readonly cmtAuthorPicker: Locator;
+    readonly authorCommandRoot: Locator;
+    readonly authorFirstItem: Locator;
 
     readonly suggestedPostTab: Locator;
     readonly postContainer: Locator;
@@ -31,6 +37,7 @@ export class DetailFreePage extends BasePage {
     readonly sugPagiantion: Locator;
     readonly sugPrevBtn: Locator;
     readonly sugNextBtn: Locator;
+    readonly otherPostContainer: Locator;
     readonly otherPostTab: Locator;
     readonly noOtherPostTxt: Locator;
 
@@ -54,28 +61,34 @@ export class DetailFreePage extends BasePage {
         this.postContentImg = page.locator('.postContent img')
         this.postVideoIframe = page.locator("//figure[@class='media']//iframe");
         this.postContentVideo = page.locator('.postContent video');
-        this.postAuthor = page.locator('article [data-testid="dropdown-menu-trigger"]').first();
+        this.postAuthor = page.getByTestId('user-info-context-menu-nickname').first();
         this.postCreationTime = page.getByRole('button', { name: 'Toggle date format' }).first();
-        this.editNumTxt = page.locator('span[data-testid="tooltip-trigger"]').filter({ hasText: '수정' });
+        this.editNumTxt = page.locator('span[data-testid="tooltip-trigger"]').filter({ hasText: '수정' }).first();
         this.editPostBtn = page.getByLabel('수정', { exact: true });
         this.deletePostBtn = page.getByLabel('삭제', { exact: true })
-        this.likeBtn = page.locator('section').nth(2).locator('button[data-testid="button-root"]'); //Need to update
-        this.reportBtn = page.getByRole('button', { name: '신고' });
+        this.likeBtn = page.getByTestId('community-post-recommend-button');
+        this.reportBtn = page.getByTestId('community-post-report-button');
         this.cmtInput = page.locator('[id="comment-textarea"]');
         this.submitCmtBtn = page.getByRole('button', { name: '댓글 전송' });
-        this.assignCmtAuthor = page.getByTestId('popover-trigger').nth(3);
-        this.cmtCount = page.locator('div.flex.items-center.gap-2.mx-4'); //Need to update
+        this.cmtCount = page.getByTestId('community-comment-count');
         this.noCommentTxt = page.getByText('댓글이 없습니다.', { exact: true });
-        this.cmtItems = page.locator('li.relative.border-b.border-b-gray-100.py-4'); //Need to update
+        this.cmtItems = page.getByTestId('community-comment-item');
+        this.cmtText = page.locator(".text-xs.text-foreground.my-2.wrap-break-word.whitespace-pre-wrap"); // Tobe edit
+        this.replyCmtInput = page.getByRole('textbox', { name: '답글을 입력하세요…' });
         this.cmtFirstPageBtn = page.locator('nav[role="navigation"]').first().locator('li[data-slot="pagination-item"]').filter({ hasText: /^1$/ });
 
+        this.cmtAuthorPicker = page.getByTestId('popover-trigger').last();//Tobe edit
+        this.authorCommandRoot = page.locator('[data-testid="command-root"]');
+        this.authorFirstItem = this.authorCommandRoot.locator('[data-testid="command-item"]').first();
+
         this.suggestedPostTab = page.getByRole('tab', { name: '추천 게시물' });
-        this.postContainer = page.locator('div.space-y-0'); //Need to update
+        this.postContainer = page.getByTestId('community-related-posts-list');
         this.postItem = this.postContainer.locator('> div');
         this.noSuggestedPostTxt = page.getByText('추천 게시물이 없습니다.', { exact: true });
-        this.sugPagiantion = page.locator('div.flex.items-center.justify-center.gap-2.bg-white.p-4.rounded-b-large'); //Need to update
+        this.sugPagiantion = page.getByTestId('community-related-posts-pagination');
         this.sugPrevBtn = this.sugPagiantion.locator('button').first();
         this.sugNextBtn = this.sugPagiantion.locator('button').last();
+        this.otherPostContainer = page.getByTestId('community-related-posts-author-list');
         this.otherPostTab = page.getByRole('tab', { name: '글쓴이의 게시물 더보기' });
         this.noOtherPostTxt = page.getByText('글쓴이의 다른 게시물이 없습니다.', { exact: true });
 
@@ -96,8 +109,8 @@ export class DetailFreePage extends BasePage {
     }
 
     async writeCmt(content: string) {
-        await this.cmtInput.fill(content);
-        await this.submitCmtBtn.click();
+        await this.cmtInput.first().fill(content);
+        await this.submitCmtBtn.first().click();
     }
 
     getPostIdFromUrl(url: string): string {
@@ -112,13 +125,41 @@ export class DetailFreePage extends BasePage {
         const cmtItem = this.cmtItems.nth(index);
         return {
             item: cmtItem,
-            authorLabel: cmtItem.getByText('작성자', { exact: true }),
+            authorLabel: cmtItem.getByTestId('user-info-context-menu-trigger'),
             myCmtLabel: cmtItem.getByText('내 댓글', { exact: true }),
             editLabel: cmtItem.getByText('수정됨', { exact: true }),
             replyBtn: cmtItem.getByText('답글', { exact: true }),
-            reportBtn: cmtItem.getByText('신고', { exact: true }),
-            editBtn: cmtItem.getByText('수정', { exact: true }),
-            deleteBtn: cmtItem.getByText('삭제', { exact: true }),
+            reportCmtBtn: cmtItem.getByText('신고', { exact: true }),
+            editCmtBtn: cmtItem.getByText('수정', { exact: true }),
+            deleteCmtBtn: cmtItem.getByText('삭제', { exact: true }),
+        };
+    }
+
+    getCmtElementByText(text: string) {
+        const cmtItem = this.cmtItems.filter({ hasText: text }).last();
+        return {
+            item: cmtItem,
+            authorLabel: cmtItem.getByTestId('user-info-context-menu-trigger'),
+            myCmtLabel: cmtItem.getByText('내 댓글', { exact: true }),
+            editLabel: cmtItem.getByText('수정됨', { exact: true }),
+            replyBtn: cmtItem.getByText('답글', { exact: true }),
+            reportCmtBtn: cmtItem.getByText('신고', { exact: true }),
+            editCmtBtn: cmtItem.getByText('수정', { exact: true }),
+            deleteCmtBtn: cmtItem.getByText('삭제', { exact: true }),
+        };
+    }
+
+    getLastCmtElement() {
+        const cmtItem = this.cmtItems.last();
+        return {
+            item: cmtItem,
+            authorLabel: cmtItem.getByTestId('user-info-context-menu-trigger'),
+            myCmtLabel: cmtItem.getByText('내 댓글', { exact: true }),
+            editLabel: cmtItem.getByText('수정됨', { exact: true }),
+            replyBtn: cmtItem.getByText('답글', { exact: true }),
+            reportCmtBtn: cmtItem.getByText('신고', { exact: true }),
+            editCmtBtn: cmtItem.getByText('수정', { exact: true }),
+            deleteCmtBtn: cmtItem.getByText('삭제', { exact: true }),
         };
     }
 
@@ -157,15 +198,15 @@ export class DetailFreePage extends BasePage {
     }
 
     getSuggestedPostElements(postElement: Locator) {
-        return { //To update locator
-            boardName: postElement.locator('.text-xxs, .text-xs').first(),
-            postTitle: postElement.locator('h3, a.min-w-0 h1, .line-clamp-1:not([data-testid="dropdown-menu-trigger"])').first(),
-            writerNickname: postElement.locator('[data-testid="dropdown-menu-trigger"]').first(),
+        return {
+            boardName: postElement.getByTestId('community-related-posts-item-category'),
+            postTitle: postElement.getByTestId('community-related-posts-item-link'),
+            writerNickname: postElement.getByTestId('user-info-context-menu-trigger'),
             creationTime: postElement.getByRole('button', { name: 'Toggle date format' }).first(),
-            viewCount: postElement.locator('span.text-neutral-300'),
+            viewCount: postElement.getByTestId('community-related-posts-item-view-count'),
 
-            commentCount: postElement.locator('span.text-primary, span.text-red-500').first(),
-            imageIcon: postElement.locator('svg.tabler-icon-image, img[src*="image"]').first()
+            commentCount: postElement.getByTestId('community-related-posts-item-comment-count'),
+            imageIcon: postElement.locator('img[src="/images/home/image.svg"]')
         };
     }
 
@@ -202,5 +243,15 @@ export class DetailFreePage extends BasePage {
             const currentWriter = await elements.writerNickname.textContent();
             expect(currentWriter?.trim()).toBe(author?.trim());
         }
+    }
+
+    async selectFirstCmtAuthor(): Promise<string> {
+        await this.cmtAuthorPicker.click();
+        await expect(this.authorCommandRoot).toBeVisible();
+        const firstItem = this.authorFirstItem;
+        const fullText = (await firstItem.textContent())?.trim() ?? '';
+        const authorName = fullText.split('(')[0].trim();
+        await firstItem.click();
+        return authorName;
     }
 }
