@@ -1,17 +1,18 @@
 {
     "postUrl": {
-        "normalPost": "/community/free/10929848",
+        "normalPost": "/community/free/10642155",
         "noticePost": "/community/free/10646554",
         "myPost": "/community/free/10932494",
         "editMyPost": "/community/edit/free/10932494",
         "blockedPost": "/community/free/10836317",
-        "commentPost": "/community/free/10418021",
+        "commentPost": "/community/free/10932567",
         "myPostOtherUserCmt": "/community/free/10932500",
         "editMyPostOtherUserCmt": "/community/edit/free/10932500",
         "prisonerPost": "/community/free/10932499",
         "editPrisonerPost": "/community/edit/free/10932499",
-        "reportedFiveTimePost": "/community/free/10412678",
-        "reportedTenTimePost": "/community/free/10412650"
+        "reportCmtPost": "/community/free/10929803",
+        "reportedFiveTimePost": "/community/free/10929860",
+        "reportedTenTimePost": "/community/free/10929873"
     },
     "likeMsg": {
         "success": "추천되었습니다.",
@@ -25,6 +26,10 @@
     "editPostMsg": {
         "unableEdit": "이 글과 관련된 코멘트가 존재하므로 수정할 수 없습니다. 코멘트가 1건 이상 달린 원글은 수정할 수 없습니다.",
         "prisonerUnableEdit": "수감 상태에서는 글을 수정할 수 없습니다."
+    },
+    "deletePostMsg": {
+        "success": "선택된 게시글이 삭제되었습니다.",
+        "unableDelete": "이 글과 관련된 코멘트가 존재하므로 삭제할 수 없습니다.\n코멘트가 1건 이상 달린 원글은 삭제할 수 없습니다."
     },
     "cmtMsg": {
         "success": "댓글이 등록되었습니다.",
@@ -44,5 +49,16 @@
             "content": "&#65;&#66;&#67;&#68;&#69;&#70;&#71;&#72;&#73;&#74;&#75;&#76;&#77;&#78;&#79;&#80;&#81;&#82;&#83;&#84;&#85;&#86;&#87;&#88;&#89;&#90;&#97;&#98;&#99;&#100;&#101;&#102;&#103;&#104;&#105;&#106;&#107;&#108;&#109;&#110;&#111;&#112;&#113;&#114;&#115;&#116;&#117;&#118;&#119;&#120;&#121;&#122;",
             "errorMsg": "보안에 위험을 야기할 수 있는 문자가 다수 포함되어 있습니다."
         }
-    ]
+    ],
+    "reportCmtMsg": {
+        "success": "신고가 완료되었습니다.",
+        "duplicate": "이미 신고된 댓글입니다."
+    },
+    "editCmtMsg": {
+        "success": "수정되었습니다.",
+        "prisoner": "수감 상태에서는 댓글 수정이 불가능합니다."
+    },
+    "deleteCmtMsg": {
+        "success": "댓글이 삭제되었습니다."
+    }
 }

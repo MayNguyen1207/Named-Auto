@@ -246,17 +246,15 @@ test.describe('Normal User Flow', () => {
     test('[Community] Image should not be added when user clicks X button or Cancel button', async ({ page, browserName }) => {
         test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
 
-        await writeFreePage.insertImgBtn.click();
-        await writeFreePage.addImgLnkBtn.click();
-        await writeFreePage.imgLnkInput.fill(imageData.valid.path);
-        await writeFreePage.dialogCloseBtn.click();
-        await expect(page.locator('img[src*="20260622143506588"]')).not.toBeVisible();
+        const buttonsToTest = [writeFreePage.dialogCloseBtn, writeFreePage.dialogCancelBtn];
 
-        await writeFreePage.insertImgBtn.click();
-        await writeFreePage.addImgLnkBtn.click();
-        await writeFreePage.imgLnkInput.fill(imageData.valid.path);
-        await writeFreePage.dialogCancelBtn.click();
-        await expect(page.locator('img[src*="20260622143506588"]')).not.toBeVisible();
+        for (const btn of buttonsToTest) {
+            await writeFreePage.insertImgBtn.click();
+            await writeFreePage.addImgLnkBtn.click();
+            await writeFreePage.imgLnkInput.fill(imageData.valid.path);
+            await btn.click();
+            await expect(page.locator('img[src*="20260622143506588"]')).not.toBeVisible();
+        }
     });
 
     test('[Community] User can add alt text, link for inserted image', async ({ page, browserName }) => {
@@ -272,49 +270,47 @@ test.describe('Normal User Flow', () => {
     test('[Community] User cannot upload invalid image', async ({ page, browserName }) => {
         test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
 
-        await writeFreePage.uploadImageFromMainButton(imageData.tooLarge.path);
-        await writeFreePage.verifyToastMsg('error', imageData.tooLarge.errorMsg);
-        await expect(writeFreePage.imgArea).not.toBeVisible();
+        const invalidCases = [
+            { action: () => writeFreePage.uploadImageFromMainButton(imageData.tooLarge.path), data: imageData.tooLarge },
+            { action: () => writeFreePage.uploadImageFromMainButton(imageData.invalidFormat.path), data: imageData.invalidFormat },
+            { action: () => writeFreePage.insertImageByUrl(imageData.invalidUrl.path), data: imageData.invalidUrl }
+        ];
 
-        await writeFreePage.uploadImageFromMainButton(imageData.invalidFormat.path);
-        await writeFreePage.verifyToastMsg('error', imageData.invalidFormat.errorMsg);
-        await expect(writeFreePage.imgArea).not.toBeVisible();
-
-        await writeFreePage.insertImageByUrl(imageData.invalidUrl.path);
-        await writeFreePage.verifyToastMsg('error', imageData.invalidUrl.errorMsg);
-        await expect(writeFreePage.imgArea).not.toBeVisible();
+        for (const { action, data } of invalidCases) {
+            await action();
+            await writeFreePage.verifyToastMsg('error', data.errorMsg);
+            await expect(writeFreePage.imgArea).not.toBeVisible();
+        }
     });
 
     test('[Community] Video should not be added when user clicks X button or Cancel button', async ({ page, browserName }) => {
         test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
 
-        await writeFreePage.videoMenuBtn.click();
-        await writeFreePage.insertVideoLnkBtn.click();
-        await writeFreePage.videoLnkInput.fill(videoData.valid.path);
-        await writeFreePage.dialogCloseBtn.click();
-        await expect(page.locator('iframe[src*="aSte18D2_YE"]')).not.toBeVisible();
+        const buttonsToTest = [writeFreePage.dialogCloseBtn, writeFreePage.dialogCancelBtn];
 
-        await writeFreePage.videoMenuBtn.click();
-        await writeFreePage.insertVideoLnkBtn.click();
-        await writeFreePage.videoLnkInput.fill(videoData.valid.path);
-        await writeFreePage.dialogCancelBtn.click();
-        await expect(page.locator('iframe[src*="aSte18D2_YE"]')).not.toBeVisible();
+        for (const btn of buttonsToTest) {
+            await writeFreePage.videoMenuBtn.click();
+            await writeFreePage.insertVideoLnkBtn.click();
+            await writeFreePage.videoLnkInput.fill(videoData.valid.path);
+            await btn.click();
+            await expect(page.locator('iframe[src*="aSte18D2_YE"]')).not.toBeVisible();
+        }
     });
 
     test('[Community] User cannot upload invalid video', async ({ page, browserName }) => {
         test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
 
-        await writeFreePage.insertVideoByUrl(videoData.invalidUrl.path);
-        await writeFreePage.verifyToastMsg('error', videoData.invalidUrl.errorMsg);
-        await expect(page.locator('figure.media')).not.toBeVisible();
+        const invalidCases = [
+            { action: () => writeFreePage.insertVideoByUrl(videoData.invalidUrl.path), data: videoData.invalidUrl, locator: 'figure.media' },
+            { action: () => writeFreePage.uploadVideoFile(videoData.toolarge.path), data: videoData.toolarge, locator: 'figure.video' },
+            { action: () => writeFreePage.uploadVideoFile(videoData.invalidFormat.path), data: videoData.invalidFormat, locator: 'figure.video' }
+        ];
 
-        await writeFreePage.uploadVideoFile(videoData.toolarge.path);
-        await writeFreePage.verifyToastMsg('error', videoData.toolarge.errorMsg);
-        await expect(page.locator('figure.video')).not.toBeVisible();
-
-        await writeFreePage.uploadVideoFile(videoData.invalidFormat.path);
-        await writeFreePage.verifyToastMsg('error', videoData.invalidFormat.errorMsg);
-        await expect(page.locator('figure.video')).not.toBeVisible();
+        for (const { action, data, locator } of invalidCases) {
+            await action();
+            await writeFreePage.verifyToastMsg('error', data.errorMsg);
+            await expect(page.locator(locator)).not.toBeVisible();
+        }
     });
 
     test('[Community] User can click 이용약관 to open Terms in new tab', async () => {

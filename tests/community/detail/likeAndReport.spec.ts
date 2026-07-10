@@ -38,7 +38,7 @@ test.describe('Normal User Flow', () => {
     test.describe('Tests that need a brand new post', () => {
         let sharedPostUrl = '';
         let sharedPostId = '';
-        let dynamicTokenUserB = '';
+        let dynamicToken = '';
 
         test.beforeAll(async ({ apiBaseURL, request }) => {
             const loginResponse = await request.post(`${apiBaseURL}/login`, {
@@ -50,10 +50,10 @@ test.describe('Normal User Flow', () => {
             expect(loginResponse.ok()).toBeTruthy();
 
             const loginJson = await loginResponse.json();
-            dynamicTokenUserB = loginJson.session_id;
+            dynamicToken = loginJson.session_id;
 
             const createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
-                headers: { 'NAMED-SESSION': `${dynamicTokenUserB}` },
+                headers: { 'NAMED-SESSION': `${dynamicToken}`, },
                 form: {
                     board_type: 'free',
                     subject: `Auto Test Shared Post ${Date.now()}`,

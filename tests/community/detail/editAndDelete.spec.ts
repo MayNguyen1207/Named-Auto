@@ -59,7 +59,7 @@ test.describe('Normal User Flow', () => {
         await expect(page).toHaveURL(freePostData.postUrl.editMyPost);
         await expect(writeFreePage.titleInput).toHaveValue(titleBefore);
         await expect(writeFreePage.contentInput).toHaveText(contentBefore);
-        const titleAfter = titleBefore + `${Date.now()}`;
+        const titleAfter = titleBefore + ` ${Date.now()}`;
         await writeFreePage.titleInput.fill(titleAfter);
         await writeFreePage.writeBtn.click();
         await page.waitForTimeout(500);
@@ -103,24 +103,47 @@ test.describe('Normal User Flow', () => {
             }
         });
         expect(createPostResponse.ok()).toBeTruthy();
+
         const postJson = await createPostResponse.json();
         const postId = postJson.wr_id;
         const postUrl = `/community/free/${postId}`;
 
+        await request.post(`${apiBaseURL}/community/board/${postId}/comment`, {
+            headers: { 'NAMED-SESSION': `${dynamicToken}` },
+            form: {
+                wr_id: postId,
+                board_type: 'free',
+                content: `Auto comment number ${Date.now()}`,
+                comment_type: 'new'
+            }
+        });
+
         await detailFreePage.navigate(postUrl);
         await detailFreePage.deletePostBtn.click();
-        await expect(detailFreePage.noticeDialog).toHaveText(
-            "한번 삭제한 게시물은 복구할 방법이 없습니다." +
-            "정말 삭제하시겠습니까?"
+        await expect(detailFreePage.noticeDialog).toContainText(
+            `한번 삭제한 게시물은 복구할 방법이 없습니다.
+            정말 삭제하시겠습니까?`
         );
-        await detailFreePage.noticeDialogCancelBtn.click();
+        await detailFreePage.dialogCancelBtn.click();
         await expect(detailFreePage.noticeDialog).toBeHidden();
         await expect(page).toHaveURL(postUrl);
 
         await detailFreePage.deletePostBtn.click();
-        await detailFreePage.noticeDialogConfirmBtn.click();
-        await detailFreePage.verifyToastMsg("success", "삭제되었습니다.");
+        await detailFreePage.dialogConfirmBtn.click();
+        await detailFreePage.verifyToastMsg("success", freePostData.deletePostMsg.success);
         await detailFreePage.navigate(postUrl);
         await expect(detailFreePage.noDataLogo).toBeVisible();
-    })
+    });
+
+    test('[Community] User cannot delete a post that has other user\'s comment', async ({ page }) => {
+        await detailFreePage.navigate(freePostData.postUrl.myPostOtherUserCmt);
+        await page.waitForTimeout(500);
+        await detailFreePage.deletePostBtn.click();
+        await expect(detailFreePage.noticeDialog).toContainText(
+            `한번 삭제한 게시물은 복구할 방법이 없습니다.
+            정말 삭제하시겠습니까?`
+        );
+        await detailFreePage.dialogConfirmBtn.click();
+        await detailFreePage.verifyToastMsg("error", freePostData.deletePostMsg.unableDelete);
+    });
 });
