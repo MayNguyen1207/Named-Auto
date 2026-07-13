@@ -27,7 +27,7 @@
     }
   ],
   "inactiveEmail": {
-    "email": "test_account3@yopmail.com",
+    "email": "test_009@yopmail.com",
     "password": "Named@123",
     "verificationAlertText": "등록된 이메일 주소로 인증번호가 발송 되었습니다.",
     "expiredOtpMsg": "인증 시간이 만료되었습니다. 인증번호를 다시 요청해 주세요.",
@@ -39,7 +39,7 @@
     ]
   },
   "inactivePhone": {
-    "email": "test_account7@yopmail.com",
+    "email": "test_acc1@yopmail.com",
     "password": "Named@123",
     "expectedTexts": [
       "장기 미접속 상태 해제를 위한 본인 인증",
@@ -49,7 +49,7 @@
     ]
   },
   "reactiveEmail": {
-    "email": "test_account5@yopmail.com",
+    "email": "test_acc3@yopmail.com",
     "password": "Named@123",
     "verificationAlertText": "등록된 이메일 주소로 인증번호가 발송 되었습니다.",
     "expectedTexts": [
@@ -60,7 +60,7 @@
     ]
   },
   "reactivePhone": {
-    "email": "test_account8@yopmail.com",
+    "email": "test_acc2@yopmail.com",
     "password": "Named@123",
     "expectedTexts": [
       "장기 미접속 상태 해제를 위한 본인 인증",
@@ -70,46 +70,46 @@
     ]
   },
   "unauthorizedEmail": {
-    "email": "test_account10@yopmail.com",
+    "email": "test_007@yopmail.com",
     "password": "Named@123",
     "otp": "123456"
   },
   "unauthorizedPhone": {
-    "email": "test_account6@yopmail.com",
+    "email": "test_005@yopmail.com",
     "password": "Named@123",
     "otp": "123456"
   },
   "sleepAndUnauthorizedEmail": {
-    "email": "test_account9@yopmail.com",
+    "email": "test_008@yopmail.com",
     "password": "Named@123",
     "otp": "123456"
   },
   "sleepAndUnauthorizedPhone": {
-    "email": "sliverpack108@yopmail.com",
+    "email": "test_006@yopmail.com",
     "password": "Named@123",
     "otp": "123456"
   },
   "lockedAccount": {
-    "email": "sliverpack101@yopmail.com",
+    "email": "test_004@yopmail.com",
     "password": "Named@123",
     "expectedMessages": [
-      "해킹계정으로 등록되어, 잠김상태가 되었습니다. 2026년 06월 23일에 해킹계정으로 등록되어 잠김상태가 되었습니다.",
+      "해킹계정으로 등록되어, 잠김상태가 되었습니다. 2026년 07월 09일에 해킹계정으로 등록되어 잠김상태가 되었습니다.",
       "을 완료해야 계정을 다시 사용 할 수 있습니다. 궁금하신 사항은 아래 이메일로 문의해 주시기 바랍니다."
     ]
   },
   "blockedAccount": {
-    "email": "sliverpack104@yopmail.com",
+    "email": "test_003@yopmail.com",
     "password": "Named@123",
     "expectedMessages": [
-      "2026년 06월 25일에 접근이 차단되었습니다. 궁금하신 사항은 아래 이메일로 문의해 주시기 바랍니다.",
+      "2026년 07월 09일에 접근이 차단되었습니다. 궁금하신 사항은 아래 이메일로 문의해 주시기 바랍니다.",
       "help@named.com"
     ]
   },
   "deletedAccount": {
-    "email": "sliverpack103@yopmail.com",
+    "email": "test_002@yopmail.com",
     "password": "Named@123",
     "expectedMessages": [
-      "네임드에서 탈퇴한 계정입니다. 2026년 06월 25일 탈퇴하여 로그인 할 수 없습니다. 궁금하신 사항은 아래 이메일로 문의주시기 바랍니다.",
+      "네임드에서 탈퇴한 계정입니다. 2026년 07월 09일 탈퇴하여 로그인 할 수 없습니다. 궁금하신 사항은 아래 이메일로 문의주시기 바랍니다.",
       "help@named.com"
     ]
   },
@@ -124,12 +124,12 @@
     "password": "Named@123"
   },
   "sameallowedIpAccount": {
-    "email": "sliverpack107@yopmail.com",
+    "email": "test_001@yopmail.com",
     "password": "Named@123"
   },
   "admin": {
-    "email": "manager_turnover@named.com",
-    "password": "geH2A_tf7hDg2xK",
+    "email": "manager_named001@named.com",
+    "password": "Named@123",
     "fakeIp": "203.119.34.12",
     "expectedErrorMessage": "관리자 로그인이 허용되지 않은 IP입니다."
   },

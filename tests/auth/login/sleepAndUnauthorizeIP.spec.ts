@@ -41,6 +41,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep and Authorize IP',
       await loginPage.enterOtpAndVerifyComplete('123456');
       await loginPage.handleReactivationSuccessAlert();
       await expect(page).toHaveURL('/login');
+
       await loginPage.passwordInput.fill(data.password);
       await loginPage.loginButton.click();
       await expect(loginPage.verifyIpDialog).toBeVisible();
@@ -56,15 +57,37 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep and Authorize IP',
 
       await loginPage.verifyVerificationDefaultUI(method, data.email);
 
-      await loginPage.sendOtpAndProceedToInputScreen();
+      await loginPage.sendOtpButton.click();
+      if (method === 'phone') {
+        await expect(
+          page.getByText('입력하신 휴대폰 번호로 코드가 전송되었습니다. 문자 메세지를 확인해 주세요.', { exact: true })
+        ).toBeVisible({ timeout: 5000 });
+      } else {
+        await expect(
+          page.getByText('입력하신 이메일로 코드가 전송되었습니다. 이메일을 확인해 주세요.', { exact: true })
+        ).toBeVisible({ timeout: 5000 });
+      }
+      
+      const currentAlert = page.getByRole('dialog', { name: '알림' }).last();
+      await currentAlert.getByRole('button', { name: '확인' }).click();
 
+      const currentVerificationDialog = page.getByLabel('Phone or Email verification').last();
+      const verifyCompleteBtn = currentVerificationDialog.getByRole('button', { name: '인증 완료' });
+      await expect(verifyCompleteBtn).toBeDisabled({ timeout: 5000 });
       await loginPage.verifyOtpScreenDefaultUI();
 
       await page.clock.install();
       await page.clock.fastForward('03:01');
+      await loginPage.verifyOtpResendUI();
       await loginPage.resendOtp();
       await loginPage.goBackButton.click();
-      await loginPage.verifyVerificationDefaultUI(method, data.email);
+
+      if (method === 'email') {
+        await expect(loginPage.verificationEmailInput).not.toBeEditable();
+      } else if (method === 'phone') {
+        await expect(loginPage.verificationPhoneInput).not.toBeEditable();
+        await expect(page.getByRole('button', { name: '+1' })).toBeDisabled();
+      }
 
       await loginPage.sendOtpButton.click();
       try {
