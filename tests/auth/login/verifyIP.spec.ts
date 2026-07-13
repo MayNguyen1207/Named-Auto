@@ -24,7 +24,19 @@ test.describe('[Auth] Normal User Login Feature Tests - Verify IP', () => {
       await loginPage.proceedToVerificationFromIpDialog(method);
       await loginPage.verifyVerificationDefaultUI(method, data.email);
 
-      await loginPage.sendOtpAndProceedToInputScreen();
+      await loginPage.sendOtpButton.click();
+      if (method === 'phone') {
+        await expect(
+          page.getByText('입력하신 휴대폰 번호로 코드가 전송되었습니다. 문자 메세지를 확인해 주세요.', { exact: true })
+        ).toBeVisible();
+      } else {
+        await expect(
+          page.getByText('입력하신 이메일로 코드가 전송되었습니다. 이메일을 확인해 주세요.', { exact: true })
+        ).toBeVisible();
+      }
+      await expect(loginPage.confirmButton).toBeVisible();
+      await loginPage.confirmButton.click();
+
       await loginPage.verifyOtpScreenDefaultUI();
 
       await loginPage.enterOtpAndVerifyComplete(data.otp);
