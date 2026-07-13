@@ -29,3 +29,15 @@ export function getExpectedRelativeTime(registeredTimeStr: string): string {
 export function getExpectedDetailTime(registeredTimeStr: string): string {
     return dayjs(registeredTimeStr).tz('Asia/Seoul').format('YYYY.MM.DD HH:mm');
 }
+
+/** Format a post's wr_datetime for list display:
+ *  - HH:mm if the post was registered today (KST)
+ *  - MM/DD if it was registered on a previous day
+ */
+export function formatPostDate(wrDatetime: string): string {
+    const KST = 'Asia/Seoul';
+    const postDate = dayjs.tz(wrDatetime, KST);
+    const todayKST = dayjs().tz(KST);
+    const isToday = postDate.format('YYYY-MM-DD') === todayKST.format('YYYY-MM-DD');
+    return isToday ? postDate.format('HH:mm') : postDate.format('MM/DD');
+}

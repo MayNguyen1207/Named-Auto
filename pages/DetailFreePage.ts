@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
+import loginData from '../data-test/login-data.json';
 
 export class DetailFreePage extends BasePage {
     readonly page: Page;
@@ -20,10 +21,10 @@ export class DetailFreePage extends BasePage {
     readonly submitCmtBtn: Locator;
     readonly cmtCount: Locator;
     readonly noCommentTxt: Locator;
+    readonly cmtList: Locator;
     readonly cmtItems: Locator;
     readonly cmtText: Locator;
     readonly replyCmtInput: Locator;
-    readonly cmtFirstPageBtn: Locator;
 
     // Author picker
     readonly cmtAuthorPicker: Locator;
@@ -72,10 +73,10 @@ export class DetailFreePage extends BasePage {
         this.submitCmtBtn = page.getByRole('button', { name: '댓글 전송' });
         this.cmtCount = page.getByTestId('community-comment-count');
         this.noCommentTxt = page.getByText('댓글이 없습니다.', { exact: true });
+        this.cmtList = page.getByTestId('community-comment-list');
         this.cmtItems = page.getByTestId('community-comment-item');
         this.cmtText = page.locator(".text-xs.text-foreground.my-2.wrap-break-word.whitespace-pre-wrap"); // Tobe edit
         this.replyCmtInput = page.getByRole('textbox', { name: '답글을 입력하세요…' });
-        this.cmtFirstPageBtn = page.locator('nav[role="navigation"]').first().locator('li[data-slot="pagination-item"]').filter({ hasText: /^1$/ });
 
         this.cmtAuthorPicker = page.getByTestId('popover-trigger').last();//Tobe edit
         this.authorCommandRoot = page.locator('[data-testid="command-root"]');
@@ -253,5 +254,25 @@ export class DetailFreePage extends BasePage {
         const authorName = fullText.split('(')[0].trim();
         await firstItem.click();
         return authorName;
+    }
+
+    // Delete post via API
+    async deletePostViaAPI(request: import('@playwright/test').APIRequestContext, apiBaseURL: string, postId: string) {
+        const loginResponse = await request.post(`${apiBaseURL}/login`, {
+            form: {
+                email: loginData.admin.email,
+                password: loginData.admin.password,
+            }
+        });
+        const loginJson = await loginResponse.json();
+        const adminToken = loginJson.session_id;
+
+        await request.delete(`${apiBaseURL}/community/board/${postId}/`, {
+            headers: { 'NAMED-SESSION': `${adminToken}` },
+            form: {
+                wr_id: postId,
+                board_type: 'free',
+            }
+        });
     }
 }
