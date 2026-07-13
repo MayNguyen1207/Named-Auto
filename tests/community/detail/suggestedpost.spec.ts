@@ -155,7 +155,7 @@ test.describe('Guest Flow', () => {
         await expect(detailFreePage.otherPostTab).toHaveAttribute('aria-selected', 'true');
 
         await Promise.race([
-            detailFreePage.postContainer.waitFor({ state: 'visible', timeout: 5000 }).catch(() => { }),
+            detailFreePage.otherPostContainer.waitFor({ state: 'visible', timeout: 5000 }).catch(() => { }),
             detailFreePage.noOtherPostTxt.waitFor({ state: 'visible', timeout: 5000 }).catch(() => { })
         ]);
         if (await detailFreePage.noOtherPostTxt.isVisible()) {
@@ -163,7 +163,7 @@ test.describe('Guest Flow', () => {
             await expect(detailFreePage.sugPagiantion).toBeHidden();
             return;
         } else {
-            await expect(detailFreePage.postContainer).toBeVisible();
+            await expect(detailFreePage.otherPostContainer).toBeVisible();
             let initialCount = await detailFreePage.postItem.count();
             await detailFreePage.verifyOtherPostWriter();
             if (initialCount === 4 && await detailFreePage.sugPagiantion.isVisible()) {
