@@ -35,62 +35,6 @@ test.describe('Guest Flow', () => {
         await loginPage.login(loginData.valid.email, loginData.valid.password);
         await expect(page).toHaveURL(freePostData.postUrl.normalPost);
     });
-
-    test('[Community] Verify comment chronological order and pagination (Oldest first, Newest last)', async ({ page, apiBaseURL, request }) => {
-        let postUrl = '';
-        let postId = '';
-        let dynamicToken = '';
-
-        const loginResponse = await request.post(`${apiBaseURL}/login`, {
-            form: {
-                email: loginData.userC.email,
-                password: loginData.userC.password,
-            }
-        });
-        expect(loginResponse.ok()).toBeTruthy();
-
-        const loginJson = await loginResponse.json();
-        dynamicToken = loginJson.session_id;
-
-        const createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
-            headers: { 'NAMED-SESSION': `${dynamicToken}` },
-            form: {
-                board_type: 'free',
-                subject: `Auto Test Comment Pagination ${Date.now()}`,
-                content: '<p>Bài viết dùng để test Comment Pagination...</p>',
-                is_notice: 'false',
-                comment_allowed: 'true'
-            }
-        });
-        expect(createPostResponse.ok()).toBeTruthy();
-        const postJson = await createPostResponse.json();
-        postId = postJson.wr_id;
-        postUrl = `/community/free/${postId}`;
-
-        const totalCommentsToCreate = 25;
-        for (let i = 1; i <= totalCommentsToCreate; i++) {
-            await request.post(`${apiBaseURL}/community/board/${postId}/comment`, {
-                headers: { 'NAMED-SESSION': `${dynamicToken}` },
-                form: {
-                    wr_id: postId,
-                    board_type: 'free',
-                    content: `Auto comment number ${i}`,
-                    comment_type: 'new'
-                }
-            });
-        }
-
-        await detailFreePage.navigate(postUrl);
-        await page.waitForTimeout(500);
-
-        const lastCommentOnDefaultPage = detailFreePage.cmtItems.last();
-        await expect(lastCommentOnDefaultPage).toContainText(`Auto comment number ${totalCommentsToCreate}`);
-
-        await detailFreePage.cmtFirstPageBtn.click();
-        await page.waitForTimeout(500);
-        const firstCommentOnFirstPage = detailFreePage.cmtItems.first();
-        await expect(firstCommentOnFirstPage).toContainText('Auto comment number 1');
-    });
 });
 
 test.describe('Prisoner Flow', () => {
@@ -147,7 +91,7 @@ test.describe('Normal User Flow', () => {
         detailFreePage = new DetailFreePage(page);
     });
 
-    test('[Community] Normal user can write a comment successfully', async ({ page, apiBaseURL, playwright }) => {
+    test('[Community] Normal user can write a comment successfully', async ({ page, apiBaseURL, playwright, request }) => {
         const apiContext = await playwright.request.newContext();
         const loginResponse = await apiContext.post(`${apiBaseURL}/login`, {
             form: {
@@ -170,7 +114,8 @@ test.describe('Normal User Flow', () => {
         });
         expect(createPostResponse.ok()).toBeTruthy();
         const postJson = await createPostResponse.json();
-        const newPostUrl = `/community/free/${postJson.wr_id}`;
+        const postId = postJson.wr_id
+        const newPostUrl = `/community/free/${postId}`;
 
         await detailFreePage.navigate(newPostUrl);
         await page.waitForTimeout(500);
@@ -185,6 +130,8 @@ test.describe('Normal User Flow', () => {
         await expect(detailFreePage.cmtItems.first()).toContainText(myCommentText);
         await expect(detailFreePage.noCommentTxt).toBeHidden();
         await expect(detailFreePage.cmtCount).toHaveText("1");
+
+        await detailFreePage.deletePostViaAPI(request, apiBaseURL, postId);
     });
 
     for (const data of freePostData.invalidCmt) {

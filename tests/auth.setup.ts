@@ -24,7 +24,7 @@ setup('Authenticate as Normal User', async ({ page }) => {
   await page.context().storageState({ path: userStatePath });
 });
 
-/*setup('Authenticate as Admin', async ({ page }) => {
+setup('Authenticate as Admin', async ({ page }) => {
   const loginPage = new LoginPage(page);
   await loginPage.navigate();
   await loginPage.login(loginData.admin.email, loginData.admin.password);
@@ -43,4 +43,4 @@ setup('Authenticate as Guest', async ({ page }) => {
 
   const guestStatePath = path.resolve(__dirname, '../playwright/.auth/guest.json');
   await page.context().storageState({ path: guestStatePath });
-});*/
+});
