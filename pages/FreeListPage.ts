@@ -9,12 +9,12 @@ export class FreeListPage extends BasePage {
     readonly myCmtTab: Locator;
     readonly writeBtn: Locator;
     readonly listItems: Locator;
+    readonly noItemText: Locator;
 
     readonly searchType: Locator;
     readonly searchTitleContent: Locator;
     readonly searchAuthor: Locator;
     readonly searchKeywordInput: Locator;
-    readonly searchBtn: Locator;
 
     constructor(page: Page) {
         super(page);
@@ -25,12 +25,12 @@ export class FreeListPage extends BasePage {
         this.myCmtTab = page.getByRole('radio', { name: '내댓글' });
         this.writeBtn = page.getByRole('button', { name: '글쓰기' });
         this.listItems = page.getByTestId('post-item');
+        this.noItemText = page.getByText('게시글이 없습니다.', { exact: true }).first();
 
         this.searchType = page.getByRole('combobox').first();
         this.searchTitleContent = page.getByRole('option', { name: '제목+내용' });
         this.searchAuthor = page.getByRole('option', { name: '작성자' });
         this.searchKeywordInput = page.getByRole('textbox', { name: '검색어 입력' });
-        this.searchBtn = page.getByRole('button', { name: '검색' });
     }
 
     async navigate() {

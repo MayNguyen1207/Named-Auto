@@ -12,13 +12,8 @@ dayjs.extend(timezone);
 
 test.describe('Guest Flow', () => {
 
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        detailFreePage = new DetailFreePage(page);
-    });
-
     test('[Community] Guest cannot comment in post', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
         await detailFreePage.cmtInput.scrollIntoViewIfNeeded();
         await detailFreePage.cmtInput.click();
@@ -38,17 +33,10 @@ test.describe('Guest Flow', () => {
 });
 
 test.describe('Prisoner Flow', () => {
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        const loginPage = new LoginPage(page);
-        await loginPage.navigate();
-        await page.waitForTimeout(500);
-        await loginPage.login(loginData.prisoner.email, loginData.prisoner.password);
-        detailFreePage = new DetailFreePage(page);
-    });
+    test.use({ storageState: 'playwright/.auth/prisoner.json' });
 
     test('[Community] Prisoner cannot comment on a Free post', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
         await detailFreePage.writeCmt(`${Date.now()}`);
         await detailFreePage.verifyToastMsg("error", freePostData.cmtMsg.prisoner);
@@ -56,17 +44,13 @@ test.describe('Prisoner Flow', () => {
 });
 
 test.describe('Non-verified User Flow', () => {
-    test('[Community] Non-verified user cannot comment on a Free post', async ({ page }) => {
-        const loginPage = new LoginPage(page);
-        await loginPage.navigate();
-        await page.waitForTimeout(500);
-        await loginPage.login(loginData.nonverifiedUser.email, loginData.nonverifiedUser.password);
+    test.use({ storageState: 'playwright/.auth/non-verified-user.json' });
 
-        let detailFreePage: DetailFreePage;
-        detailFreePage = new DetailFreePage(page);
+    test('[Community] Non-verified user cannot comment on a Free post', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
         await page.waitForTimeout(1000);
-        await detailFreePage.writeCmt(`${Date.now}`);
+        await detailFreePage.writeCmt(`${Date.now()}`);
         await expect(detailFreePage.noticeDialog).toContainText(
             "댓글은 본인 인증을 해야만 쓰실 수 있습니다." +
             "본인인증을 진행하시겠습니까?"
@@ -75,7 +59,7 @@ test.describe('Non-verified User Flow', () => {
         await detailFreePage.dialogCancelBtn.click();
         await expect(page).toHaveURL(freePostData.postUrl.normalPost);
 
-        await detailFreePage.writeCmt(`${Date.now}`);
+        await detailFreePage.writeCmt(`${Date.now()}`);
         await detailFreePage.verifyBtn.click();
         await expect(page.getByRole('heading', { name: '핸드폰 인증받기' })).toBeVisible(); //TODO: Edit locator after creating My Info page
         await expect(page).toHaveURL(/.*mypage\/info/);
@@ -144,7 +128,7 @@ test.describe('Normal User Flow', () => {
 
     test('[Community] User cannot comment in a post whose author has blocked the user', async () => {
         await detailFreePage.navigate(freePostData.postUrl.blockedPost);
-        await detailFreePage.writeCmt(`${Date.now}`);
+        await detailFreePage.writeCmt(`${Date.now()}`);
         await detailFreePage.verifyToastMsg("error", freePostData.cmtMsg.block)
     });
 })

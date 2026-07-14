@@ -6,15 +6,11 @@ import postData from '../../../data-test/write-post-data.json';
 test.describe('Admin Flow', () => {
     test.use({ storageState: 'playwright/.auth/admin.json' });
 
-    let writeFreePage: WriteFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        writeFreePage = new WriteFreePage(page);
-        await writeFreePage.navigate();
-    });
-
     test('[Community] Admin can assign author for the post', async ({ page, browserName }) => {
         test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
+
+        const writeFreePage = new WriteFreePage(page);
+        await writeFreePage.navigate();
 
         const selectedAuthor = await writeFreePage.selectFirstAuthor();
         expect(selectedAuthor).not.toBe('');

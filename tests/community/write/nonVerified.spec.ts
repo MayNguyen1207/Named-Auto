@@ -1,20 +1,15 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from '../../../pages/LoginPage';
 import { WriteFreePage } from '../../../pages/WriteFreePage';
-import loginData from '../../../data-test/login-data.json';
 import postData from '../../../data-test/write-post-data.json';
 
 test.describe('Phone number Non-verified User Flow', () => {
+    test.use({ storageState: 'playwright/.auth/non-verified-user.json' });
+
     test('[Community] Non-verified user should be prevented from writing Free post', async ({ page, browserName }) => {
         test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
 
-        let writeFreePage: WriteFreePage;
-        writeFreePage = new WriteFreePage(page);
+        const writeFreePage = new WriteFreePage(page);
         await writeFreePage.navigate();
-
-        const loginPage = new LoginPage(page);
-        await loginPage.login(loginData.nonverifiedUser.email, loginData.nonverifiedUser.password);
-        await writeFreePage.closeVerificationPopup();
 
         await writeFreePage.writePost(postData.valid.title, postData.valid.content);
         await writeFreePage.writeBtn.click();

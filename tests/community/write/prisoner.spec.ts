@@ -1,17 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from '../../../pages/LoginPage';
 import { WriteFreePage } from '../../../pages/WriteFreePage';
 import loginData from '../../../data-test/login-data.json';
 
 test.describe('Prisoner Flow', () => {
+    test.use({ storageState: 'playwright/.auth/prisoner.json' });
 
     test('[Community] A modal should be shown when prisoner accesses Write Post page', async ({ page }) => {
-        let writeFreePage: WriteFreePage;
-        writeFreePage = new WriteFreePage(page);
+        const writeFreePage = new WriteFreePage(page);
         await writeFreePage.navigate();
-
-        const loginPage = new LoginPage(page);
-        await loginPage.login(loginData.prisoner.email, loginData.prisoner.password);
         await expect(writeFreePage.jailPoster).toBeVisible();
         await expect(writeFreePage.prisonNotice).toContainText(
             "서비스 이용 제한 안내" +
