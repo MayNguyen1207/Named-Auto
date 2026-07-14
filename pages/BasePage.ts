@@ -53,8 +53,8 @@ export class BasePage {
 
         this.noDataLogo = page.getByRole('img', { name: 'no data' });
 
-        this.pagCombo = page.getByRole('combobox', { name: '개씩 보기' });
-        this.pagSelectedValue = page.locator('span[data-testid="select-value"]');
+        this.pagCombo = page.getByTestId('select-trigger').last();
+        this.pagSelectedValue = page.locator('span[data-testid="select-value"]').last();
         this.pagInput = page.getByRole('textbox', { name: '페이지로 이동' });
         this.pagPreviousBtn = page.locator('[data-slot="pagination-item"]').first();
         this.pagNextBtn = page.locator('[data-slot="pagination-item"]').last();
@@ -81,8 +81,10 @@ export class BasePage {
     }
 
     // To check pagination
-    getPageItem(num: number | string): Locator {
-        return this.page.getByRole('button', { name: new RegExp(`^${num}$`) });
+    getPageItem(pageNumber: number | string) {
+        return this.page
+            .locator('nav[aria-label="pagination"] a, nav[aria-label="pagination"] button')
+            .filter({ hasText: new RegExp(`^${pageNumber}$`) });
     }
 
     async clickPageNumber(num: number) {

@@ -144,7 +144,7 @@ test.describe('Guest Flow', () => {
         await page.keyboard.press('Escape');
 
         await detailFreePage.pagInput.scrollIntoViewIfNeeded();
-        await expect(detailFreePage.getPageItem(9)).toHaveClass(/.*font-bold.*text-white.*/);
+        await expect(detailFreePage.getPageItem(9)).toHaveAttribute('aria-current', 'page');
 
         await detailFreePage.verifyListItemsNumber();
         await page.keyboard.press('Escape');
@@ -163,23 +163,23 @@ test.describe('Guest Flow', () => {
 
         await detailFreePage.goToPageViaInput('3');
         await page.waitForTimeout(500);
-        await expect(detailFreePage.getPageItem(3)).toHaveClass(/.*font-bold.*text-white.*/);
+        await expect(detailFreePage.getPageItem(3)).toHaveAttribute('aria-current', 'page');
 
         await detailFreePage.goToPageViaInput('0');
         await page.waitForTimeout(500);
-        await expect(detailFreePage.getPageItem(1)).toHaveClass(/.*font-bold.*text-white.*/);
+        await expect(detailFreePage.getPageItem(1)).toHaveAttribute('aria-current', 'page');
 
         await detailFreePage.goToPageViaInput('99');
         await page.waitForTimeout(500);
-        await expect(detailFreePage.getPageItem(5)).toHaveClass(/.*font-bold.*text-white.*/);
+        await expect(detailFreePage.getPageItem(5)).toHaveAttribute('aria-current', 'page');
 
         await detailFreePage.pagPreviousBtn.click();
         await page.waitForTimeout(500);
-        await expect(detailFreePage.getPageItem(4)).toHaveClass(/.*font-bold.*text-white.*/);
+        await expect(detailFreePage.getPageItem(4)).toHaveAttribute('aria-current', 'page');
 
         await detailFreePage.pagNextBtn.click();
         await page.waitForTimeout(500);
-        await expect(detailFreePage.getPageItem(5)).toHaveClass(/.*font-bold.*text-white.*/);
+        await expect(detailFreePage.getPageItem(5)).toHaveAttribute('aria-current', 'page');
 
         await detailFreePage.deletePostViaAPI(request, apiBaseURL, postId);
     });
@@ -188,13 +188,8 @@ test.describe('Guest Flow', () => {
 test.describe('Normal User Flow', () => {
     test.use({ storageState: 'playwright/.auth/user.json' });
 
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        detailFreePage = new DetailFreePage(page);
-    });
-
-    test('[Community] Check the display of comment in normal user view', async () => {
+    test('[Community] Check the display of comment in normal user view', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.commentPost);
 
         const cmtData = [
@@ -218,13 +213,8 @@ test.describe('Normal User Flow', () => {
 test.describe('Admin Flow', () => {
     test.use({ storageState: 'playwright/.auth/admin.json' });
 
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        detailFreePage = new DetailFreePage(page);
-    });
-
-    test('[Community] Check the display of comment in admin view', async () => {
+    test('[Community] Check the display of comment in admin view', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.commentPost);
 
         const cmtData = [

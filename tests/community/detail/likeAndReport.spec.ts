@@ -2,22 +2,11 @@ import { test, expect } from '../../../utils/fixtures';
 import { DetailFreePage } from '../../../pages/DetailFreePage';
 import loginData from '../../../data-test/login-data.json';
 import freePostData from '../../../data-test/free-post-data.json';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 test.describe('Guest Flow', () => {
 
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        detailFreePage = new DetailFreePage(page);
-    });
-
     test('[Community] Move to Login popup should be shown when guest likes the post', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
         await detailFreePage.likeBtn.scrollIntoViewIfNeeded();
         await expect(detailFreePage.likeBtn).toHaveText(/\d+/);

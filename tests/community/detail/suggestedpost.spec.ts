@@ -1,12 +1,6 @@
 import { test, expect } from '../../../utils/fixtures';
 import { DetailFreePage } from '../../../pages/DetailFreePage';
 import freePostData from '../../../data-test/free-post-data.json';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 test.describe('Guest Flow', () => {
 

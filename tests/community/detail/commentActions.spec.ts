@@ -1,23 +1,12 @@
 import { test, expect } from '../../../utils/fixtures';
-import { LoginPage } from '../../../pages/LoginPage';
 import { DetailFreePage } from '../../../pages/DetailFreePage';
 import loginData from '../../../data-test/login-data.json';
 import freePostData from '../../../data-test/free-post-data.json';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 test.describe('Guest Flow', () => {
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        detailFreePage = new DetailFreePage(page);
-    });
 
     test('[Community] Guest cannot reply or report a comment', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.myPost);
         await page.waitForTimeout(500);
 
@@ -33,17 +22,10 @@ test.describe('Guest Flow', () => {
 });
 
 test.describe('Prisoner Flow', () => {
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        detailFreePage = new DetailFreePage(page);
-    });
+    test.use({ storageState: 'playwright/.auth/prisoner.json' });
 
     test('[Community] Prisoner cannot edit a comment', async ({ page }) => {
-        const loginPage = new LoginPage(page);
-        await loginPage.navigate();
-        await loginPage.login(loginData.prisoner.email, loginData.prisoner.password);
-
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.prisonerPost);
         await page.waitForTimeout(500);
 

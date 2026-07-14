@@ -2,16 +2,11 @@ import { test, expect } from '../../../utils/fixtures';
 import { DetailFreePage } from '../../../pages/DetailFreePage';
 import freePostData from '../../../data-test/free-post-data.json';
 
-test.describe('Guest Flow', () => {
+test.describe('Admin Flow', () => {
     test.use({ storageState: 'playwright/.auth/admin.json' });
 
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        detailFreePage = new DetailFreePage(page);
-    });
-
     test('[Community] Admin can assign author to the comment', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.blockedPost);
         await page.waitForTimeout(500);
 
