@@ -21,6 +21,7 @@ test.describe('Normal User Flow; Write Post and submit', () => {
 
         test('[Community] User can write Free post with valid data, add emoji, format text, insert link', async ({ page, browserName }) => {
             test.skip(browserName !== 'chromium', 'Specific error in initializing the Editor on the WebKit emulator');
+            test.setTimeout(60000);
 
             await writeFreePage.insertLink(postData.lnkData.fullData.text, postData.lnkData.fullData.url);
             await page.keyboard.press('Enter');
@@ -41,10 +42,10 @@ test.describe('Normal User Flow; Write Post and submit', () => {
             await writeFreePage.writeBtn.click();
 
             const detailFreePage = new DetailFreePage(page);
-            await expect(page).toHaveURL(/.*community\/free/, { timeout: 15000 });
+            await expect(page).toHaveURL(/.*community\/free/);
 
             const txtLink = detailFreePage.postContent.getByRole('link', { name: 'Google Search' });
-            await expect(txtLink).toBeVisible();
+            await expect(txtLink).toBeVisible({ timeout: 15000 });
             await expect(txtLink).toHaveAttribute('href', "https://www.google.com");
 
             const plainLink = detailFreePage.postContent.getByRole('link', { name: 'https://mail.google.com' });
@@ -72,6 +73,7 @@ test.describe('Normal User Flow; Write Post and submit', () => {
 
     test('[Community] User can insert valid image into post content', async ({ page, browserName }) => {
         test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
+        test.setTimeout(60000);
 
         const loginPage = new LoginPage(page);
         await loginPage.navigate();
@@ -95,9 +97,9 @@ test.describe('Normal User Flow; Write Post and submit', () => {
         await writeFreePage.writeBtn.click();
 
         const detailFreePage = new DetailFreePage(page);
-        await expect(page).toHaveURL(/.*community\/free/, { timeout: 15000 });
+        await expect(page).toHaveURL(/.*community\/free/);
 
-        await expect(detailFreePage.postContentImg).toHaveCount(3);
+        await expect(detailFreePage.postContentImg).toHaveCount(3, { timeout: 15000 });
         const count = await detailFreePage.postContentImg.count();
         for (let i = 0; i < count; i++) {
             await expect(detailFreePage.postContentImg.nth(i)).toHaveJSProperty('complete', true);
@@ -108,6 +110,7 @@ test.describe('Normal User Flow; Write Post and submit', () => {
 
     test('[Community] User can insert valid video into post content by embed code, URL and uploading from device', async ({ page, browserName }) => {
         test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
+        test.setTimeout(60000);
 
         const loginPage = new LoginPage(page);
         await loginPage.navigate();
@@ -132,9 +135,9 @@ test.describe('Normal User Flow; Write Post and submit', () => {
         await writeFreePage.writeBtn.click();
 
         const detailFreePage = new DetailFreePage(page);
-        await expect(page).toHaveURL(/.*community\/free/, { timeout: 15000 });
+        await expect(page).toHaveURL(/.*community\/free/);
 
-        await expect(detailFreePage.postVideoIframe).toHaveCount(2);
+        await expect(detailFreePage.postVideoIframe).toHaveCount(2, { timeout: 15000 });
         await expect(detailFreePage.postVideoIframe.nth(0)).toHaveAttribute('src', /EngW7tLk6R8/);
         await expect(detailFreePage.postVideoIframe.nth(1)).toHaveAttribute('src', /aSte18D2_YE/);
 

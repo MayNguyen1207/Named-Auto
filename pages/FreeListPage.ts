@@ -16,6 +16,12 @@ export class FreeListPage extends BasePage {
     readonly searchAuthor: Locator;
     readonly searchKeywordInput: Locator;
 
+    readonly movePostBtn: Locator;
+    readonly deletePostBtn: Locator;
+    readonly listBoardToMove: Locator;
+    readonly boardToMove: Locator;
+    readonly moveBtn: Locator;
+
     constructor(page: Page) {
         super(page);
         this.page = page;
@@ -31,6 +37,12 @@ export class FreeListPage extends BasePage {
         this.searchTitleContent = page.getByRole('option', { name: '제목+내용' });
         this.searchAuthor = page.getByRole('option', { name: '작성자' });
         this.searchKeywordInput = page.getByRole('textbox', { name: '검색어 입력' });
+
+        this.movePostBtn = page.locator('div.flex.gap-2.items-center.justify-end').locator('button').nth(3); // Tobe updated
+        this.deletePostBtn = page.locator('div.flex.gap-2.items-center.justify-end').locator('button').nth(4); // Tobe updated
+        this.listBoardToMove = page.locator('div.space-y-0.mx-4'); // Tobe updated
+        this.boardToMove = this.listBoardToMove.locator('> div'); // Tobe updated
+        this.moveBtn = page.getByRole('button', { name: '이동' });
     }
 
     async navigate() {
@@ -53,17 +65,17 @@ export class FreeListPage extends BasePage {
         };
     }
 
-    async verifyPostList (   //TODO: check if image icon is displayed
+    async verifyPostList(   //TODO: check if image icon is displayed
         page: Page,
-        request: APIRequestContext, 
-        apiBaseURL: string, 
+        request: APIRequestContext,
+        apiBaseURL: string,
         filter: 'all' | 'best' | 'my_wr' | 'my_cm'
     ) {
         const headers: Record<string, string> = {};
         if (filter === 'my_wr' || filter === 'my_cm') {
             const cookies = await page.context().cookies();
             const sessionCookie = cookies.find(c => c.name === 'dev_session_id');
-            
+
             if (sessionCookie) {
                 headers['NAMED-SESSION'] = sessionCookie.value;
             }
