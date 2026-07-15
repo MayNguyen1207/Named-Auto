@@ -47,40 +47,55 @@ test.describe('Normal User Flow', () => {
     });
 
     test('[Community] User can report a comment only 1 time', async ({ page, apiBaseURL, playwright }) => {
-        const apiContext = await playwright.request.newContext();
-        const loginResponse = await apiContext.post(`${apiBaseURL}/login`, {
-            form: {
-                email: loginData.userD.email,
-                password: loginData.userD.password,
-            }
+        let loginResponse: any;
+        let apiContext: any;
+        let lastCmt: any;
+
+        await test.step('Login via API to get session_id', async () => {
+            apiContext = await playwright.request.newContext();
+            loginResponse = await apiContext.post(`${apiBaseURL}/login`, {
+                form: {
+                    email: loginData.userD.email,
+                    password: loginData.userD.password,
+                }
+            });
         });
-        const loginJson = await loginResponse.json();
-        const dynamicToken = loginJson.session_id;
 
-        const postId = detailFreePage.getPostIdFromUrl(freePostData.postUrl.reportCmtPost);
-        const createCmtResponse = await apiContext.post(`${apiBaseURL}/community/board/${postId}/comment`, {
-            headers: { 'NAMED-SESSION': dynamicToken },
-            form: {
-                wr_id: postId,
-                board_type: 'free',
-                content: `Auto test report comment ${Date.now()}`,
-                comment_type: 'new'
-            }
+        await test.step('Create a dummy comment', async () => {
+            const loginJson = await loginResponse.json();
+            const dynamicToken = loginJson.session_id;
+
+            const postId = detailFreePage.getPostIdFromUrl(freePostData.postUrl.reportCmtPost);
+            const createCmtResponse = await apiContext.post(`${apiBaseURL}/community/board/${postId}/comment`, {
+                headers: { 'NAMED-SESSION': dynamicToken },
+                form: {
+                    wr_id: postId,
+                    board_type: 'free',
+                    content: `Auto test report comment ${Date.now()}`,
+                    comment_type: 'new'
+                }
+            });
+            expect(createCmtResponse.ok()).toBeTruthy();
         });
-        expect(createCmtResponse.ok()).toBeTruthy();
 
-        await detailFreePage.navigate(freePostData.postUrl.reportCmtPost);
-        await page.waitForTimeout(500);
+        await test.step('Go to the post', async () => {
+            await detailFreePage.navigate(freePostData.postUrl.reportCmtPost);
+            await page.waitForTimeout(500);
+        });
 
-        const lastCmt = detailFreePage.getLastCmtElement();
-        await lastCmt.reportCmtBtn.click();
+        await test.step('Report comment for the first time', async () => {
+            lastCmt = detailFreePage.getLastCmtElement();
+            await lastCmt.reportCmtBtn.click();
 
-        await detailFreePage.selectReportOptionAndFillReason('비매너');
-        await detailFreePage.popupReportBtn.click();
-        await detailFreePage.verifyToastMsg('success', freePostData.reportCmtMsg.success);
+            await detailFreePage.selectReportOptionAndFillReason('비매너');
+            await detailFreePage.popupReportBtn.click();
+            await detailFreePage.verifyToastMsg('success', freePostData.reportCmtMsg.success);
+        });
 
-        await lastCmt.reportCmtBtn.click();
-        await detailFreePage.verifyToastMsg('error', freePostData.reportCmtMsg.duplicate);
+        await test.step('Report comment for the second time', async () => {
+            await lastCmt.reportCmtBtn.click();
+            await detailFreePage.verifyToastMsg('error', freePostData.reportCmtMsg.duplicate);
+        });
     });
 
     test('[Community] User can edit comment successfully', async ({ page }) => {

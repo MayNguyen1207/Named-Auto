@@ -23,7 +23,7 @@ export class BasePage {
 
     readonly noDataLogo: Locator;
 
-    //Pagiantion
+    //Pagination
     readonly pagCombo: Locator;
     readonly pagSelectedValue: Locator;
     readonly pagInput: Locator;
@@ -31,6 +31,9 @@ export class BasePage {
     readonly pagNextBtn: Locator;
     readonly pagComboList: Locator;
     readonly pagOptions: Locator;
+
+    //Checkbox
+    readonly checkBox: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -60,6 +63,8 @@ export class BasePage {
         this.pagNextBtn = page.locator('[data-slot="pagination-item"]').last();
         this.pagComboList = page.getByRole('listbox');
         this.pagOptions = page.getByRole('option');
+
+        this.checkBox = page.locator('button.flex.flex-row.gap-2.items-center').or(page.getByTestId('checkbox-root')); // Tobe updated page.getByTestId('checkbox-root')
     }
 
     // To close Verification campaign popup
@@ -91,9 +96,11 @@ export class BasePage {
         await this.page.getByRole('button', { name: new RegExp(`^${num}$`) }).click();
     }
 
-    async goToPageViaInput(num: string) {
-        await this.pagInput.fill(num);
+    async goToPageViaInput(pageNumber: string, expectedPage: number | string) {
+        await this.pagInput.fill(pageNumber);
         await this.pagInput.press('Enter');
+        await this.page.waitForTimeout(500);
+        await expect(this.getPageItem(expectedPage)).toHaveAttribute('aria-current', 'page');
     }
 
     async verifySelectedOption(num: number) {
@@ -105,10 +112,34 @@ export class BasePage {
     }
     async verifyListItemsNumber() {
         await this.pagCombo.click();
-        await this.page.waitForTimeout(200);
         const actualOptions = await this.pagOptions.allInnerTexts();
         const cleanedOptions = actualOptions.map(text => text.trim());
         const expectedOptions = ['10', '20', '30', '40', '50'];
         expect(cleanedOptions).toEqual(expectedOptions);
+    }
+
+    // To check checkbox
+    async selectAllCheckBox() {
+        await this.checkBox.first().click();
+        const count = await this.checkBox.count();
+        for (let i = 0; i < count; i++) {
+            await expect(this.checkBox.nth(i).locator('svg')).toHaveClass(/tabler-icon-square-rounded-check/);
+        }
+    }
+
+    async deselectAllCheckBox() {
+        await this.checkBox.first().click();
+        const count = await this.checkBox.count();
+        for (let i = 0; i < count; i++) {
+            await expect(this.checkBox.nth(i).locator('svg')).toHaveClass(/tabler-icon-square-rounded/);
+        }
+    }
+
+    async selectAndDeselectCheckBox() {
+        await this.checkBox.nth(1).click();
+        await expect(this.checkBox.locator('svg')).toHaveClass(/tabler-icon-square-rounded-check/);
+
+        await this.checkBox.nth(1).click();
+        await expect(this.checkBox.locator('svg')).toHaveClass(/tabler-icon-square-rounded/);
     }
 }
