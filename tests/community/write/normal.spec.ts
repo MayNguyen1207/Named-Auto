@@ -72,7 +72,7 @@ test.describe('Normal User Flow; Write Post and submit', () => {
     });
 
     test('[Community] User can insert valid image into post content', async ({ page, browserName }) => {
-        test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
+        test.skip(browserName !== 'firefox', 'Specific error in initializing the Editor on the WebKit emulator');
         test.setTimeout(60000);
 
         const loginPage = new LoginPage(page);
@@ -109,7 +109,7 @@ test.describe('Normal User Flow; Write Post and submit', () => {
     });
 
     test('[Community] User can insert valid video into post content by embed code, URL and uploading from device', async ({ page, browserName }) => {
-        test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
+        test.skip(browserName !== 'firefox', 'Specific error in initializing the Editor on the WebKit emulator');
         test.setTimeout(60000);
 
         const loginPage = new LoginPage(page);

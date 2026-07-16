@@ -1,6 +1,7 @@
 import { test, expect } from '../../../utils/fixtures';
 import { FreeListPage } from '../../../pages/FreeListPage';
 import loginData from '../../../data-test/login-data.json';
+import freeListData from '../../../data-test/free-list-data.json';
 
 test.describe('Admin Flow', () => {
     test.use({ storageState: 'playwright/.auth/admin.json' });
@@ -12,11 +13,14 @@ test.describe('Admin Flow', () => {
         await freeListPage.navigate();
     });
 
-    /*test('[Community] Checkboxes should function correctly', async () => {
+    test('[Community] Checkboxes should function correctly', async ({ page }) => {
+        await page.waitForTimeout(1000);
         await freeListPage.selectAllCheckBox();
+        await page.waitForTimeout(1000);
         await freeListPage.deselectAllCheckBox();
+        await page.waitForTimeout(1000);
         await freeListPage.selectAndDeselectCheckBox();
-    });*/
+    });
 
     test('[Community] Admin can delete posts in list', async ({ page }) => {
         await freeListPage.goToPageViaInput('200', 200);
@@ -113,7 +117,7 @@ test.describe('Admin Flow', () => {
 
             await freeListPage.moveBtn.click();
 
-            await freeListPage.verifyToastMsg('success', '선택된 게시글이 성공적으로 이동되었습니다.');
+            await freeListPage.verifyToastMsg('success', freeListData.movePostMsg.success);
             await page.waitForTimeout(2000);
             await expect(freeListPage.listBoardToMove).toBeHidden();
             await expect(page.getByText(lastPostTitle)).toBeHidden();

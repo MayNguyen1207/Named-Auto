@@ -34,6 +34,16 @@ test.describe('Guest Flow', () => {
     });
 });
 
+test.describe('Admin Flow', () => {
+    test.use({ storageState: 'playwright/.auth/admin.json' });
+
+    test('[Community] A list is shown at the bottom of the detail page in Admin view', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
+        await detailFreePage.navigate(freePostData.postUrl.normalPost);
+        await expect(detailFreePage.listPost).toBeVisible();
+    });
+});
+
 test.describe('Verify post creation date time display', () => {
     test.use({ timezoneId: 'Asia/Seoul' });
 

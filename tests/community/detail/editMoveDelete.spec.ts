@@ -133,3 +133,113 @@ test.describe('Normal User Flow', () => {
         await detailFreePage.verifyToastMsg("error", freePostData.deletePostMsg.unableDelete);
     });
 });
+
+test.describe('Admin Flow', () => {
+    test.use({ storageState: 'playwright/.auth/admin.json' });
+
+    let detailFreePage: DetailFreePage;
+
+    test.beforeEach(async ({ page }) => {
+        detailFreePage = new DetailFreePage(page);
+    });
+
+    test('[Community] Move Post popup should be shown when clicking Move Post button', async () => {
+        await detailFreePage.navigate(freePostData.postUrl.normalPost);
+        await detailFreePage.movePostBtn.click();
+        await expect(detailFreePage.dialog.filter({ hasText: '게시물이동'})).toBeVisible();
+    });
+
+    test('[Community] Admin can edit post even when post has comments', async ({ page }) => {
+        await detailFreePage.navigate(freePostData.postUrl.myPostOtherUserCmt);
+        await page.waitForTimeout(500);
+        const titleBefore = await detailFreePage.postTitle.textContent() as string;
+        const contentBefore = await detailFreePage.postContent.textContent() as string;
+        await detailFreePage.editPostBtn.click();
+
+        const writeFreePage = new WriteFreePage(page);
+        await expect(page).toHaveURL(freePostData.postUrl.editMyPostOtherUserCmt);
+        await expect(writeFreePage.titleInput).toHaveValue(titleBefore);
+        await expect(writeFreePage.contentInput).toHaveText(contentBefore);
+        const titleAfter = `My post with other user's comment (do not delete or edit or comment) ${Date.now()}`;
+        await writeFreePage.titleInput.fill(titleAfter);
+        await writeFreePage.writeBtn.click();
+        await page.waitForTimeout(500);
+
+        await expect(page).toHaveURL(freePostData.postUrl.myPostOtherUserCmt);
+        await expect(detailFreePage.postTitle).toHaveText(titleAfter);
+    });
+
+    test('[Community] Admin can delete post even when post has comments', async ({ page, request, apiBaseURL }) => {
+        let createPostResponse: any;
+        let postUrl: string;
+
+        await test.step('Create a post to delete', async () => {
+            const loginResponse = await request.post(`${apiBaseURL}/login`, {
+                form: {
+                    email: loginData.valid.email,
+                    password: loginData.valid.password,
+                }
+            });
+            expect(loginResponse.ok()).toBeTruthy();
+
+            const loginJson = await loginResponse.json();
+            const dynamicToken = loginJson.session_id;
+
+            createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
+                headers: { 'NAMED-SESSION': `${dynamicToken}` },
+                form: {
+                    board_type: 'free',
+                    subject: `Auto Test Delete Post By Admin ${Date.now()}`,
+                    content: '<p>Bài viết dùng để xóa...</p>',
+                    is_notice: 'false',
+                    comment_allowed: 'true'
+                }
+            });
+            expect(createPostResponse.ok()).toBeTruthy();
+        });
+
+        await test.step('Comment to the post by another user', async () => {
+            const loginResponse = await request.post(`${apiBaseURL}/login`, {
+                form: {
+                    email: loginData.userB.email,
+                    password: loginData.userB.password,
+                }
+            });
+            expect(loginResponse.ok()).toBeTruthy();
+
+            const loginJson = await loginResponse.json();
+            const dynamicToken = loginJson.session_id;
+
+            const postJson = await createPostResponse.json();
+            const postId = postJson.wr_id;
+            postUrl = `/community/free/${postId}`;
+
+            await request.post(`${apiBaseURL}/community/board/${postId}/comment`, {
+                headers: { 'NAMED-SESSION': `${dynamicToken}` },
+                form: {
+                    wr_id: postId,
+                    board_type: 'free',
+                    content: `Auto comment number ${Date.now()}`,
+                    comment_type: 'new'
+                }
+            });
+        });
+        await test.step('Delete the post', async () => {
+            await detailFreePage.navigate(postUrl!);
+            await detailFreePage.deletePostBtn.click();
+            await expect(detailFreePage.noticeDialog).toContainText(
+                `한번 삭제한 게시물은 복구할 방법이 없습니다.
+                정말 삭제하시겠습니까?`
+            );
+            await detailFreePage.dialogCancelBtn.click();
+            await expect(detailFreePage.noticeDialog).toBeHidden();
+            await expect(page).toHaveURL(postUrl!);
+
+            await detailFreePage.deletePostBtn.click();
+            await detailFreePage.dialogConfirmBtn.click();
+            await detailFreePage.verifyToastMsg("success", freePostData.deletePostMsg.success);
+            await detailFreePage.navigate(postUrl!);
+            await expect(detailFreePage.noDataLogo).toBeVisible();
+        });
+    });
+})
