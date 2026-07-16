@@ -1,6 +1,6 @@
 import { test, expect } from '../../../utils/fixtures';
 import { FreeListPage } from '../../../pages/FreeListPage';
-import searchData from '../../../data-test/free-list-search-data.json';
+import freeListData from '../../../data-test/free-list-data.json';
 
 test.describe('Guest Flow', () => {
 
@@ -13,7 +13,7 @@ test.describe('Guest Flow', () => {
 
     test('[Community] User can search in Free list by subject and content', async ({ page }) => {
         expect(freeListPage.searchType).toHaveText('제목+내용');
-        await freeListPage.searchKeywordInput.fill(searchData.search.titleContent);
+        await freeListPage.searchKeywordInput.fill(freeListData.search.titleContent);
 
         const responsePromise = page.waitForResponse(response =>
             response.url().includes('/community/board?') &&
@@ -44,7 +44,7 @@ test.describe('Guest Flow', () => {
         await freeListPage.searchType.click();
         await freeListPage.searchAuthor.click();
         expect(freeListPage.searchType).toHaveText('작성자');
-        await freeListPage.searchKeywordInput.fill(searchData.search.author);
+        await freeListPage.searchKeywordInput.fill(freeListData.search.author);
 
         const responsePromise = page.waitForResponse(response =>
             response.url().includes('/community/board?') &&
@@ -72,7 +72,7 @@ test.describe('Guest Flow', () => {
     });
 
     test('[Community] Empty list screen should be shown when user searches no result keyword', async ({ page }) => {
-        await freeListPage.searchKeywordInput.fill(searchData.search.noResult);
+        await freeListPage.searchKeywordInput.fill(freeListData.search.noResult);
         await expect(freeListPage.noItemText).toBeVisible();
 
         await freeListPage.searchType.click();

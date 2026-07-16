@@ -24,6 +24,8 @@ test.describe('Guest Flow', () => {
             { index: 0, showAuthor: true, showReport: true },   // Author
             { index: 1, showAuthor: false, showReport: true },  // Normal user
             { index: 2, showAuthor: false, showReport: false }, // Admin
+            { index: 3, showAuthor: false, showReport: true },  // Comment assigned auhtor
+            { index: 4, showAuthor: false, showReport: true },  // Comment assigned auhtor
         ];
 
         for (const data of cmtData) {
@@ -33,14 +35,15 @@ test.describe('Guest Flow', () => {
             await (data.showReport ? expect(cmt.reportCmtBtn).toBeVisible() : expect(cmt.reportCmtBtn).toBeHidden());
             await expect(cmt.editCmtBtn).toBeHidden();
             await expect(cmt.deleteCmtBtn).toBeHidden();
+            await expect(cmt.ipInfo).toBeHidden();
         }
     });
 
     test('[Community] Edit Label should be shown for comment that has been edited', async () => {
         await detailFreePage.navigate(freePostData.postUrl.commentPost);
-        const secondCmt = detailFreePage.getCmtElements(1);
-        await expect(secondCmt.editLabel).toBeVisible();
-        await secondCmt.editLabel.hover();
+        const thirdCmt = detailFreePage.getCmtElements(2);
+        await expect(thirdCmt.editLabel).toBeVisible();
+        await thirdCmt.editLabel.hover();
         await expect(detailFreePage.hoverTooltip).toContainText(/\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}:\d{2}/);
     });
 
@@ -237,6 +240,8 @@ test.describe('Normal User Flow', () => {
             { index: 0, showAuthor: true, showMyCmt: false, showReport: true, showAction: false }, // Author
             { index: 1, showAuthor: false, showMyCmt: true, showReport: false, showAction: true }, // My comment
             { index: 2, showAuthor: false, showMyCmt: false, showReport: false, showAction: false }, // Admin
+            { index: 3, showAuthor: false, showMyCmt: false, showReport: true, showAction: false },  // Comment assigned auhtor
+            { index: 4, showAuthor: false, showMyCmt: false, showReport: true, showAction: false },  // Comment assigned auhtor
         ];
 
         for (const data of cmtData) {
@@ -247,6 +252,7 @@ test.describe('Normal User Flow', () => {
             await (data.showReport ? expect(cmt.reportCmtBtn).toBeVisible() : expect(cmt.reportCmtBtn).toBeHidden());
             await (data.showAction ? expect(cmt.editCmtBtn).toBeVisible() : expect(cmt.editCmtBtn).toBeHidden());
             await (data.showAction ? expect(cmt.deleteCmtBtn).toBeVisible() : expect(cmt.deleteCmtBtn).toBeHidden());
+            await expect(cmt.ipInfo).toBeHidden();
         }
     })
 });
@@ -259,19 +265,22 @@ test.describe('Admin Flow', () => {
         await detailFreePage.navigate(freePostData.postUrl.commentPost);
 
         const cmtData = [
-            { index: 0, showAuthor: true, showReport: true },    // Author
-            { index: 1, showAuthor: false, showReport: true },   // Normal User
-            { index: 2, showAuthor: false, showReport: false },  // Other Admin
+            { index: 0, showAuthor: true, showMyCmt: false, showReport: true },    // Author
+            { index: 1, showAuthor: false, showMyCmt: false, showReport: true },   // Normal User
+            { index: 2, showAuthor: false, showMyCmt: false, showReport: false },  // Other Admin
+            { index: 3, showAuthor: false, showMyCmt: false, showReport: false },  // Other admin assigned auhtor
+            { index: 4, showAuthor: false, showMyCmt: true, showReport: false },  // My comment but assigned auhtor
         ];
 
         for (const data of cmtData) {
             const cmt = detailFreePage.getCmtElements(data.index);
             await (data.showAuthor ? expect(cmt.authorLabel).toBeVisible() : expect(cmt.authorLabel).toBeHidden());
-            await expect(cmt.myCmtLabel).toBeHidden();
+            await (data.showMyCmt ? expect(cmt.myCmtLabel).toBeVisible() : expect(cmt.myCmtLabel).toBeHidden());
             await expect(cmt.replyBtn).toBeVisible();
             await (data.showReport ? expect(cmt.reportCmtBtn).toBeVisible() : expect(cmt.reportCmtBtn).toBeHidden());
             await expect(cmt.editCmtBtn).toBeVisible();
             await expect(cmt.deleteCmtBtn).toBeVisible();
+            await expect(cmt.ipInfo).toBeVisible();
         }
     })
 })

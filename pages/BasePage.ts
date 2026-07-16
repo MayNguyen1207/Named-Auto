@@ -64,7 +64,7 @@ export class BasePage {
         this.pagComboList = page.getByRole('listbox');
         this.pagOptions = page.getByRole('option');
 
-        this.checkBox = page.locator('button.flex.flex-row.gap-2.items-center').or(page.getByTestId('checkbox-root')); // Tobe updated page.getByTestId('checkbox-root')
+        this.checkBox = page.locator('button.flex.flex-row.gap-2.items-center').or(page.locator('[data-slot=checkbox]')); // Tobe updated page.getByTestId('checkbox-root')
     }
 
     // To close Verification campaign popup
@@ -137,9 +137,10 @@ export class BasePage {
 
     async selectAndDeselectCheckBox() {
         await this.checkBox.nth(1).click();
-        await expect(this.checkBox.locator('svg')).toHaveClass(/tabler-icon-square-rounded-check/);
+        await expect(this.checkBox.nth(1).locator('svg')).toHaveClass(/tabler-icon-square-rounded-check/);
+        await this.page.waitForTimeout(1000);
 
         await this.checkBox.nth(1).click();
-        await expect(this.checkBox.locator('svg')).toHaveClass(/tabler-icon-square-rounded/);
+        await expect(this.checkBox.nth(1).locator('svg')).toHaveClass(/tabler-icon-square-rounded/);
     }
 }
