@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { HomePage } from '../../../pages/HomePage';
 import { LoginPage } from '../../../pages/LoginPage';
 import loginData from '../../../data-test/login-data.json';
@@ -7,17 +7,6 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
     let homePage: HomePage;
     let loginPage: LoginPage;
     const { email, password, directLoginPages } = loginData.loginFromOtherPage;
-    const handleLoginDialogAndLogin = async (page: Page, expectedLoginUrl: any, finalExpectedUrl: any) => {
-        const loginRequiredDialog = page.getByRole('dialog');
-        await expect(loginRequiredDialog).toBeVisible();
-        await loginRequiredDialog.getByRole('button', { name: '확인' }).click({ force: true });
-
-        await expect(page).toHaveURL(expectedLoginUrl);
-        await page.waitForLoadState('networkidle');
-
-        await loginPage.login(email, password);
-        await expect(page).toHaveURL(finalExpectedUrl);
-    };
 
     test.beforeEach(async ({ page }) => {
         homePage = new HomePage(page);
@@ -45,7 +34,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await page.getByTestId('input-field').fill('a');
         await page.locator(".tabler-icon.tabler-icon-send-2").first().click();
 
-        await handleLoginDialogAndLogin(page, '/login?callbackUrl=%2Fhome', '/home');
+        await loginPage.handleLoginRequiredDialog(email, password, '/login?callbackUrl=%2Fhome', '/home');
     });
 
     test('[Auth] Login from Match page when action is restricted (Chat)', async ({ page }) => {
@@ -53,7 +42,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await page.getByRole('textbox', { name: '메세지를 입력하세요' }).fill('a');
         await page.getByRole('button').filter({ hasText: /^$/ }).nth(3).click();
 
-        await handleLoginDialogAndLogin(page, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fodds/, /\/match\/soccer\/11737634\/odds/);
+        await loginPage.handleLoginRequiredDialog(email, password, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fodds/, /\/match\/soccer\/11737634\/odds/);
     });
 
     test('[Auth] Login from Match page when action is restricted (Write Post)', async ({ page }) => {
@@ -61,7 +50,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await page.getByRole('button', { name: '분석글' }).click();
         await page.getByText('글쓰기', { exact: true }).click();
 
-        await handleLoginDialogAndLogin(page, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fanalysis/, /\/match\/soccer\/11737634\/analysis/);
+        await loginPage.handleLoginRequiredDialog(email, password, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fanalysis/, /\/match\/soccer\/11737634\/analysis/);
     });
 
     test('[Auth] Login from PowerBall page when action is restricted', async ({ page }) => {
@@ -87,7 +76,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await page.getByRole('tab', { name: '게임픽' }).click();
         await page.getByRole('button', { name: /^홀/ }).first().click();
 
-        await handleLoginDialogAndLogin(page, /\/login/, /\/minigame\/rball\/double_dragon/);
+        await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/minigame\/rball\/double_dragon/);
     });
 
     test('[Auth] Login from Trusted Sites page when action is restricted (Write post)', async ({ page }) => {
@@ -95,13 +84,13 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await page.getByRole('link', { name: '후기' }).click();
         await page.getByRole('button', { name: '글쓰기' }).click();
 
-        await handleLoginDialogAndLogin(page, /\/login/, /\/trustedsites\/review/);
+        await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/trustedsites\/review/);
     });
 
     test('[Auth] Login from Trusted Sites Details page when action is restricted (Comment)', async ({ page }) => {
         await page.goto('/trustedsites/4147');
         await page.getByRole('textbox', { name: /댓글 작성시 타인에 대한 배려와 책임을 담아주세요/ }).click();
 
-        await handleLoginDialogAndLogin(page, /\/login/, /\/trustedsites\/4147/);
+        await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/trustedsites\/4147/);
     });
 });
