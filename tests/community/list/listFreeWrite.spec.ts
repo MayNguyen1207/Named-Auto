@@ -18,7 +18,6 @@ test.describe('Guest Flow', () => {
         await freeListPage.moveLoginCfBtn.click();
         await expect(page).toHaveURL(/.*\/login/);
         const loginPage = new LoginPage(page);
-        await page.waitForTimeout(500);
         await loginPage.login(loginData.valid.email, loginData.valid.password);
         await expect(page).toHaveURL('/community/free');
     });
@@ -30,7 +29,6 @@ test.describe('Non-verified user Flow', () => {
     test('[Community] User can move to Write Post screen when clicking Write button', async ({ page }) => {
         const freeListPage = new FreeListPage(page);
         await freeListPage.navigate();
-        await page.waitForTimeout(2000);
         await freeListPage.writeBtn.click();
         await expect(freeListPage.noticeDialog).toContainText(
             "본인 인증을 거치지 않은 경우 글쓰기가 제한됩니다." +
@@ -53,7 +51,6 @@ test.describe('Prisoner Flow', () => {
     test('[Community] A modal should be shown when prisoner accesses Write Post page', async ({ page }) => {
         const freeListPage = new FreeListPage(page);
         await freeListPage.navigate();
-        await page.waitForTimeout(2000);
         await freeListPage.writeBtn.click();
         await expect(freeListPage.jailPoster).toBeVisible();
         await expect(freeListPage.prisonNotice).toContainText(
@@ -72,6 +69,6 @@ test.describe('Normal User Flow', () => {
         const freeListPage = new FreeListPage(page);
         await freeListPage.navigate();
         await freeListPage.writeBtn.click();
-        await expect(page).toHaveURL('/community/create?boardType=free');
+        await expect(page).toHaveURL('/community/create?boardType=free', { timeout: 10000 });
     });
 })

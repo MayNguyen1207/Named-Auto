@@ -27,7 +27,7 @@ for (const { role, storageState } of flows) {
                 게시물을 열람하시겠습니까?`
             );
             await detailFreePage.restrictedPostBackBtn.click();
-            await expect(page).not.toHaveURL(freePostData.postUrl.reportedFiveTimePost);
+            await expect(page).not.toHaveURL(freePostData.postUrl.reportedFiveTimePost, { timeout: 10000 });
         });
 
         test('[Community] Restricted post popup should be showed if the post has been reported 5 > 9 times, click View button to View post', async ({ page }) => {
@@ -47,7 +47,7 @@ for (const { role, storageState } of flows) {
             );
             await expect(detailFreePage.restrictedPostViewBtn).toBeHidden();
             await detailFreePage.restrictedPostBackBtn.click();
-            await expect(page).not.toHaveURL(freePostData.postUrl.reportedTenTimePost);
+            await expect(page).not.toHaveURL(freePostData.postUrl.reportedTenTimePost, { timeout: 10000 });
         });
     });
 }

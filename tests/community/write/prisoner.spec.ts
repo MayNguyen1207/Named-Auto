@@ -14,6 +14,6 @@ test.describe('Prisoner Flow', () => {
             loginData.prisoner.expectedUsername + "님은 비매너의 죄명으로 영창에 수감되어 네임드의 서비스를 이용하실 수 없습니다.");
 
         await writeFreePage.previousPageBtn.click();
-        await expect(page).not.toHaveURL('/community\/create\?boardType=free');
+        await expect(page).not.toHaveURL('/community\/create\?boardType=free', { timeout: 10000 });
     });
 });

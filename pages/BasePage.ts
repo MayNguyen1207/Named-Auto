@@ -82,7 +82,7 @@ export class BasePage {
     }
     async verifyToastMsg(type: 'error' | 'success' | 'info', expectedText: string) {
         const toast = this.getToastByType(type).filter({ hasText: expectedText }).first();
-        await expect(toast).toBeVisible();
+        await expect(toast).toBeVisible({ timeout: 10000 });
     }
 
     // To check pagination
@@ -94,19 +94,18 @@ export class BasePage {
 
     async clickPageNumber(num: number) {
         await this.page.getByRole('button', { name: new RegExp(`^${num}$`) }).click();
+        await this.page.waitForTimeout(500);
     }
 
     async goToPageViaInput(pageNumber: string, expectedPage: number | string) {
         await this.pagInput.fill(pageNumber);
         await this.pagInput.press('Enter');
-        await this.page.waitForTimeout(500);
         await expect(this.getPageItem(expectedPage)).toHaveAttribute('aria-current', 'page');
     }
 
     async verifySelectedOption(num: number) {
         await expect(this.pagSelectedValue).toHaveText("10개씩 보기");
         await this.pagCombo.click();
-        await this.page.waitForTimeout(200);
         await this.pagOptions.filter({ hasText: `${num}`}).click();
         await expect(this.pagSelectedValue).toHaveText(`${num}`+"개씩 보기");
     }

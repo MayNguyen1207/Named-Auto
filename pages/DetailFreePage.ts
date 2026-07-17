@@ -75,7 +75,7 @@ export class DetailFreePage extends BasePage {
         this.deletePostBtn = page.getByLabel('삭제', { exact: true });
 
         
-        this.postAuthor = page.getByTestId('user-info-context-menu-nickname').first();
+        this.postAuthor = page.locator('article').getByTestId('user-info-context-menu-nickname').first();
         this.postCreationTime = page.getByRole('button', { name: 'Toggle date format' }).first();
         this.editNumTxt = page.locator('span[data-testid="tooltip-trigger"]').filter({ hasText: '수정' }).first();
 
@@ -93,7 +93,7 @@ export class DetailFreePage extends BasePage {
         this.likeBtn = page.getByTestId('community-post-recommend-button');
         this.reportBtn = page.getByTestId('community-post-report-button');
 
-        this.cmtInput = page.locator('[id="comment-textarea"]');
+        this.cmtInput = page.locator('[id="comment-textarea"]').first();
         this.submitCmtBtn = page.getByRole('button', { name: '댓글 전송' });
         this.cmtCount = page.getByTestId('community-comment-count');
         this.noCommentTxt = page.getByText('댓글이 없습니다.', { exact: true });
@@ -102,7 +102,7 @@ export class DetailFreePage extends BasePage {
         this.cmtText = page.locator(".text-xs.text-foreground.my-2.wrap-break-word.whitespace-pre-wrap"); // Tobe edit
         this.replyCmtInput = page.getByRole('textbox', { name: '답글을 입력하세요…' });
 
-        this.cmtAuthorPicker = page.getByTestId('popover-trigger').last();//Tobe edit
+        this.cmtAuthorPicker = page.getByTestId('popover-trigger').nth(2);//Tobe edit
         this.authorCommandRoot = page.locator('[data-testid="command-root"]');
         this.authorFirstItem = this.authorCommandRoot.locator('[data-testid="command-item"]').first();
 
@@ -135,7 +135,7 @@ export class DetailFreePage extends BasePage {
 
     async navigate(url: string) {
         await this.page.goto(url);
-        await this.page.waitForTimeout(3000);
+        await expect(this.postTitle).toBeVisible({ timeout: 10000 });
     }
 
     async writeCmt(content: string) {
