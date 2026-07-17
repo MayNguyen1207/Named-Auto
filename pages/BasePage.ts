@@ -23,7 +23,7 @@ export class BasePage {
 
     readonly noDataLogo: Locator;
 
-    //Pagiantion
+    //Pagination
     readonly pagCombo: Locator;
     readonly pagSelectedValue: Locator;
     readonly pagInput: Locator;
@@ -31,6 +31,9 @@ export class BasePage {
     readonly pagNextBtn: Locator;
     readonly pagComboList: Locator;
     readonly pagOptions: Locator;
+
+    //Checkbox
+    readonly checkBox: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -53,13 +56,15 @@ export class BasePage {
 
         this.noDataLogo = page.getByRole('img', { name: 'no data' });
 
-        this.pagCombo = page.getByRole('combobox');
-        this.pagSelectedValue = page.locator('span[data-testid="select-value"]');
+        this.pagCombo = page.getByTestId('select-trigger').last();
+        this.pagSelectedValue = page.locator('span[data-testid="select-value"]').last();
         this.pagInput = page.getByRole('textbox', { name: '페이지로 이동' });
         this.pagPreviousBtn = page.locator('[data-slot="pagination-item"]').first();
         this.pagNextBtn = page.locator('[data-slot="pagination-item"]').last();
         this.pagComboList = page.getByRole('listbox');
         this.pagOptions = page.getByRole('option');
+
+        this.checkBox = page.locator('button.flex.flex-row.gap-2.items-center').or(page.locator('[data-slot=checkbox]')); // Tobe updated page.getByTestId('checkbox-root')
     }
 
     // To close Verification campaign popup
@@ -77,32 +82,64 @@ export class BasePage {
     }
     async verifyToastMsg(type: 'error' | 'success' | 'info', expectedText: string) {
         const toast = this.getToastByType(type).filter({ hasText: expectedText }).first();
-        await expect(toast).toBeVisible();
+        await expect(toast).toBeVisible({ timeout: 10000 });
     }
 
     // To check pagination
-    async clickPageNumber(num: number) {
-        await this.page.locator('[data-slot="pagination-item"]').filter({ hasText: `"${num}"` }).click();
+    getPageItem(pageNumber: number | string) {
+        return this.page
+            .locator('nav[aria-label="pagination"] a, nav[aria-label="pagination"] button')
+            .filter({ hasText: new RegExp(`^${pageNumber}$`) });
     }
 
-    async goToPageViaInput(num: string) {
-        await this.pagInput.fill(num);
+    async clickPageNumber(num: number) {
+        await this.page.getByRole('button', { name: new RegExp(`^${num}$`) }).click();
+        await this.page.waitForTimeout(500);
+    }
+
+    async goToPageViaInput(pageNumber: string, expectedPage: number | string) {
+        await this.pagInput.fill(pageNumber);
         await this.pagInput.press('Enter');
+        await expect(this.getPageItem(expectedPage)).toHaveAttribute('aria-current', 'page');
     }
 
     async verifySelectedOption(num: number) {
         await expect(this.pagSelectedValue).toHaveText("10개씩 보기");
         await this.pagCombo.click();
-        await this.page.waitForTimeout(200);
         await this.pagOptions.filter({ hasText: `${num}`}).click();
         await expect(this.pagSelectedValue).toHaveText(`${num}`+"개씩 보기");
     }
     async verifyListItemsNumber() {
         await this.pagCombo.click();
-        await this.page.waitForTimeout(200);
         const actualOptions = await this.pagOptions.allInnerTexts();
         const cleanedOptions = actualOptions.map(text => text.trim());
         const expectedOptions = ['10', '20', '30', '40', '50'];
         expect(cleanedOptions).toEqual(expectedOptions);
+    }
+
+    // To check checkbox
+    async selectAllCheckBox() {
+        await this.checkBox.first().click();
+        const count = await this.checkBox.count();
+        for (let i = 0; i < count; i++) {
+            await expect(this.checkBox.nth(i).locator('svg')).toHaveClass(/tabler-icon-square-rounded-check/);
+        }
+    }
+
+    async deselectAllCheckBox() {
+        await this.checkBox.first().click();
+        const count = await this.checkBox.count();
+        for (let i = 0; i < count; i++) {
+            await expect(this.checkBox.nth(i).locator('svg')).toHaveClass(/tabler-icon-square-rounded/);
+        }
+    }
+
+    async selectAndDeselectCheckBox() {
+        await this.checkBox.nth(1).click();
+        await expect(this.checkBox.nth(1).locator('svg')).toHaveClass(/tabler-icon-square-rounded-check/);
+        await this.page.waitForTimeout(1000);
+
+        await this.checkBox.nth(1).click();
+        await expect(this.checkBox.nth(1).locator('svg')).toHaveClass(/tabler-icon-square-rounded/);
     }
 }

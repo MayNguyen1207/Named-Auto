@@ -146,8 +146,9 @@
     "password": "Named@123"
   },
   "admin": {
-    "email": "manager_named001@named.com",
-    "password": "Named@123",
+    "email": "manager_turnover@named.com",
+    "password": "geH2A_tf7hDg2xK",
+    "expectedUsername": "[NM]Turnover",
     "fakeIp": "203.119.34.12",
     "expectedErrorMessage": "관리자 로그인이 허용되지 않은 IP입니다."
   },

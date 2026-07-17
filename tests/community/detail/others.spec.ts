@@ -34,6 +34,16 @@ test.describe('Guest Flow', () => {
     });
 });
 
+test.describe('Admin Flow', () => {
+    test.use({ storageState: 'playwright/.auth/admin.json' });
+
+    test('[Community] A list is shown at the bottom of the detail page in Admin view', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
+        await detailFreePage.navigate(freePostData.postUrl.normalPost);
+        await expect(detailFreePage.listPost).toBeVisible();
+    });
+});
+
 test.describe('Verify post creation date time display', () => {
     test.use({ timezoneId: 'Asia/Seoul' });
 
@@ -73,7 +83,6 @@ test.describe('Verify post creation date time display', () => {
 
             await detailFreePage.postCreationTime.hover();
             const expectedDetailText = dayjs(mockCreatedTime).tz('Asia/Seoul').format('YYYY.MM.DD HH:mm');
-            await page.waitForTimeout(500);
             await expect(detailFreePage.hoverTooltip).toContainText(expectedDetailText);
 
             await detailFreePage.postCreationTime.click();

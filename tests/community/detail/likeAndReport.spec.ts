@@ -2,22 +2,11 @@ import { test, expect } from '../../../utils/fixtures';
 import { DetailFreePage } from '../../../pages/DetailFreePage';
 import loginData from '../../../data-test/login-data.json';
 import freePostData from '../../../data-test/free-post-data.json';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 test.describe('Guest Flow', () => {
 
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        detailFreePage = new DetailFreePage(page);
-    });
-
     test('[Community] Move to Login popup should be shown when guest likes the post', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
         await detailFreePage.likeBtn.scrollIntoViewIfNeeded();
         await expect(detailFreePage.likeBtn).toHaveText(/\d+/);
@@ -35,16 +24,16 @@ test.describe('Normal User Flow', () => {
         detailFreePage = new DetailFreePage(page);
     });
 
-    test.describe('Tests that need a brand new post', () => {
+    test('[Community] Normal user can like and report a post only 1 time', async ({ page, request, apiBaseURL }) => {
         let sharedPostUrl = '';
         let sharedPostId = '';
         let dynamicToken = '';
 
-        test.beforeAll(async ({ apiBaseURL, request }) => {
+        await test.step('Create a brand new post', async () => {
             const loginResponse = await request.post(`${apiBaseURL}/login`, {
                 form: {
-                    email: loginData.userB.email,
-                    password: loginData.userB.password,
+                    email: loginData.userD.email,
+                    password: loginData.userD.password,
                 }
             });
             expect(loginResponse.ok()).toBeTruthy();
@@ -68,9 +57,8 @@ test.describe('Normal User Flow', () => {
             sharedPostUrl = `/community/free/${sharedPostId}`;
         });
 
-        test('[Community] Normal user can like a post only 1 time', async ({ page }) => {
+        await test.step('Normal user can like a post only 1 time', async () => {
             await detailFreePage.navigate(sharedPostUrl);
-            await page.waitForTimeout(500);
             await detailFreePage.likeBtn.click();
             await detailFreePage.verifyToastMsg("success", freePostData.likeMsg.success);
             await expect(detailFreePage.likeBtn.locator('span')).toHaveText('1');
@@ -80,9 +68,8 @@ test.describe('Normal User Flow', () => {
             await expect(detailFreePage.likeBtn.locator('span')).toHaveText('1');
         });
 
-        test('[Community] Normal user can report another user\'s post only 1 time', async ({ page }) => {
+        await test.step('Normal user can report a post only 1 time', async () => {
             await detailFreePage.navigate(sharedPostUrl);
-            await page.waitForTimeout(500);
             await detailFreePage.reportBtn.click();
             await detailFreePage.verifyReportPopupOptions();
             await expect(detailFreePage.reportTextArea).toBeHidden();
@@ -101,7 +88,6 @@ test.describe('Normal User Flow', () => {
 
     test('[Community] Normal user cannot like my own post, [Report] button is hidden in my own post', async ({ page }) => {
         await detailFreePage.navigate(freePostData.postUrl.myPost);
-        await page.waitForTimeout(500);
         const likeNumber = await detailFreePage.likeBtn.locator('span').textContent() ?? '';
         await detailFreePage.likeBtn.click();
         await detailFreePage.verifyToastMsg("error", freePostData.likeMsg.likeMyOwnPost);

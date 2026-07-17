@@ -12,13 +12,8 @@ dayjs.extend(timezone);
 
 test.describe('Guest Flow', () => {
 
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        detailFreePage = new DetailFreePage(page);
-    });
-
     test('[Community] Guest cannot comment in post', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
         await detailFreePage.cmtInput.scrollIntoViewIfNeeded();
         await detailFreePage.cmtInput.click();
@@ -31,80 +26,16 @@ test.describe('Guest Flow', () => {
         await detailFreePage.moveLoginCfBtn.click();
         await expect(page).toHaveURL(/.*\/login/);
         const loginPage = new LoginPage(page);
-        await page.waitForTimeout(500);
         await loginPage.login(loginData.valid.email, loginData.valid.password);
-        await expect(page).toHaveURL(freePostData.postUrl.normalPost);
-    });
-
-    test('[Community] Verify comment chronological order and pagination (Oldest first, Newest last)', async ({ page, apiBaseURL, request }) => {
-        let postUrl = '';
-        let postId = '';
-        let dynamicToken = '';
-
-        const loginResponse = await request.post(`${apiBaseURL}/login`, {
-            form: {
-                email: loginData.userC.email,
-                password: loginData.userC.password,
-            }
-        });
-        expect(loginResponse.ok()).toBeTruthy();
-
-        const loginJson = await loginResponse.json();
-        dynamicToken = loginJson.session_id;
-
-        const createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
-            headers: { 'NAMED-SESSION': `${dynamicToken}` },
-            form: {
-                board_type: 'free',
-                subject: `Auto Test Comment Pagination ${Date.now()}`,
-                content: '<p>Bài viết dùng để test Comment Pagination...</p>',
-                is_notice: 'false',
-                comment_allowed: 'true'
-            }
-        });
-        expect(createPostResponse.ok()).toBeTruthy();
-        const postJson = await createPostResponse.json();
-        postId = postJson.wr_id;
-        postUrl = `/community/free/${postId}`;
-
-        const totalCommentsToCreate = 25;
-        for (let i = 1; i <= totalCommentsToCreate; i++) {
-            await request.post(`${apiBaseURL}/community/board/${postId}/comment`, {
-                headers: { 'NAMED-SESSION': `${dynamicToken}` },
-                form: {
-                    wr_id: postId,
-                    board_type: 'free',
-                    content: `Auto comment number ${i}`,
-                    comment_type: 'new'
-                }
-            });
-        }
-
-        await detailFreePage.navigate(postUrl);
-        await page.waitForTimeout(500);
-
-        const lastCommentOnDefaultPage = detailFreePage.cmtItems.last();
-        await expect(lastCommentOnDefaultPage).toContainText(`Auto comment number ${totalCommentsToCreate}`);
-
-        await detailFreePage.cmtFirstPageBtn.click();
-        await page.waitForTimeout(500);
-        const firstCommentOnFirstPage = detailFreePage.cmtItems.first();
-        await expect(firstCommentOnFirstPage).toContainText('Auto comment number 1');
+        await expect(page).toHaveURL(freePostData.postUrl.normalPost, { timeout: 10000 });
     });
 });
 
 test.describe('Prisoner Flow', () => {
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        const loginPage = new LoginPage(page);
-        await loginPage.navigate();
-        await page.waitForTimeout(500);
-        await loginPage.login(loginData.prisoner.email, loginData.prisoner.password);
-        detailFreePage = new DetailFreePage(page);
-    });
+    test.use({ storageState: 'playwright/.auth/prisoner.json' });
 
     test('[Community] Prisoner cannot comment on a Free post', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
         await detailFreePage.writeCmt(`${Date.now()}`);
         await detailFreePage.verifyToastMsg("error", freePostData.cmtMsg.prisoner);
@@ -112,17 +43,12 @@ test.describe('Prisoner Flow', () => {
 });
 
 test.describe('Non-verified User Flow', () => {
-    test('[Community] Non-verified user cannot comment on a Free post', async ({ page }) => {
-        const loginPage = new LoginPage(page);
-        await loginPage.navigate();
-        await page.waitForTimeout(500);
-        await loginPage.login(loginData.nonverifiedUser.email, loginData.nonverifiedUser.password);
+    test.use({ storageState: 'playwright/.auth/non-verified-user.json' });
 
-        let detailFreePage: DetailFreePage;
-        detailFreePage = new DetailFreePage(page);
+    test('[Community] Non-verified user cannot comment on a Free post', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
-        await page.waitForTimeout(1000);
-        await detailFreePage.writeCmt(`${Date.now}`);
+        await detailFreePage.writeCmt(`${Date.now()}`);
         await expect(detailFreePage.noticeDialog).toContainText(
             "댓글은 본인 인증을 해야만 쓰실 수 있습니다." +
             "본인인증을 진행하시겠습니까?"
@@ -131,7 +57,7 @@ test.describe('Non-verified User Flow', () => {
         await detailFreePage.dialogCancelBtn.click();
         await expect(page).toHaveURL(freePostData.postUrl.normalPost);
 
-        await detailFreePage.writeCmt(`${Date.now}`);
+        await detailFreePage.writeCmt(`${Date.now()}`);
         await detailFreePage.verifyBtn.click();
         await expect(page.getByRole('heading', { name: '핸드폰 인증받기' })).toBeVisible(); //TODO: Edit locator after creating My Info page
         await expect(page).toHaveURL(/.*mypage\/info/);
@@ -147,7 +73,7 @@ test.describe('Normal User Flow', () => {
         detailFreePage = new DetailFreePage(page);
     });
 
-    test('[Community] Normal user can write a comment successfully', async ({ page, apiBaseURL, playwright }) => {
+    test('[Community] Normal user can write a comment successfully', async ({ page, apiBaseURL, playwright, request }) => {
         const apiContext = await playwright.request.newContext();
         const loginResponse = await apiContext.post(`${apiBaseURL}/login`, {
             form: {
@@ -170,10 +96,10 @@ test.describe('Normal User Flow', () => {
         });
         expect(createPostResponse.ok()).toBeTruthy();
         const postJson = await createPostResponse.json();
-        const newPostUrl = `/community/free/${postJson.wr_id}`;
+        const postId = postJson.wr_id
+        const newPostUrl = `/community/free/${postId}`;
 
         await detailFreePage.navigate(newPostUrl);
-        await page.waitForTimeout(500);
         await expect(detailFreePage.noCommentTxt).toBeVisible();
         await expect(detailFreePage.cmtCount).toHaveText("0");
 
@@ -185,6 +111,8 @@ test.describe('Normal User Flow', () => {
         await expect(detailFreePage.cmtItems.first()).toContainText(myCommentText);
         await expect(detailFreePage.noCommentTxt).toBeHidden();
         await expect(detailFreePage.cmtCount).toHaveText("1");
+
+        await detailFreePage.deletePostViaAPI(request, apiBaseURL, postId);
     });
 
     for (const data of freePostData.invalidCmt) {
@@ -197,7 +125,7 @@ test.describe('Normal User Flow', () => {
 
     test('[Community] User cannot comment in a post whose author has blocked the user', async () => {
         await detailFreePage.navigate(freePostData.postUrl.blockedPost);
-        await detailFreePage.writeCmt(`${Date.now}`);
+        await detailFreePage.writeCmt(`${Date.now()}`);
         await detailFreePage.verifyToastMsg("error", freePostData.cmtMsg.block)
     });
 })

@@ -1,25 +1,13 @@
 import { test, expect } from '../../../utils/fixtures';
-import { LoginPage } from '../../../pages/LoginPage';
 import { DetailFreePage } from '../../../pages/DetailFreePage';
 import loginData from '../../../data-test/login-data.json';
 import freePostData from '../../../data-test/free-post-data.json';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 test.describe('Guest Flow', () => {
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        detailFreePage = new DetailFreePage(page);
-    });
 
     test('[Community] Guest cannot reply or report a comment', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.myPost);
-        await page.waitForTimeout(500);
 
         const lastCmt = detailFreePage.getLastCmtElement();
 
@@ -33,19 +21,11 @@ test.describe('Guest Flow', () => {
 });
 
 test.describe('Prisoner Flow', () => {
-    let detailFreePage: DetailFreePage;
-
-    test.beforeEach(async ({ page }) => {
-        detailFreePage = new DetailFreePage(page);
-    });
+    test.use({ storageState: 'playwright/.auth/prisoner.json' });
 
     test('[Community] Prisoner cannot edit a comment', async ({ page }) => {
-        const loginPage = new LoginPage(page);
-        await loginPage.navigate();
-        await loginPage.login(loginData.prisoner.email, loginData.prisoner.password);
-
+        const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.prisonerPost);
-        await page.waitForTimeout(500);
 
         const lastCmt = detailFreePage.getLastCmtElement();
 
@@ -65,45 +45,56 @@ test.describe('Normal User Flow', () => {
     });
 
     test('[Community] User can report a comment only 1 time', async ({ page, apiBaseURL, playwright }) => {
-        const apiContext = await playwright.request.newContext();
-        const loginResponse = await apiContext.post(`${apiBaseURL}/login`, {
-            form: {
-                email: loginData.userD.email,
-                password: loginData.userD.password,
-            }
-        });
-        const loginJson = await loginResponse.json();
-        const dynamicToken = loginJson.session_id;
+        let loginResponse: any;
+        let apiContext: any;
+        let lastCmt: any;
 
-        const postId = detailFreePage.getPostIdFromUrl(freePostData.postUrl.reportCmtPost);
-        const createCmtResponse = await apiContext.post(`${apiBaseURL}/community/board/${postId}/comment`, {
-            headers: { 'NAMED-SESSION': dynamicToken },
-            form: {
-                wr_id: postId,
-                board_type: 'free',
-                content: `Auto test report comment ${Date.now()}`,
-                comment_type: 'new'
-            }
+        await test.step('Login via API to get session_id', async () => {
+            apiContext = await playwright.request.newContext();
+            loginResponse = await apiContext.post(`${apiBaseURL}/login`, {
+                form: {
+                    email: loginData.userD.email,
+                    password: loginData.userD.password,
+                }
+            });
         });
-        expect(createCmtResponse.ok()).toBeTruthy();
+
+        await test.step('Create a dummy comment', async () => {
+            const loginJson = await loginResponse.json();
+            const dynamicToken = loginJson.session_id;
+
+            const postId = detailFreePage.getPostIdFromUrl(freePostData.postUrl.reportCmtPost);
+            const createCmtResponse = await apiContext.post(`${apiBaseURL}/community/board/${postId}/comment`, {
+                headers: { 'NAMED-SESSION': dynamicToken },
+                form: {
+                    wr_id: postId,
+                    board_type: 'free',
+                    content: `Auto test report comment ${Date.now()}`,
+                    comment_type: 'new'
+                }
+            });
+            expect(createCmtResponse.ok()).toBeTruthy();
+        });
 
         await detailFreePage.navigate(freePostData.postUrl.reportCmtPost);
-        await page.waitForTimeout(500);
 
-        const lastCmt = detailFreePage.getLastCmtElement();
-        await lastCmt.reportCmtBtn.click();
+        await test.step('Report comment for the first time', async () => {
+            lastCmt = detailFreePage.getLastCmtElement();
+            await lastCmt.reportCmtBtn.click();
 
-        await detailFreePage.selectReportOptionAndFillReason('비매너');
-        await detailFreePage.popupReportBtn.click();
-        await detailFreePage.verifyToastMsg('success', freePostData.reportCmtMsg.success);
+            await detailFreePage.selectReportOptionAndFillReason('비매너');
+            await detailFreePage.popupReportBtn.click();
+            await detailFreePage.verifyToastMsg('success', freePostData.reportCmtMsg.success);
+        });
 
-        await lastCmt.reportCmtBtn.click();
-        await detailFreePage.verifyToastMsg('error', freePostData.reportCmtMsg.duplicate);
+        await test.step('Report comment for the second time', async () => {
+            await lastCmt.reportCmtBtn.click();
+            await detailFreePage.verifyToastMsg('error', freePostData.reportCmtMsg.duplicate);
+        });
     });
 
-    test('[Community] User can edit comment successfully', async ({ page }) => {
+    test('[Community] User can edit comment successfully', async () => {
         await detailFreePage.navigate(freePostData.postUrl.myPost);
-        await page.waitForTimeout(500);
 
         const lastCmt = detailFreePage.getLastCmtElement();
         const cmtBefore = await detailFreePage.cmtText.last().textContent() as string;
@@ -119,7 +110,6 @@ test.describe('Normal User Flow', () => {
 
     test('[Community] User can delete a comment successfully', async ({ page }) => {
         await detailFreePage.navigate(freePostData.postUrl.noticePost);
-        await page.waitForTimeout(500);
 
         const cmtContent = "Comment to Delete";
         await detailFreePage.writeCmt(cmtContent);
@@ -139,25 +129,21 @@ test.describe('Normal User Flow', () => {
 
     test('[Community] User can comment to depth3', async ({ page }) => {
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
-        await page.waitForTimeout(500);
 
         const t = Date.now();
         const cmts = [`Depth 1 ${t}`, `Depth 2 ${t}`, `Depth 3 ${t}`];
 
         await detailFreePage.writeCmt(cmts[0]);
-        await page.waitForTimeout(500);
         const el1 = detailFreePage.getCmtElementByText(cmts[0]);
 
         await el1.replyBtn.click();
         await detailFreePage.replyCmtInput.last().fill(cmts[1]);
         await detailFreePage.submitCmtBtn.last().click();
-        await page.waitForTimeout(500);
         const el2 = detailFreePage.getCmtElementByText(cmts[1]);
 
         await el2.replyBtn.click();
         await detailFreePage.replyCmtInput.first().fill(cmts[2]);
         await detailFreePage.submitCmtBtn.nth(3).click();
-        await page.waitForTimeout(500);
         const el3 = detailFreePage.getCmtElementByText(cmts[2]);
 
         await expect(el3.replyBtn).toBeHidden();
@@ -169,7 +155,6 @@ test.describe('Normal User Flow', () => {
             await el.deleteCmtBtn.click();
             await detailFreePage.dialogConfirmBtn.click();
             await detailFreePage.verifyToastMsg("success", freePostData.deleteCmtMsg.success);
-            await page.waitForTimeout(500);
         }
     });
 });

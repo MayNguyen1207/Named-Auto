@@ -112,7 +112,7 @@ export class WriteFreePage extends BasePage {
 
     async enterTitle(title: string) {
         await this.titleInput.fill(title);
-        await this.page.waitForTimeout(3000);
+        await this.page.waitForTimeout(2000);
         if ((await this.titleInput.inputValue()) === '') {
             await this.titleInput.fill(title);
         }
