@@ -56,6 +56,14 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await handleLoginDialogAndLogin(page, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fodds/, /\/match\/soccer\/11737634\/odds/);
     });
 
+    test('[Auth] Login from Match page when action is restricted (Write Post)', async ({ page }) => {
+        await page.goto('/match/soccer/11737634/odds');
+        await page.getByRole('button', { name: '분석글' }).click();
+        await page.getByText('글쓰기', { exact: true }).click();
+
+        await handleLoginDialogAndLogin(page, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fanalysis/, /\/match\/soccer\/11737634\/analysis/);
+    });
+
     test('[Auth] Login from PowerBall page when action is restricted', async ({ page }) => {
         await page.goto('/minigame/rball/double_dragon');
         await page.getByRole('button', { name: '바로가기' }).click();
