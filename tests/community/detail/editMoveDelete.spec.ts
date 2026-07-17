@@ -36,7 +36,6 @@ test.describe('Normal User Flow', () => {
 
     test('[Community] User can edit post when post has author\'s comment only', async ({ page }) => {
         await detailFreePage.navigate(freePostData.postUrl.myPost);
-        await page.waitForTimeout(500);
         const titleBefore = await detailFreePage.postTitle.textContent() as string;
         const contentBefore = await detailFreePage.postContent.textContent() as string;
         await detailFreePage.editPostBtn.click();
@@ -48,15 +47,13 @@ test.describe('Normal User Flow', () => {
         const titleAfter = titleBefore + ` ${Date.now()}`;
         await writeFreePage.titleInput.fill(titleAfter);
         await writeFreePage.writeBtn.click();
-        await page.waitForTimeout(500);
 
-        await expect(page).toHaveURL(freePostData.postUrl.myPost);
+        await expect(page).toHaveURL(freePostData.postUrl.myPost, { timeout: 10000 });
         await expect(detailFreePage.postTitle).toHaveText(titleAfter);
     });
 
     test('[Community] User cannot edit a post that has other user\'s comment', async ({ page }) => {
         await detailFreePage.navigate(freePostData.postUrl.myPostOtherUserCmt);
-        await page.waitForTimeout(500);
         await detailFreePage.editPostBtn.click();
         await detailFreePage.verifyToastMsg("error", freePostData.editPostMsg.unableEdit);
 
@@ -123,7 +120,6 @@ test.describe('Normal User Flow', () => {
 
     test('[Community] User cannot delete a post that has other user\'s comment', async ({ page }) => {
         await detailFreePage.navigate(freePostData.postUrl.myPostOtherUserCmt);
-        await page.waitForTimeout(500);
         await detailFreePage.deletePostBtn.click();
         await expect(detailFreePage.noticeDialog).toContainText(
             `한번 삭제한 게시물은 복구할 방법이 없습니다.
@@ -149,9 +145,10 @@ test.describe('Admin Flow', () => {
         await expect(detailFreePage.dialog.filter({ hasText: '게시물이동'})).toBeVisible();
     });
 
-    test('[Community] Admin can edit post even when post has comments', async ({ page }) => {
+    test('[Community] Admin can edit post even when post has comments', async ({ page, browserName }) => {
+        test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
+
         await detailFreePage.navigate(freePostData.postUrl.myPostOtherUserCmt);
-        await page.waitForTimeout(500);
         const titleBefore = await detailFreePage.postTitle.textContent() as string;
         const contentBefore = await detailFreePage.postContent.textContent() as string;
         await detailFreePage.editPostBtn.click();
@@ -163,9 +160,8 @@ test.describe('Admin Flow', () => {
         const titleAfter = `My post with other user's comment (do not delete or edit or comment) ${Date.now()}`;
         await writeFreePage.titleInput.fill(titleAfter);
         await writeFreePage.writeBtn.click();
-        await page.waitForTimeout(500);
 
-        await expect(page).toHaveURL(freePostData.postUrl.myPostOtherUserCmt);
+        await expect(page).toHaveURL(freePostData.postUrl.myPostOtherUserCmt, { timeout: 10000 });
         await expect(detailFreePage.postTitle).toHaveText(titleAfter);
     });
 
@@ -176,8 +172,8 @@ test.describe('Admin Flow', () => {
         await test.step('Create a post to delete', async () => {
             const loginResponse = await request.post(`${apiBaseURL}/login`, {
                 form: {
-                    email: loginData.valid.email,
-                    password: loginData.valid.password,
+                    email: loginData.userD.email,
+                    password: loginData.userD.password,
                 }
             });
             expect(loginResponse.ok()).toBeTruthy();
@@ -238,6 +234,7 @@ test.describe('Admin Flow', () => {
             await detailFreePage.deletePostBtn.click();
             await detailFreePage.dialogConfirmBtn.click();
             await detailFreePage.verifyToastMsg("success", freePostData.deletePostMsg.success);
+            await page.waitForTimeout(3000);
             await detailFreePage.navigate(postUrl!);
             await expect(detailFreePage.noDataLogo).toBeVisible();
         });

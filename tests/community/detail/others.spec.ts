@@ -83,7 +83,6 @@ test.describe('Verify post creation date time display', () => {
 
             await detailFreePage.postCreationTime.hover();
             const expectedDetailText = dayjs(mockCreatedTime).tz('Asia/Seoul').format('YYYY.MM.DD HH:mm');
-            await page.waitForTimeout(500);
             await expect(detailFreePage.hoverTooltip).toContainText(expectedDetailText);
 
             await detailFreePage.postCreationTime.click();

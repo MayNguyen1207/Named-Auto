@@ -8,14 +8,12 @@ test.describe('Admin Flow', () => {
     test('[Community] Admin can assign author to the comment', async ({ page }) => {
         const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.blockedPost);
-        await page.waitForTimeout(500);
 
         const authorName = await detailFreePage.selectFirstCmtAuthor();
 
         const commentContent = `Assigned Comment ${Date.now()}`;
         await detailFreePage.writeCmt(commentContent);
         await detailFreePage.verifyToastMsg("success", freePostData.cmtMsg.success);
-        await page.waitForTimeout(500);
 
         const cmtEl = detailFreePage.getCmtElementByText(commentContent);
         const actualAuthor = await cmtEl.authorLabel.textContent();
@@ -24,6 +22,5 @@ test.describe('Admin Flow', () => {
         await cmtEl.deleteCmtBtn.click();
         await detailFreePage.dialogConfirmBtn.click();
         await detailFreePage.verifyToastMsg("success", freePostData.deleteCmtMsg.success);
-        await page.waitForTimeout(500);
     });
 })

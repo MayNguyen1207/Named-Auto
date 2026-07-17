@@ -104,7 +104,6 @@ test.describe('Guest Flow', () => {
 
         await test.step('Go to the dummy post', async () => {
             await detailFreePage.navigate(postUrl);
-            await page.waitForTimeout(500);
         });
 
         await test.step('Verify the last comment', async () => {
@@ -114,7 +113,6 @@ test.describe('Guest Flow', () => {
 
         await test.step('Verify the first comment', async () => {
             await detailFreePage.clickPageNumber(1);
-            await page.waitForTimeout(500);
             const firstCommentOnFirstPage = detailFreePage.cmtItems.first();
             await expect(firstCommentOnFirstPage).toContainText('Auto comment number 1');
         });
@@ -178,7 +176,6 @@ test.describe('Guest Flow', () => {
 
         await test.step('Go to the dummy post', async () => {
             await detailFreePage.navigate(postUrl);
-            await page.waitForTimeout(500);
             await page.keyboard.press('Escape');
         });
 
@@ -200,7 +197,6 @@ test.describe('Guest Flow', () => {
         await test.step('Verify pagination option selection', async () => {
             await detailFreePage.verifySelectedOption(20);
             await detailFreePage.clickPageNumber(1);
-            await page.waitForTimeout(500);
             await expect(detailFreePage.cmtItems).toHaveCount(20);
         });
 

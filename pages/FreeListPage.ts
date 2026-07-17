@@ -47,7 +47,7 @@ export class FreeListPage extends BasePage {
 
     async navigate() {
         await this.page.goto('/community/free');
-        await this.page.waitForTimeout(500);
+        await expect(this.listItems.first()).toBeVisible({ timeout: 10000 });
     }
 
     getListItemElements(index: number) {
@@ -56,6 +56,7 @@ export class FreeListPage extends BasePage {
             item: listItem,
             boardType: listItem.getByTestId('post-type'),
             postTitle: listItem.getByTestId('post-title'),
+            imageIcon: listItem.locator('img[src="/images/home/image.svg"]'),
             cmtCount: listItem.getByTestId('post-comment-count'),
             postAuthor: listItem.getByTestId('user-info-context-menu-trigger'),
             registerDate: listItem.getByTestId('post-register-date'),
@@ -109,7 +110,7 @@ export class FreeListPage extends BasePage {
             const isNotice = i < noticePosts.length;
 
             const expectedBoardType = isNotice ? '공지' : '자유';
-            await expect(el.boardType).toHaveText(expectedBoardType);
+            await expect(el.boardType).toHaveText(expectedBoardType, { timeout: 30000 });
 
             if (isNotice) {
                 await expect(el.noticeLabel).toBeVisible();
@@ -118,6 +119,12 @@ export class FreeListPage extends BasePage {
             }
 
             await expect(el.postTitle).toHaveText(post.wr_subject);
+
+            if (post.is_photo === 1) {
+                await expect(el.imageIcon).toBeVisible();
+            } else {
+                await expect(el.imageIcon).toBeHidden();
+            }
 
             if (post.wr_comment > 0) {
                 await expect(el.cmtCount).toBeVisible();

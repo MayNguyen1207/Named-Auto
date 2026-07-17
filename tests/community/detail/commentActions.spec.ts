@@ -8,7 +8,6 @@ test.describe('Guest Flow', () => {
     test('[Community] Guest cannot reply or report a comment', async ({ page }) => {
         const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.myPost);
-        await page.waitForTimeout(500);
 
         const lastCmt = detailFreePage.getLastCmtElement();
 
@@ -27,7 +26,6 @@ test.describe('Prisoner Flow', () => {
     test('[Community] Prisoner cannot edit a comment', async ({ page }) => {
         const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.prisonerPost);
-        await page.waitForTimeout(500);
 
         const lastCmt = detailFreePage.getLastCmtElement();
 
@@ -78,10 +76,7 @@ test.describe('Normal User Flow', () => {
             expect(createCmtResponse.ok()).toBeTruthy();
         });
 
-        await test.step('Go to the post', async () => {
-            await detailFreePage.navigate(freePostData.postUrl.reportCmtPost);
-            await page.waitForTimeout(500);
-        });
+        await detailFreePage.navigate(freePostData.postUrl.reportCmtPost);
 
         await test.step('Report comment for the first time', async () => {
             lastCmt = detailFreePage.getLastCmtElement();
@@ -98,9 +93,8 @@ test.describe('Normal User Flow', () => {
         });
     });
 
-    test('[Community] User can edit comment successfully', async ({ page }) => {
+    test('[Community] User can edit comment successfully', async () => {
         await detailFreePage.navigate(freePostData.postUrl.myPost);
-        await page.waitForTimeout(500);
 
         const lastCmt = detailFreePage.getLastCmtElement();
         const cmtBefore = await detailFreePage.cmtText.last().textContent() as string;
@@ -116,7 +110,6 @@ test.describe('Normal User Flow', () => {
 
     test('[Community] User can delete a comment successfully', async ({ page }) => {
         await detailFreePage.navigate(freePostData.postUrl.noticePost);
-        await page.waitForTimeout(500);
 
         const cmtContent = "Comment to Delete";
         await detailFreePage.writeCmt(cmtContent);
@@ -136,25 +129,21 @@ test.describe('Normal User Flow', () => {
 
     test('[Community] User can comment to depth3', async ({ page }) => {
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
-        await page.waitForTimeout(500);
 
         const t = Date.now();
         const cmts = [`Depth 1 ${t}`, `Depth 2 ${t}`, `Depth 3 ${t}`];
 
         await detailFreePage.writeCmt(cmts[0]);
-        await page.waitForTimeout(500);
         const el1 = detailFreePage.getCmtElementByText(cmts[0]);
 
         await el1.replyBtn.click();
         await detailFreePage.replyCmtInput.last().fill(cmts[1]);
         await detailFreePage.submitCmtBtn.last().click();
-        await page.waitForTimeout(500);
         const el2 = detailFreePage.getCmtElementByText(cmts[1]);
 
         await el2.replyBtn.click();
         await detailFreePage.replyCmtInput.first().fill(cmts[2]);
         await detailFreePage.submitCmtBtn.nth(3).click();
-        await page.waitForTimeout(500);
         const el3 = detailFreePage.getCmtElementByText(cmts[2]);
 
         await expect(el3.replyBtn).toBeHidden();
@@ -166,7 +155,6 @@ test.describe('Normal User Flow', () => {
             await el.deleteCmtBtn.click();
             await detailFreePage.dialogConfirmBtn.click();
             await detailFreePage.verifyToastMsg("success", freePostData.deleteCmtMsg.success);
-            await page.waitForTimeout(500);
         }
     });
 });

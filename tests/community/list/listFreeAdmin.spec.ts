@@ -16,9 +16,7 @@ test.describe('Admin Flow', () => {
     test('[Community] Checkboxes should function correctly', async ({ page }) => {
         await page.waitForTimeout(1000);
         await freeListPage.selectAllCheckBox();
-        await page.waitForTimeout(1000);
         await freeListPage.deselectAllCheckBox();
-        await page.waitForTimeout(1000);
         await freeListPage.selectAndDeselectCheckBox();
     });
 

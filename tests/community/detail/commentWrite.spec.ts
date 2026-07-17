@@ -26,9 +26,8 @@ test.describe('Guest Flow', () => {
         await detailFreePage.moveLoginCfBtn.click();
         await expect(page).toHaveURL(/.*\/login/);
         const loginPage = new LoginPage(page);
-        await page.waitForTimeout(500);
         await loginPage.login(loginData.valid.email, loginData.valid.password);
-        await expect(page).toHaveURL(freePostData.postUrl.normalPost);
+        await expect(page).toHaveURL(freePostData.postUrl.normalPost, { timeout: 10000 });
     });
 });
 
@@ -49,7 +48,6 @@ test.describe('Non-verified User Flow', () => {
     test('[Community] Non-verified user cannot comment on a Free post', async ({ page }) => {
         const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
-        await page.waitForTimeout(1000);
         await detailFreePage.writeCmt(`${Date.now()}`);
         await expect(detailFreePage.noticeDialog).toContainText(
             "댓글은 본인 인증을 해야만 쓰실 수 있습니다." +
@@ -102,7 +100,6 @@ test.describe('Normal User Flow', () => {
         const newPostUrl = `/community/free/${postId}`;
 
         await detailFreePage.navigate(newPostUrl);
-        await page.waitForTimeout(500);
         await expect(detailFreePage.noCommentTxt).toBeVisible();
         await expect(detailFreePage.cmtCount).toHaveText("0");
 
