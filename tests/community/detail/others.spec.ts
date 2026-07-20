@@ -37,10 +37,41 @@ test.describe('Guest Flow', () => {
 test.describe('Admin Flow', () => {
     test.use({ storageState: 'playwright/.auth/admin.json' });
 
-    test('[Community] A list is shown at the bottom of the detail page in Admin view', async ({ page }) => {
-        const detailFreePage = new DetailFreePage(page);
+    let detailFreePage: DetailFreePage;
+
+    test.beforeEach(async ({ page }) => {
+        detailFreePage = new DetailFreePage(page);
+    });
+
+    test('[Community] A Free list are shown in Admin view', async () => {
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
         await expect(detailFreePage.listPost).toBeVisible();
+    });
+
+    test('[Community] User email, Login IP, Read Info should be shown in Admin view', async ({ page }) => {
+        const detailFreePage2 = new DetailFreePage(page);
+        const postId = detailFreePage2.getPostIdFromUrl(freePostData.postUrl.normalPost);
+
+        let memberEmail = '';
+        let wrIp = '';
+        let managerRead = '';
+
+        await page.route(`**/community/board/${postId}*`, async (route) => {
+            const response = await route.fetch();
+            const json = await response.json();
+
+            memberEmail = json.member_info?.email ?? '';
+            wrIp = json.wr_ip ?? '';
+            managerRead = json.manager_read ?? '';
+
+            await route.fulfill({ response, json });
+        });
+
+        await detailFreePage2.navigate(freePostData.postUrl.normalPost);
+
+        await expect(detailFreePage2.emailInfo).toContainText(memberEmail);
+        await expect(detailFreePage2.postIPInfo).toContainText(wrIp);
+        await expect(detailFreePage2.adminRead).toContainText(managerRead);
     });
 });
 
