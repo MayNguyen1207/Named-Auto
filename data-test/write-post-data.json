@@ -53,7 +53,7 @@
     {
       "id": "base64Img",
       "name": "User can not write post if content contains base64 image",
-      "title": "불장에 국내 상장사 배당금 38조 육박 '역대 최대' testtt",
+      "title": "불장에 국내 상장사 배당금 38조 육박 '역대 최대'",
       "content": "국내 상장사들의 지난해 12월 결산 배당금 규모가 38조 원에 육박하며 역대 최대 수준을 기록했다.<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\" />",
       "toastMsg": "Base64 이미지 업로드는 허용되지 않습니다."
     }

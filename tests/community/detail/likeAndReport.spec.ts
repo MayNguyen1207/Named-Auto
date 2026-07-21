@@ -15,6 +15,30 @@ test.describe('Guest Flow', () => {
     });
 });
 
+test.describe('Non-verified User Flow', () => {
+    test.use({ storageState: 'playwright/.auth/non-verified-user.json' });
+
+    test('[Community] Non-verified user cannot report a post', async ({ page }) => {
+        const detailFreePage = new DetailFreePage(page);
+        await detailFreePage.navigate(freePostData.postUrl.normalPost);
+
+        await detailFreePage.reportBtn.click();
+        await expect.soft(detailFreePage.noticeDialog).toContainText(
+            "신고 기능은 본인 인증을 해야만 이용 가능합니다." +
+            "본인인증을 진행하시겠습니까?"
+        );
+
+        await detailFreePage.dialogCancelBtn.click();
+        await expect(detailFreePage.noticeDialog).toBeHidden();
+        await expect(page).toHaveURL(freePostData.postUrl.normalPost);
+
+        await detailFreePage.reportBtn.click();
+        await detailFreePage.verifyBtn.click();
+        await expect(page.getByRole('heading', { name: '핸드폰 인증받기' })).toBeVisible(); //TODO: Edit locator after creating My Info page
+        await expect(page).toHaveURL(/.*mypage\/info/);
+    });
+});
+
 test.describe('Normal User Flow', () => {
     test.use({ storageState: 'playwright/.auth/user.json' });
 

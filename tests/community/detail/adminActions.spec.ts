@@ -19,6 +19,12 @@ test.describe('Admin Flow', () => {
         detailFreePage = new DetailFreePage(page);
     });
 
+    test('[Community] Move Post popup should be shown when clicking Move Post button', async () => {
+        await detailFreePage.navigate(freePostData.postUrl.normalPost);
+        await detailFreePage.movePostBtn.click();
+        await expect(detailFreePage.dialog.filter({ hasText: '게시물이동'})).toBeVisible();
+    });
+
     test('[Community] Admin can add and remove a post from Best list', async ({ page, apiBaseURL, browserName }) => {
         test.skip(browserName !== 'chromium', 'Avoid conflict in parallel');
 

@@ -12,7 +12,8 @@
         "editPrisonerPost": "/community/edit/free/10932499",
         "reportCmtPost": "/community/free/10929803",
         "reportedFiveTimePost": "/community/free/10929875",
-        "reportedTenTimePost": "/community/free/10929873"
+        "reportedTenTimePost": "/community/free/10929873",
+        "blockedUserPost": "/community/free/10932267"
     },
     "likeMsg": {
         "success": "추천되었습니다.",
@@ -39,13 +40,13 @@
     "invalidCmt": [
         {
             "id": "onlySpace",
-            "name": "User cannot submit a comment that contains only space",
+            "name": "contains only space",
             "content": "        ",
             "errorMsg": "댓글 내용을 입력해 주세요."
         },
         {
             "id": "harmfulCmt",
-            "name": "User cannot submit a comment that contains more than 50 '&#'",
+            "name": "contains more than 50 '&#'",
             "content": "&#65;&#66;&#67;&#68;&#69;&#70;&#71;&#72;&#73;&#74;&#75;&#76;&#77;&#78;&#79;&#80;&#81;&#82;&#83;&#84;&#85;&#86;&#87;&#88;&#89;&#90;&#97;&#98;&#99;&#100;&#101;&#102;&#103;&#104;&#105;&#106;&#107;&#108;&#109;&#110;&#111;&#112;&#113;&#114;&#115;&#116;&#117;&#118;&#119;&#120;&#121;&#122;",
             "errorMsg": "보안에 위험을 야기할 수 있는 문자가 다수 포함되어 있습니다."
         }
@@ -59,7 +60,8 @@
         "prisoner": "수감 상태에서는 댓글 수정이 불가능합니다."
     },
     "deleteCmtMsg": {
-        "success": "댓글이 삭제되었습니다."
+        "success": "댓글이 삭제되었습니다.",
+        "unableDelete": "이 댓글과 관련된 답글이 존재하므로 삭제 할 수 없습니다."
     },
     "bestMsg": {
         "add": "성공적으로 처리되었습니다.",
