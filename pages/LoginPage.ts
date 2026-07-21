@@ -355,4 +355,16 @@ export class LoginPage {
     const expectedTitle = type === 'email' ? '이메일 인증' : '휴대폰 인증';
     await expect(this.emailVerificationDialogContent).toContainText(expectedTitle);
   }
+
+  async handleLoginRequiredDialog(email: string, password: string, expectedLoginUrl: string | RegExp, finalExpectedUrl: string | RegExp) {
+    const loginRequiredDialog = this.page.getByRole('dialog');
+    await expect(loginRequiredDialog).toBeVisible();
+    await loginRequiredDialog.getByRole('button', { name: '확인' }).click({ force: true });
+
+    await expect(this.page).toHaveURL(expectedLoginUrl);
+    await this.page.waitForLoadState('networkidle');
+
+    await this.login(email, password);
+    await expect(this.page).toHaveURL(finalExpectedUrl);
+  }
 }

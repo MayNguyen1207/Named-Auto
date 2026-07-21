@@ -1,11 +1,21 @@
 ﻿{
   "emailValidation": {
-    "validInputs": ["abc","123456","!@#$%^","   "],
+    "validInputs": [
+      "abc",
+      "123456",
+      "!@#$%^",
+      "   "
+    ],
     "invalidFormat": "invalidemail_format.com",
     "expectedFormatErrorMsg": "유효한 이메일 주소를 입력해 주세요."
   },
   "passwordValidation": {
-    "validInputs": ["abc","123456","!@#$%^","   "]
+    "validInputs": [
+      "abc",
+      "123456",
+      "!@#$%^",
+      "   "
+    ]
   },
   "valid": {
     "email": "autotest01@yopmail.com",
@@ -89,6 +99,14 @@
     "password": "Named@123",
     "otp": "123456"
   },
+  "sleepAndUnauthorizedEmailOTP": {
+    "email": "sliverpack5@yopmail.com",
+    "password": "Named@123"
+  },
+  "sleepAndUnauthorizedPhoneOTP": {
+    "email": "sliverpack32@yopmail.com",
+    "password": "Named@123"
+  },
   "lockedAccount": {
     "email": "test_004@yopmail.com",
     "password": "Named@123",
@@ -154,5 +172,31 @@
   "userD": {
     "email": "qavn9@yopmail.com",
     "password": "Named@123"
+  },
+  "loginFromOtherPage": {
+    "email": "qavn2@yopmail.com",
+    "password": "Named@123",
+    "directLoginPages": [
+      {
+        "name": "Home page",
+        "url": "/home",
+        "hasLoginUrlCheck": true
+      },
+      {
+        "name": "Sport page",
+        "url": "/scorecenter/major",
+        "hasLoginUrlCheck": false
+      },
+      {
+        "name": "PowerBall page",
+        "url": "/minigame/rball/double_dragon",
+        "hasLoginUrlCheck": false
+      },
+      {
+        "name": "Trusted Sites page",
+        "url": "/trustedsites",
+        "hasLoginUrlCheck": false
+      }
+    ]
   }
 }
