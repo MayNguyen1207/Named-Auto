@@ -40,8 +40,8 @@ export class FreeListPage extends BasePage {
 
         this.movePostBtn = page.locator('div.flex.gap-2.items-center.justify-end').locator('button').nth(3); // Tobe updated
         this.deletePostBtn = page.locator('div.flex.gap-2.items-center.justify-end').locator('button').nth(4); // Tobe updated
-        this.listBoardToMove = page.locator('div.space-y-0.mx-4'); // Tobe updated
-        this.boardToMove = this.listBoardToMove.locator('> div'); // Tobe updated
+        this.listBoardToMove = page.getByTestId('community-post-move-list');
+        this.boardToMove = page.getByTestId('community-post-move-item');
         this.moveBtn = page.getByRole('button', { name: '이동' });
     }
 
@@ -66,7 +66,7 @@ export class FreeListPage extends BasePage {
         };
     }
 
-    async verifyPostList(   //TODO: check if image icon is displayed
+    async verifyPostList(
         page: Page,
         request: APIRequestContext,
         apiBaseURL: string,

@@ -71,17 +71,16 @@ export class DetailFreePage extends BasePage {
         super(page);
         this.page = page;
         this.editPostBtn = page.getByLabel('수정', { exact: true });
-        this.movePostBtn = page.getByRole('button', { name: '이동' });
-        this.deletePostBtn = page.getByLabel('삭제', { exact: true });
+        this.movePostBtn = page.getByTestId('community-post-move-button');
+        this.deletePostBtn = page.getByTestId('community-post-delete-button');
 
-        
         this.postAuthor = page.locator('article').getByTestId('user-info-context-menu-nickname').first();
         this.postCreationTime = page.getByRole('button', { name: 'Toggle date format' }).first();
         this.editNumTxt = page.locator('span[data-testid="tooltip-trigger"]').filter({ hasText: '수정' }).first();
 
-        this.emailInfo = page.locator('span.text-xs.text-light-grey.font-normal').first(); //Tobe update
-        this.postIPInfo = page.locator('span.text-xs.text-light-grey.font-normal').last(); //Tobe update
-        this.adminRead = page.locator('span.text-sm.text-primary.font-bold:visible'); //Tobe update
+        this.emailInfo = page.getByTestId('community-admin-info-email-button');
+        this.postIPInfo = page.getByTestId('community-admin-info-ip-button');
+        this.adminRead = page.getByTestId('community-admin-info-manager-read-button');
 
         this.postTitle = page.locator('h1:visible');
         this.postContent = page.getByLabel('게시글 내용');
@@ -99,10 +98,10 @@ export class DetailFreePage extends BasePage {
         this.noCommentTxt = page.getByText('댓글이 없습니다.', { exact: true });
         this.cmtList = page.getByTestId('community-comment-list');
         this.cmtItems = page.getByTestId('community-comment-item');
-        this.cmtText = page.locator(".text-xs.text-foreground.my-2.wrap-break-word.whitespace-pre-wrap"); // Tobe edit
+        this.cmtText = page.getByTestId('community-comment-item-content');
         this.replyCmtInput = page.getByRole('textbox', { name: '답글을 입력하세요…' });
 
-        this.cmtAuthorPicker = page.getByTestId('popover-trigger').nth(2);//Tobe edit
+        this.cmtAuthorPicker = page.getByTestId('community-comment-author-selection')
         this.authorCommandRoot = page.locator('[data-testid="command-root"]');
         this.authorFirstItem = this.authorCommandRoot.locator('[data-testid="command-item"]').first();
 
@@ -127,9 +126,9 @@ export class DetailFreePage extends BasePage {
         this.popupRadioGroup = page.getByRole('radiogroup');
         this.popupReasonInput = page.getByPlaceholder('신고내용을 작성해주세요.');
 
-        this.bestBtn = page.locator("body > main:nth-child(5) > div:nth-child(1) > main:nth-child(2) > section:nth-child(3) > div:nth-child(3) > article:nth-child(1) > div:nth-child(3) > button:nth-child(1)"); //Tobe edit
-        this.suggestBtn = page.locator("body > main:nth-child(5) > div:nth-child(1) > main:nth-child(2) > section:nth-child(3) > div:nth-child(3) > article:nth-child(1) > div:nth-child(3) > button:nth-child(2)") //Tobe edit
-        this.readBtn = page.locator("body > main:nth-child(5) > div:nth-child(1) > main:nth-child(2) > section:nth-child(3) > div:nth-child(3) > article:nth-child(1) > div:nth-child(3) > button:nth-child(3)") //Tobe edit
+        this.bestBtn = page.getByTestId('community-admin-post-action-best-button')
+        this.suggestBtn = page.getByTestId('community-admin-post-action-cast-button')
+        this.readBtn = page.getByTestId('community-admin-post-action-read-button')
         this.listPost = page.locator('div.w-full.mx-auto');
     }
 
@@ -162,7 +161,7 @@ export class DetailFreePage extends BasePage {
             reportCmtBtn: cmtItem.getByText('신고', { exact: true }),
             editCmtBtn: cmtItem.getByText('수정', { exact: true }),
             deleteCmtBtn: cmtItem.getByText('삭제', { exact: true }),
-            ipInfo: cmtItem.getByText('210.245.49.54')  //Tobe updated
+            ipInfo: cmtItem.getByTestId('community-comment-item-ip')
         };
     }
 
@@ -177,7 +176,7 @@ export class DetailFreePage extends BasePage {
             reportCmtBtn: cmtItem.getByText('신고', { exact: true }),
             editCmtBtn: cmtItem.getByText('수정', { exact: true }),
             deleteCmtBtn: cmtItem.getByText('삭제', { exact: true }),
-            ipInfo: cmtItem.getByText('210.245.49.54')  //Tobe updated
+            ipInfo: cmtItem.getByTestId('community-comment-item-ip')
         };
     }
 
@@ -192,7 +191,7 @@ export class DetailFreePage extends BasePage {
             reportCmtBtn: cmtItem.getByText('신고', { exact: true }),
             editCmtBtn: cmtItem.getByText('수정', { exact: true }),
             deleteCmtBtn: cmtItem.getByText('삭제', { exact: true }),
-            ipInfo: cmtItem.locator("span[class='text-xxs text-neutral-400 pt-0 tablet:pt-0.75']").first() //Tobe updated
+            ipInfo: cmtItem.getByTestId('community-comment-item-ip')
         };
     }
 
@@ -279,7 +278,7 @@ export class DetailFreePage extends BasePage {
     }
 
     async selectFirstCmtAuthor(): Promise<string> {
-        await this.cmtAuthorPicker.click();
+        await this.cmtAuthorPicker.first().click();
         await expect(this.authorCommandRoot).toBeVisible();
         const firstItem = this.authorFirstItem;
         const fullText = (await firstItem.textContent())?.trim() ?? '';
