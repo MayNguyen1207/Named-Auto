@@ -196,16 +196,6 @@
         "name": "Trusted Sites page",
         "url": "/trustedsites",
         "hasLoginUrlCheck": false
-      },
-      {
-        "name": "Community Best page",
-        "url": "/community/best",
-        "hasLoginUrlCheck": false
-      },
-      {
-        "name": "Community Attend page",
-        "url": "/community/attend",
-        "hasLoginUrlCheck": false
       }
     ]
   }
