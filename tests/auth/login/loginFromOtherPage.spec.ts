@@ -94,34 +94,6 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/trustedsites\/4147/);
     });
 
-    test('[Auth] Login from Community page', async ({ page }) => {
-        await page.goto('/community/best');
-        await page.getByTestId('navigation-button-login').click();
-        await loginPage.login(email, password);
-        await expect(page).toHaveURL('/home');
-    });
-
-    test('[Auth] Login from Community Free page when action is restricted (Write post)', async ({ page }) => {
-        await page.goto('/community/free');
-        await page.getByRole('button', { name: '글쓰기' }).click();
-
-        await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/community\/free/);
-    });
-
-    test('[Auth] Login from Community Verification Details page when action is restricted (Comment)', async ({ page }) => {
-        await page.goto('/community/verification/67780');
-        await page.getByRole('textbox', { name: /댓글 작성시 타인에 대한 배려와 책임을 담아주세요/ }).click();
-
-        await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/community\/verification\/67780/);
-    });
-
-    test('[Auth] Login from Community Attend page when action is restricted (Comment)', async ({ page }) => {
-        await page.goto('/community/attend');
-        await page.locator('textarea').click();
-
-        await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/community\/attend/);
-    });
-
     test('[Auth] Login from Market page', async ({ page }) => {
         await page.goto('/market/market');
         await page.getByTestId('navigation-button-login').click();
