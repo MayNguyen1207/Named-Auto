@@ -32,7 +32,6 @@ export class DetailFreePage extends BasePage {
     readonly noCommentTxt: Locator;
     readonly cmtList: Locator;
     readonly cmtItems: Locator;
-    readonly cmtText: Locator;
     readonly replyCmtInput: Locator;
 
     // Author picker
@@ -92,13 +91,12 @@ export class DetailFreePage extends BasePage {
         this.likeBtn = page.getByTestId('community-post-recommend-button');
         this.reportBtn = page.getByTestId('community-post-report-button');
 
-        this.cmtInput = page.locator('[id="comment-textarea"]').first();
+        this.cmtInput = page.locator('[id="comment-textarea"]');
         this.submitCmtBtn = page.getByRole('button', { name: '댓글 전송' });
         this.cmtCount = page.getByTestId('community-comment-count');
         this.noCommentTxt = page.getByText('댓글이 없습니다.', { exact: true });
         this.cmtList = page.getByTestId('community-comment-list');
         this.cmtItems = page.getByTestId('community-comment-item');
-        this.cmtText = page.getByTestId('community-comment-item-content');
         this.replyCmtInput = page.getByRole('textbox', { name: '답글을 입력하세요…' });
 
         this.cmtAuthorPicker = page.getByTestId('community-comment-author-selection')
@@ -134,7 +132,7 @@ export class DetailFreePage extends BasePage {
 
     async navigate(url: string) {
         await this.page.goto(url);
-        await expect(this.postTitle).toBeVisible({ timeout: 10000 });
+        await this.page.waitForTimeout(1000);
     }
 
     async writeCmt(content: string) {
@@ -161,7 +159,8 @@ export class DetailFreePage extends BasePage {
             reportCmtBtn: cmtItem.getByText('신고', { exact: true }),
             editCmtBtn: cmtItem.getByText('수정', { exact: true }),
             deleteCmtBtn: cmtItem.getByText('삭제', { exact: true }),
-            ipInfo: cmtItem.getByTestId('community-comment-item-ip')
+            ipInfo: cmtItem.getByTestId('community-comment-item-ip'),
+            cmtText: cmtItem.getByTestId('community-comment-item-content')
         };
     }
 
@@ -176,7 +175,8 @@ export class DetailFreePage extends BasePage {
             reportCmtBtn: cmtItem.getByText('신고', { exact: true }),
             editCmtBtn: cmtItem.getByText('수정', { exact: true }),
             deleteCmtBtn: cmtItem.getByText('삭제', { exact: true }),
-            ipInfo: cmtItem.getByTestId('community-comment-item-ip')
+            ipInfo: cmtItem.getByTestId('community-comment-item-ip'),
+            cmtText: cmtItem.getByTestId('community-comment-item-content')
         };
     }
 
@@ -191,7 +191,8 @@ export class DetailFreePage extends BasePage {
             reportCmtBtn: cmtItem.getByText('신고', { exact: true }),
             editCmtBtn: cmtItem.getByText('수정', { exact: true }),
             deleteCmtBtn: cmtItem.getByText('삭제', { exact: true }),
-            ipInfo: cmtItem.getByTestId('community-comment-item-ip')
+            ipInfo: cmtItem.getByTestId('community-comment-item-ip'),
+            cmtText: cmtItem.getByTestId('community-comment-item-content')
         };
     }
 

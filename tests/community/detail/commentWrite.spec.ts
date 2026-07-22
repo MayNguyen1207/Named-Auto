@@ -15,14 +15,14 @@ test.describe('Guest Flow', () => {
     test('[Community] Guest cannot comment in post', async ({ page }) => {
         const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
-        await detailFreePage.cmtInput.scrollIntoViewIfNeeded();
-        await detailFreePage.cmtInput.click();
+        await detailFreePage.cmtInput.first().scrollIntoViewIfNeeded();
+        await detailFreePage.cmtInput.first().click();
         await expect(detailFreePage.moveLogin).toBeVisible();
 
         await detailFreePage.moveLoginCancelBtn.click();
         await expect(page).toHaveURL(freePostData.postUrl.normalPost);
 
-        await detailFreePage.cmtInput.click();
+        await detailFreePage.cmtInput.first().click();
         await detailFreePage.moveLoginCfBtn.click();
         await expect(page).toHaveURL(/.*\/login/);
         const loginPage = new LoginPage(page);
@@ -104,7 +104,7 @@ test.describe('Normal User Flow', () => {
         await expect(detailFreePage.cmtCount).toHaveText("0");
 
         const myCommentText = `Auto comment at ${Date.now()}`;
-        await detailFreePage.cmtInput.fill(myCommentText);
+        await detailFreePage.cmtInput.first().fill(myCommentText);
         await detailFreePage.submitCmtBtn.click();
 
         await detailFreePage.verifyToastMsg("success", freePostData.cmtMsg.success);
@@ -116,7 +116,7 @@ test.describe('Normal User Flow', () => {
     });
 
     for (const data of freePostData.invalidCmt) {
-        test(`[Community] ${data.name}`, async () => {
+        test(`[Community] User cannot submit a comment that ${data.name}`, async () => {
             await detailFreePage.navigate(freePostData.postUrl.normalPost);
             await detailFreePage.writeCmt(data.content);
             await detailFreePage.verifyToastMsg("error", data.errorMsg)
