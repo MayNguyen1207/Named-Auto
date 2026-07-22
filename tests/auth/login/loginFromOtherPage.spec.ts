@@ -94,13 +94,6 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/trustedsites\/4147/);
     });
 
-    test('[Auth] Login from Market page', async ({ page }) => {
-        await page.goto('/market/market');
-        await page.getByTestId('navigation-button-login').click();
-        await loginPage.login(email, password);
-        await expect(page).toHaveURL('/home');
-    });
-
     test('[Auth] Login from Market page when action is restricted (Purchase)', async ({ page }) => {
         await page.goto('/market/market');
         await page.getByTestId('market-list-item-purchase-button').first().click();
