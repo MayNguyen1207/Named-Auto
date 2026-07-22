@@ -93,4 +93,32 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
 
         await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/trustedsites\/4147/);
     });
+
+    test('[Auth] Login from Market page when action is restricted (Purchase)', async ({ page }) => {
+        await page.goto('/market/market');
+        await page.getByTestId('market-list-item-purchase-button').first().click();
+
+        await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/market\/market/);
+    });
+
+    test('[Auth] Login from Market page when action is restricted (Send Gift)', async ({ page }) => {
+        await page.goto('/market/market');
+        await page.getByTestId('market-list-item-send-gift-button').first().click();
+
+        await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/market\/market/);
+    });
+
+    test('[Auth] Login from Market - Trade page', async ({ page }) => {
+        await page.goto('/market/market');
+        await page.getByRole('link', { name: '황금마차' }).click();
+        await loginPage.login(email, password);
+        await expect(page).toHaveURL('/market/trade');
+    });
+
+    test('[Auth] Login from My Page link on Home page', async ({ page }) => {
+        await homePage.navigate();
+        await page.getByRole('link', { name: '마이페이지' }).click();
+        await loginPage.login(email, password);
+        await expect(page).toHaveURL('/mypage/info');
+    });
 });
