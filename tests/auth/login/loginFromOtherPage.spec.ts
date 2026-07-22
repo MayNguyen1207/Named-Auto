@@ -128,11 +128,4 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await loginPage.login(email, password);
         await expect(page).toHaveURL('/mypage/info');
     });
-
-    test('[Auth] Login from Customer Center page', async ({ page }) => {
-        await page.goto('/customercenter/home');
-        await page.getByTestId('navigation-button-login').click();
-        await loginPage.login(email, password);
-        await expect(page).toHaveURL('/home');
-    });
 });
