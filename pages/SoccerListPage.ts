@@ -60,8 +60,8 @@ export class SoccerListPage extends BasePage {
         this.previousMonthBtn = this.calendarModal.locator('button.size-7.rounded.flex.items-center.justify-center').first(); //Tobe updated
         this.nextMonthBtn = this.calendarModal.locator('button.size-7.rounded.flex.items-center.justify-center').nth(1); //Tobe updated
         this.calendarTodayBtn = this.calendarModal.getByRole('button', { name: '오늘' });
-        this.dayCell = this.calendarBtn.getByRole('gridcell');
-        this.yearBtn = this.calendarBtn.getByRole('button', { name: '년' });
+        this.dayCell = this.calendarModal.getByRole('gridcell');
+        this.yearBtn = this.calendarModal.getByRole('button', { name: /년/ });
         this.yearList = page.locator('div.year-selector');
         this.yearOption = this.yearList.locator('button');
 

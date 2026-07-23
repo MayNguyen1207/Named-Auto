@@ -10,6 +10,48 @@ test.describe('Guest Flow', () => {
         await soccerListPage.navigate();
     });
 
+    test('[Soccer] User can change the year in calendar', async ({ page }) => {
+        const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+        const currentYear = now.getFullYear();
+
+        await test.step('Open calendar and verify yearBtn shows current year', async () => {
+            await soccerListPage.openCalendar();
+            await expect(soccerListPage.yearBtn).toHaveText(`${currentYear}년`);
+        });
+
+        await test.step('Click yearBtn to open yearList and verify years range', async () => {
+            await soccerListPage.yearBtn.click();
+            await expect(soccerListPage.yearList).toBeVisible();
+
+            // Should show currentYear ± 5 = 11 options total
+            const expectedYears = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
+            const yearBtns = soccerListPage.yearOption;
+            await expect(yearBtns).toHaveCount(11);
+
+            for (const year of expectedYears) {
+                await expect(soccerListPage.yearOption.filter({ hasText: String(year) })).toBeVisible();
+            }
+        });
+
+        await test.step('Verify current year is highlighted', async () => {
+            const currentYearBtn = soccerListPage.yearOption.filter({ hasText: String(currentYear) });
+            await expect(currentYearBtn).toHaveClass(/bg-primary/);
+            await expect(currentYearBtn).toHaveClass(/text-primary-foreground/);
+        });
+
+        await test.step('Select a different year and verify cells update', async () => {
+            const targetYear = currentYear - 1;
+            const targetYearBtn = soccerListPage.yearOption.filter({ hasText: String(targetYear) });
+            await targetYearBtn.click();
+
+            await expect(soccerListPage.yearList).not.toBeVisible();
+            await expect(soccerListPage.yearBtn).toHaveText(`${targetYear}년`);
+
+            const firstCell = soccerListPage.dayCell.first();
+            await expect(firstCell).toHaveAttribute('data-day', new RegExp(`^${targetYear}-`));
+        });
+    });
+
     test('[Soccer] User can change the month in calendar', async ({ page }) => {
         const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
         const currentYear = now.getFullYear();
