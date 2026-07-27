@@ -88,10 +88,10 @@ test.describe('Admin Flow', () => {
                 await expect(detailFreePage.postTitle).toHaveText(label, { timeout: 10000});
 
                 if (expectComment) {
-                    await expect(detailFreePage.cmtInput).toBeVisible();
+                    await expect(detailFreePage.cmtInput.first()).toBeVisible();
                     await expect(detailFreePage.submitCmtBtn).toBeVisible();
                 } else {
-                    await expect(detailFreePage.cmtInput).not.toBeVisible();
+                    await expect(detailFreePage.cmtInput.first()).not.toBeVisible();
                     await expect(detailFreePage.submitCmtBtn).not.toBeVisible();
                 }
             });

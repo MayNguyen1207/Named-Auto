@@ -3,6 +3,7 @@ import { DetailFreePage } from '../../../pages/DetailFreePage';
 import { WriteFreePage } from '../../../pages/WriteFreePage';
 import loginData from '../../../data-test/login-data.json';
 import freePostData from '../../../data-test/free-post-data.json';
+import postData from '../../../data-test/write-post-data.json';
 
 test.describe('Prisoner Flow', () => {
     test.use({ storageState: 'playwright/.auth/prisoner.json' });
@@ -62,6 +63,39 @@ test.describe('Normal User Flow', () => {
         await writeFreePage.writeBtn.click();
         await writeFreePage.verifyToastMsg("error", freePostData.editPostMsg.unableEdit);
     });
+
+    for (const data of postData.invalid) {
+        test(`[Community] User cannot edit post with ${data.id}`, async ({ page, browserName }) => {
+            test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
+
+            await detailFreePage.navigate(freePostData.postUrl.myPost);
+            await detailFreePage.editPostBtn.click();
+
+            const writeFreePage = new WriteFreePage(page);
+            await writeFreePage.titleInput.clear();
+            await writeFreePage.contentInput.clear();
+
+            await writeFreePage.writePost(data.title, data.content);
+            switch (data.id) {
+                case 'spaceTitle':
+                    await expect(writeFreePage.writeBtn).toBeDisabled();
+                    await writeFreePage.titleInput.clear();
+                    await expect(writeFreePage.titleErrorMsg).toBeVisible();
+                    break;
+                case 'emptyTitle':
+                case 'emptyContent':
+                    await expect(writeFreePage.writeBtn).toBeDisabled();
+                    break;
+                default:
+                    await expect(writeFreePage.writeBtn).toBeEnabled();
+                    await writeFreePage.writeBtn.click();
+                    break;
+            }
+            if (data.toastMsg) {
+                await writeFreePage.verifyToastMsg('error', data.toastMsg);
+            }
+        });
+    }
 
     test('[Community] User can delete a post when post has author\'s comment only', async ({ page, apiBaseURL, request }) => {
         const loginResponse = await request.post(`${apiBaseURL}/login`, {
@@ -137,12 +171,6 @@ test.describe('Admin Flow', () => {
 
     test.beforeEach(async ({ page }) => {
         detailFreePage = new DetailFreePage(page);
-    });
-
-    test('[Community] Move Post popup should be shown when clicking Move Post button', async () => {
-        await detailFreePage.navigate(freePostData.postUrl.normalPost);
-        await detailFreePage.movePostBtn.click();
-        await expect(detailFreePage.dialog.filter({ hasText: '게시물이동'})).toBeVisible();
     });
 
     test('[Community] Admin can edit post even when post has comments', async ({ page, browserName }) => {

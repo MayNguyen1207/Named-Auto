@@ -97,7 +97,7 @@ test.describe('Normal User Flow', () => {
         await detailFreePage.navigate(freePostData.postUrl.myPost);
 
         const lastCmt = detailFreePage.getLastCmtElement();
-        const cmtBefore = await detailFreePage.cmtText.last().textContent() as string;
+        const cmtBefore = await lastCmt.cmtText.textContent() as string;
 
         await lastCmt.editCmtBtn.click();
         await expect(detailFreePage.cmtInput.last()).toHaveText(cmtBefore);
@@ -105,10 +105,22 @@ test.describe('Normal User Flow', () => {
         await detailFreePage.cmtInput.last().fill(cmtAfter);
         await detailFreePage.submitCmtBtn.last().click();
         await detailFreePage.verifyToastMsg("success", freePostData.editCmtMsg.success);
-        await expect(detailFreePage.cmtText).toHaveText(cmtAfter);
+        await expect(lastCmt.cmtText).toHaveText(cmtAfter);
     });
 
-    test('[Community] User can delete a comment successfully', async ({ page }) => {
+    for (const data of freePostData.invalidCmt) {
+        test(`[Community] User cannot edit and submit a comment that ${data.name}`, async () => {
+            await detailFreePage.navigate(freePostData.postUrl.myPost);
+            const lastCmt = detailFreePage.getLastCmtElement();
+            await lastCmt.editCmtBtn.click();
+            await detailFreePage.cmtInput.last().clear();
+            await detailFreePage.cmtInput.last().fill(data.content);
+            await detailFreePage.submitCmtBtn.last().click();
+            await detailFreePage.verifyToastMsg("error", data.errorMsg)
+        });
+    }
+
+    test('[Community] User can delete a comment successfully', async () => {
         await detailFreePage.navigate(freePostData.postUrl.noticePost);
 
         const cmtContent = "Comment to Delete";
@@ -127,7 +139,16 @@ test.describe('Normal User Flow', () => {
         await detailFreePage.verifyToastMsg("success", freePostData.deleteCmtMsg.success);
     });
 
-    test('[Community] User can comment to depth3', async ({ page }) => {
+    test('[Community] User cannot delete a comment that has replies', async () => {
+        await detailFreePage.navigate(freePostData.postUrl.normalPost);
+
+        const firstCmt = detailFreePage.getCmtElements(0);
+        await firstCmt.deleteCmtBtn.first().click();
+        await detailFreePage.dialogConfirmBtn.click();
+        await detailFreePage.verifyToastMsg("error", freePostData.deleteCmtMsg.unableDelete);
+    });
+
+    test('[Community] User can comment to depth3', async () => {
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
 
         const t = Date.now();

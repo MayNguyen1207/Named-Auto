@@ -34,6 +34,23 @@ test.describe('Guest Flow', () => {
     });
 });
 
+test.describe('Normal User Flow', () => {
+    test.use({ storageState: 'playwright/.auth/user.json' });
+
+    let detailFreePage: DetailFreePage;
+
+    test.beforeEach(async ({ page }) => {
+        detailFreePage = new DetailFreePage(page);
+    });
+
+    test('[Community] A modal should be shown when accessing blocked user post', async ({ page }) => {
+        await detailFreePage.navigate(freePostData.postUrl.blockedUserPost);
+        await expect(detailFreePage.noticeDialog).toContainText('차단한 회원의 게시글입니다. 차단 해제 후 열람할 수 있습니다.');
+        await detailFreePage.dialogConfirmBtn.click();
+        await expect(page).not.toHaveURL(freePostData.postUrl.blockedUserPost);
+    });
+});
+
 test.describe('Admin Flow', () => {
     test.use({ storageState: 'playwright/.auth/admin.json' });
 
