@@ -15,23 +15,23 @@ test.describe('[MyPage] Account Management Tests', () => {
   test('Verify unauthenticated email display and dialog', async ({ page }) => {
     await page.goto('/login?callbackUrl=/mypage/info?');
 
-    await loginPage.login(loginData.unauthenticatedUser.email, loginData.unauthenticatedUser.password);
+    await loginPage.login(loginData.unauthenticatedEmail.email, loginData.unauthenticatedEmail.password);
 
-    await myInfoPage.verifyUnauthenticatedEmailUI(loginData.unauthenticatedUser.email);
+    await myInfoPage.verifyUnauthenticatedEmailUI(loginData.unauthenticatedEmail.email);
 
     await myInfoPage.openVerificationDialog();
 
     await myInfoPage.verifyVerificationDialogVisible();
 
-    await myInfoPage.verifyVerificationDialogUI(loginData.unauthenticatedUser.email);
+    await myInfoPage.verifyVerificationDialogUI(loginData.unauthenticatedEmail.email);
   });
 
   test('Verify authenticated email display and change dialog', async ({ page }) => {
     await page.goto('/login?callbackUrl=/mypage/info?');
 
-    await loginPage.login(loginData.authenticatedUser.email, loginData.authenticatedUser.password);
+    await loginPage.login(loginData.authenticatedEmail.email, loginData.authenticatedEmail.password);
 
-    await myInfoPage.verifyAuthenticatedEmailUI(loginData.authenticatedUser.email);
+    await myInfoPage.verifyAuthenticatedEmailUI(loginData.authenticatedEmail.email);
 
     await myInfoPage.openChangeEmailDialog();
 
@@ -42,7 +42,7 @@ test.describe('[MyPage] Account Management Tests', () => {
     let userData: any;
 
     test.beforeEach(async ({ page }) => {
-      userData = loginData.unauthenticatedUser;
+      userData = loginData.unauthenticatedEmail;
       await page.goto('/login?callbackUrl=/mypage/info?');
       await loginPage.login(userData.email, userData.password);
       await myInfoPage.openVerificationDialog();

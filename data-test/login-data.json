@@ -1,4 +1,4 @@
-{
+﻿{
   "emailValidation": {
     "validInputs": [
       "abc",
@@ -199,11 +199,11 @@
       }
     ]
   },
-  "authenticatedUser": {
+  "authenticatedEmail": {
     "email": "test_010@yopmail.com",
     "password": "Named@123"
   },
-  "unauthenticatedUser": {
+  "unauthenticatedEmail": {
     "email": "qavn4@yopmail.com",
     "password": "Named@123",
     "invalidOtp": "125644",
