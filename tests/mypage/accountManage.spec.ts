@@ -38,7 +38,7 @@ test.describe('[MyPage] Account Management Tests', () => {
     await myInfoPage.verifyChangeEmailDialogVisible();
   });
 
-  test.describe('OTP Error Handling', () => {
+  test.describe('[My Page] OTP Error Handling', () => {
     let userData: any;
 
     test.beforeEach(async ({ page }) => {
