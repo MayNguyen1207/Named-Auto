@@ -20,16 +20,12 @@ test.describe('[MyPage] Reward Feature Tests', () => {
     
     await myInfoPage.verifyRewardElementsVisible(mypageData.reward.expectedTexts);
     
-    // Verify current points
     await myInfoPage.verifyCurrentPoints(mypageData.reward.expectedTexts.currentPoints);
 
-    // Open reward guide dialog
     await myInfoPage.openRewardGuideDialog(mypageData.reward.expectedTexts.guideButton);
     
-    // Verify dialog contents
     await myInfoPage.verifyRewardGuideDialogVisible(mypageData.reward.dialogExpectedTexts.noticeText);
     
-    // Close dialog and verify it's hidden
     await myInfoPage.closeRewardGuideDialog();
     await myInfoPage.verifyRewardGuideDialogHidden();
   });
