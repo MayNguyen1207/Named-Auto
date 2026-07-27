@@ -4,7 +4,7 @@ import { MyInfoPage } from '../../pages/MyInfoPage';
 import loginData from '../../data-test/login-data.json';
 import mypageData from '../../data-test/mypage-data.json';
 
-test.describe('[MyPage] Reward Feature Tests', () => {
+test.describe('[MyInfo] Reward Feature Tests', () => {
   let loginPage: LoginPage;
   let myInfoPage: MyInfoPage;
 
@@ -13,19 +13,13 @@ test.describe('[MyPage] Reward Feature Tests', () => {
     myInfoPage = new MyInfoPage(page);
   });
 
-  test('[MyPage] Verify reward page elements', async ({ page }) => {
+  test('[MyInfo] Verify reward page elements', async ({ page }) => {
     await page.goto('/login?callbackUrl=/mypage/info?');
-    
     await loginPage.login(loginData.loginFromOtherPage.email, loginData.loginFromOtherPage.password);
-    
     await myInfoPage.verifyRewardElementsVisible(mypageData.reward.expectedTexts);
-    
     await myInfoPage.verifyCurrentPoints(mypageData.reward.expectedTexts.currentPoints);
-
     await myInfoPage.openRewardGuideDialog(mypageData.reward.expectedTexts.guideButton);
-    
     await myInfoPage.verifyRewardGuideDialogVisible(mypageData.reward.dialogExpectedTexts.noticeText);
-    
     await myInfoPage.closeRewardGuideDialog();
     await myInfoPage.verifyRewardGuideDialogHidden();
   });
