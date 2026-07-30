@@ -142,7 +142,6 @@ export class WriteFreePage extends BasePage {
     }
 
     async updateLink(text: string, url: string) {
-        await this.insertLnkBtn.click();
         await this.txtLnkInput.fill(text);
         await this.lnkInput.fill(url);
         await this.updateLnkBtn.click();

@@ -59,8 +59,8 @@ test.describe('Guest Flow', () => {
         await test.step('Login via API to get session_id', async () => {
             loginResponse = await request.post(`${apiBaseURL}/login`, {
                 form: {
-                    email: loginData.userC.email,
-                    password: loginData.userC.password,
+                    email: loginData.userB.email,
+                    password: loginData.userB.password,
                 }
             });
             expect(loginResponse.ok()).toBeTruthy();

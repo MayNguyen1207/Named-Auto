@@ -9,6 +9,7 @@ test.describe('Admin Flow', () => {
         const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.blockedPost);
 
+        await detailFreePage.cmtAuthorPicker.scrollIntoViewIfNeeded();
         const authorName = await detailFreePage.selectFirstCmtAuthor();
 
         const commentContent = `Assigned Comment ${Date.now()}`;
