@@ -101,7 +101,7 @@ export class WriteFreePage extends BasePage {
         this.videoLnkInput = page.getByRole('textbox', { name: '미디어 URL' });
         this.uploadVideoBtn = page.locator('button.ck-file-dialog-button[data-cke-tooltip-text="동영상 업로드"]');
 
-        this.authorPickerTrigger = page.locator('[data-testid="popover-trigger"]').nth(2);
+        this.authorPickerTrigger = page.getByTestId('community-comment-author-selection');
         this.authorCommandRoot = page.locator('[data-testid="command-root"]');
         this.authorFirstItem = this.authorCommandRoot.locator('[data-testid="command-item"]').first();
     }
