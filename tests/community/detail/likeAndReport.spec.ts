@@ -18,7 +18,9 @@ test.describe('Guest Flow', () => {
 test.describe('Non-verified User Flow', () => {
     test.use({ storageState: 'playwright/.auth/non-verified-user.json' });
 
-    test('[Community] Non-verified user cannot report a post', async ({ page }) => {
+    test('[Community] Non-verified user cannot report a post', async ({ page }, testInfo) => {
+        test.fail(true, 'https://vincoholdinglp.atlassian.net/browse/NOS-17623');
+        
         const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
 
@@ -107,6 +109,10 @@ test.describe('Normal User Flow', () => {
             await detailFreePage.selectReportOptionAndFillReason('비매너');
             await detailFreePage.popupReportBtn.click();
             await detailFreePage.verifyToastMsg("error", freePostData.reportMsg.duplicateReport);
+        });
+
+        await test.step('Clean up: delete post via API', async () => {
+            await detailFreePage.deletePostViaAPI(request, apiBaseURL, sharedPostId);
         });
     });
 

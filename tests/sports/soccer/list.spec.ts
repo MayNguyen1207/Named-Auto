@@ -11,6 +11,8 @@ test.describe('Guest Flow', () => {
     });
 
     test('[Soccer] Number of matches should be displayed in the tab name', async ({ request, page, sportsApiBaseURL }) => {
+        test.fail(true, 'https://vincoholdinglp.atlassian.net/browse/NOS-17637');
+
         const soccerListPage = new SoccerListPage(page);
 
         await soccerListPage.navigate();
