@@ -10,6 +10,71 @@ test.describe('Guest Flow', () => {
         await soccerListPage.navigate();
     });
 
+    test('[Soccer] User can change date of the list', async ({ page, request, sportsApiBaseURL }) => {
+        const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+        const pad = (n: number) => String(n).padStart(2, '0');
+        const todayFormatted = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())}`;
+
+        await test.step('Verify default date is today', async () => {
+            await expect(soccerListPage.calendarBtn).toContainText(todayFormatted);
+        });
+
+        await test.step('Navigate to the previous day and verify match counts', async () => {
+            const prevDate = new Date(now);
+            prevDate.setDate(prevDate.getDate() - 1);
+            const prevFormatted = `${prevDate.getFullYear()}.${pad(prevDate.getMonth() + 1)}.${pad(prevDate.getDate())}`;
+            const prevApiDate = `${prevDate.getFullYear()}-${pad(prevDate.getMonth() + 1)}-${pad(prevDate.getDate())}`;
+
+            await Promise.all([
+                page.waitForResponse(resp => resp.url().includes(`games?date=${prevApiDate}`) && resp.status() === 200),
+                soccerListPage.previousDayBtn.click(),
+            ]);
+
+            await expect(soccerListPage.calendarBtn).toContainText(prevFormatted);
+
+            const prevResponse = await request.get(
+                `${sportsApiBaseURL}/v1.0/sports/soccer/games?date=${prevApiDate}&status=ALL&tomorrow-game-flag=true`
+            );
+            const prevGames = soccerListPage.extractGames(await prevResponse.json());
+
+            await soccerListPage.verifyTabMatchCounts(prevGames);
+        });
+
+        await test.step('Navigate to the next day and verify match counts', async () => {
+            const nextDate = new Date(now);
+            nextDate.setDate(nextDate.getDate() + 1);
+            const nextFormatted = `${nextDate.getFullYear()}.${pad(nextDate.getMonth() + 1)}.${pad(nextDate.getDate())}`;
+            const nextApiDate = `${nextDate.getFullYear()}-${pad(nextDate.getMonth() + 1)}-${pad(nextDate.getDate())}`;
+
+            await Promise.all([
+                page.waitForResponse(resp => resp.url().includes('sports/soccer/today-games') && resp.status() === 200),
+                soccerListPage.nextDayBtn.click(),
+            ]);
+            await Promise.all([
+                page.waitForResponse(resp => resp.url().includes(`games?date=${nextApiDate}`) && resp.status() === 200),
+                soccerListPage.nextDayBtn.click(),
+            ]);
+
+            await expect(soccerListPage.calendarBtn).toContainText(nextFormatted);
+
+            const nextResponse = await request.get(
+                `${sportsApiBaseURL}/v1.0/sports/soccer/games?date=${nextApiDate}&status=ALL&tomorrow-game-flag=true`
+            );
+            const nextGames = soccerListPage.extractGames(await nextResponse.json());
+
+            await soccerListPage.verifyTabMatchCounts(nextGames);
+        });
+
+        await test.step('Click todayBtn to return to today', async () => {
+            await Promise.all([
+                page.waitForResponse(resp => resp.url().includes('sports/soccer/today-games') && resp.status() === 200),
+                soccerListPage.todayBtn.click(),
+            ]);
+
+            await expect(soccerListPage.calendarBtn).toContainText(todayFormatted);
+        });
+    });
+
     test('[Soccer] User can change the year in calendar', async ({ page }) => {
         const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
         const currentYear = now.getFullYear();
