@@ -33,47 +33,49 @@ export class MyInfoPage {
     readonly authenticatedBadge: Locator;
     readonly changeEmailButton: Locator;
     readonly changeEmailDialog: Locator;
+    readonly newEmailInput: Locator;
 
     // OTP resend section
     readonly resendOtpText: Locator;
     readonly resendOtpButton: Locator;
 
     constructor(page: Page) {
-      this.page = page;
+        this.page = page;
 
-      // OTP section
-      this.otpInput = page.getByTestId('input-otp-root');
-      this.otpSendButton = page.getByRole('button', { name: 'OTP 받기' });
-      this.cancelButton = page.getByRole('button', { name: '취소' });
-      this.confirmButton = page.getByRole('button', { name: '인증 완료' });
+        // OTP section
+        this.otpInput = page.getByTestId('input-otp-root');
+        this.otpSendButton = page.getByRole('button', { name: 'OTP 받기' });
+        this.cancelButton = page.getByRole('button', { name: '취소' });
+        this.confirmButton = page.getByRole('button', { name: '인증 완료' });
 
-      // Reward section
-      this.rewardCloseIcon = page.locator('.tabler-icon.tabler-icon-x');
+        // Reward section
+        this.rewardCloseIcon = page.locator('.tabler-icon.tabler-icon-x');
 
-      // Email verification section - Unverified
-      this.emailInput = page.getByRole('textbox', { name: '이메일' });
-      this.emailLabel = page.getByLabel('이메일');
-      this.unverifiedIcon = page.locator('.tabler-icon.tabler-icon-circle-x-filled > path');
-      this.unverifiedBadge = page.locator('span:has-text("미인증 – 지금 인증하기")');
-      this.verifyNowLink = page.getByText('미인증 – 지금 인증하기');
+        // Email verification section - Unverified
+        this.emailInput = page.getByRole('textbox', { name: '이메일' });
+        this.emailLabel = page.getByLabel('이메일');
+        this.unverifiedIcon = page.locator('.tabler-icon.tabler-icon-circle-x-filled > path');
+        this.unverifiedBadge = page.locator('span:has-text("미인증 – 지금 인증하기")');
+        this.verifyNowLink = page.getByText('미인증 – 지금 인증하기');
 
-      // Email verification dialog
-      this.verificationDialog = page.getByRole('dialog');
-      this.verificationDialogHeading = page.getByRole('heading', { name: '이메일 인증받기' });
-      this.verificationEmailLabel = page.locator('label').filter({ hasText: '이메일' }).first();
-      this.verificationEmailInput = page.locator('input[name="email"]');
-      this.verificationOtpLabel = page.getByLabel('OTP 입력');
-      this.verificationCloseIcon = page.getByRole('img');
+        // Email verification dialog
+        this.verificationDialog = page.getByRole('dialog');
+        this.verificationDialogHeading = page.getByRole('heading', { name: '이메일 인증받기' });
+        this.verificationEmailLabel = page.locator('label').filter({ hasText: '이메일' }).first();
+        this.verificationEmailInput = page.locator('input[name="email"]');
+        this.verificationOtpLabel = page.getByLabel('OTP 입력');
+        this.verificationCloseIcon = page.getByRole('img');
 
-      // Email verification - Authenticated
-      this.authenticatedIcon = page.locator('.tabler-icon.tabler-icon-circle-check-filled > path').first();
-      this.authenticatedBadge = page.locator('p').filter({ hasText: '인증 완료' }).first();
-      this.changeEmailButton = page.locator('button').filter({ hasText: '변경하기' }).first();
-      this.changeEmailDialog = page.getByTestId('dialog-content');
+        // Email verification - Authenticated
+        this.authenticatedIcon = page.locator('.tabler-icon.tabler-icon-circle-check-filled > path').first();
+        this.authenticatedBadge = page.locator('p').filter({ hasText: '인증 완료' }).first();
+        this.changeEmailButton = page.locator('button').filter({ hasText: '변경하기' }).first();
+        this.changeEmailDialog = page.getByTestId('dialog-content');
+        this.newEmailInput = page.getByRole('textbox', { name: '새 이메일 주소' });
 
-      // OTP resend section
-      this.resendOtpText = page.getByText('OTP를 받지 못하셨나요?');
-      this.resendOtpButton = page.getByRole('button', { name: '인증번호 재발송' });
+        // OTP resend section
+        this.resendOtpText = page.getByText('OTP를 받지 못하셨나요?');
+        this.resendOtpButton = page.getByRole('button', { name: '인증번호 재발송' });
     }
 
     // ============= Private Helper Methods =============
@@ -211,6 +213,25 @@ export class MyInfoPage {
             message: errorMessage,
         });
     }
+    async mockOtpChangeEmailError(errorCode: number, errorMessage: string) {
+        await this.mockRoute('**/send-code-change-email**', 400, {
+            code: errorCode,
+            message: errorMessage,
+        });
+    }
+    async mockOtpChangeEmailSuccess() {
+        await this.mockRoute('**/send-code-change-email**', 200, {
+            code: 200,
+            message: 'OK',
+            data: {},
+        });
+    }
+    async mockExpiredOtpChangeEmailError() {
+        await this.mockRoute('**/confirm-change-email**', 400, {
+            code: 1006,
+            message: '인증 시간이 만료 되었습니다. 인증 번호를 다시 요청해 주세요.',
+        });
+    }
     async mockOtpSendSuccess() {
         await this.mockRoute('**/send-code-verify-email**', 200, {
             code: 200,
@@ -326,5 +347,33 @@ export class MyInfoPage {
     }
     async verifyChangeEmailDialogVisible() {
         await this.expectVisible(this.changeEmailDialog);
+    }
+    async verifyChangeEmailButtonVisible() {
+        await this.expectVisible(this.changeEmailButton);
+    }
+    async fillNewEmail(email: string) {
+        await this.newEmailInput.click();
+        if (email === '') {
+            await this.newEmailInput.fill('a');
+            await this.newEmailInput.press('Backspace');
+        } else {
+            await this.newEmailInput.fill(email);
+        }
+        await this.newEmailInput.press('Tab');
+    }
+    async clickSubmitChangeEmail() {
+        // Locate the submit button inside the dialog
+        const submitButton = this.changeEmailDialog.locator('button').filter({ hasText: '변경하기' });
+        await this.click(submitButton);
+    }
+    async verifyNewEmailValidationMessage(message: string, exact: boolean = false) {
+        await this.expectVisible(this.page.getByText(message, { exact }));
+    }
+    async verifyChangeEmailDialogClosed() {
+        await this.expectHidden(this.changeEmailDialog);
+    }
+    async verifyChangeEmailDialogClosedAndEmailUnchanged(emailAddress: string) {
+        await this.expectHidden(this.changeEmailDialog);
+        await this.verifyAuthenticatedEmailUI(emailAddress);
     }
 }
