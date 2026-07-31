@@ -1,4 +1,4 @@
-{
+﻿{
   "emailValidation": {
     "validInputs": [
       "abc",
@@ -174,7 +174,7 @@
     "password": "Named@123"
   },
   "loginFromOtherPage": {
-    "email": "qavn2@yopmail.com",
+    "email": "qavn3@yopmail.com",
     "password": "Named@123",
     "directLoginPages": [
       {

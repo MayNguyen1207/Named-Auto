@@ -67,7 +67,7 @@ export class MyInfoPage {
         this.verificationCloseIcon = page.getByRole('img');
 
         // Email verification - Authenticated
-        this.authenticatedIcon = page.locator('.tabler-icon.tabler-icon-circle-check-filled > path').first();
+        this.authenticatedIcon = page.locator('.tabler-icon.tabler-icon-circle-check-filled').first();
         this.authenticatedBadge = page.locator('p').filter({ hasText: '인증 완료' }).first();
         this.changeEmailButton = page.locator('button').filter({ hasText: '변경하기' }).first();
         this.changeEmailDialog = page.getByTestId('dialog-content');
