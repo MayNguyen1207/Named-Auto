@@ -200,8 +200,8 @@ test.describe('Admin Flow', () => {
         await test.step('Create a post to delete', async () => {
             const loginResponse = await request.post(`${apiBaseURL}/login`, {
                 form: {
-                    email: loginData.userD.email,
-                    password: loginData.userD.password,
+                    email: loginData.userC.email,
+                    password: loginData.userC.password,
                 }
             });
             expect(loginResponse.ok()).toBeTruthy();

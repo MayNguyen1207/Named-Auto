@@ -17,7 +17,18 @@ export class SoccerListPage extends BasePage {
 
     readonly soundBtn: Locator;
     readonly promptBtn: Locator;
-    readonly keywordInput: Locator;
+
+    readonly searchInput: Locator;
+    readonly clearBtn: Locator;
+    readonly searchList: Locator;
+    readonly searchLeagueGroup: Locator;
+    readonly searchLeagueHeader: Locator;
+    readonly searchLeagueResults: Locator;
+    readonly searchTeamGroup: Locator;
+    readonly searchTeamHeader: Locator;
+    readonly searchTeamResults: Locator;
+    readonly noResultTxt: Locator;
+
     readonly horizontalBtn: Locator;
     readonly verticalBtn: Locator;
 
@@ -31,8 +42,10 @@ export class SoccerListPage extends BasePage {
     readonly yearList: Locator;
     readonly yearOption: Locator;
 
+    readonly firstLeagueHeader: Locator;
     readonly leagueHeaders: Locator;
     readonly matchCards: Locator;
+    readonly broadcastContainer: Locator;
 
     constructor(page: Page) {
         super(page);
@@ -49,24 +62,37 @@ export class SoccerListPage extends BasePage {
         this.nextDayBtn = page.getByRole('button', { name: 'Next day' });
         this.reloadBtn = page.getByRole('button', { name: 'Reload' });
 
-        this.soundBtn = page.getByRole('checkbox', { name: '사운드' });
-        this.promptBtn = page.getByRole('checkbox', { name: '프롬프트' });
-        this.keywordInput = page.getByRole('textbox', { name: '팀이나 리그를 검색해 주세요.' });
-        this.horizontalBtn = page.getByRole('button', { name: '수평' }).nth(1);
-        this.verticalBtn = page.getByRole('button', { name: '수직' }).nth(1);
+        this.soundBtn = page.getByText('사운드', { exact: true }).first();
+        this.promptBtn = page.getByText('프롬프트', { exact: true });
+
+        this.searchInput = page.getByRole('textbox', { name: '팀이나 리그를 검색해 주세요.' });
+        this.clearBtn = page.getByRole('button', { name: 'Clear' });
+        this.searchList = page.getByTestId('search-list');
+        this.searchLeagueGroup = this.searchList.locator('> div').filter({ hasText: '리그' });
+        this.searchLeagueHeader = this.searchLeagueGroup.locator('> div').first();
+        this.searchLeagueResults = this.searchLeagueGroup.locator('> div.cursor-pointer');
+        this.searchTeamGroup = this.searchList.locator('> div').filter({ hasText: '팀' });
+        this.searchTeamHeader = this.searchTeamGroup.locator('> div').first();
+        this.searchTeamResults = this.searchTeamGroup.locator('> div.cursor-pointer');
+        this.noResultTxt = page.getByText('검색 결과가 없습니다.', { exact: true });
+
+        this.horizontalBtn = page.getByRole('button', { name: '수평' }).locator('visible=true');
+        this.verticalBtn = page.getByRole('button', { name: '수직' }).locator('visible=true');
 
         this.calendarModal = page.getByTestId('calendar-root');
-        this.monthTxt = this.calendarModal.locator("//div[contains(@class,'text-[15px] font-medium')]"); //Tobe updated
-        this.previousMonthBtn = this.calendarModal.locator('button.size-7.rounded.flex.items-center.justify-center').first(); //Tobe updated
-        this.nextMonthBtn = this.calendarModal.locator('button.size-7.rounded.flex.items-center.justify-center').nth(1); //Tobe updated
+        this.monthTxt = this.calendarModal.getByTestId('calendar-current-month');
+        this.previousMonthBtn = this.calendarModal.getByTestId('calendar-previous-month');
+        this.nextMonthBtn = this.calendarModal.getByTestId('calendar-next-month');
         this.calendarTodayBtn = this.calendarModal.getByRole('button', { name: '오늘' });
         this.dayCell = this.calendarModal.getByRole('gridcell');
         this.yearBtn = this.calendarModal.getByRole('button', { name: /년/ });
         this.yearList = page.locator('div.year-selector');
         this.yearOption = this.yearList.locator('button');
 
+        this.firstLeagueHeader = page.getByTestId('virtuoso-top-item-list')
         this.leagueHeaders = page.locator('div[data-index]:not([data-item-group-index])');
         this.matchCards = page.locator('div[data-item-group-index]');
+        this.broadcastContainer = page.getByTestId('broadcast-content');
     }
 
     async navigate() {
@@ -79,10 +105,10 @@ export class SoccerListPage extends BasePage {
     }
 
     async verifyTabMatchCounts(games: any[]) {
-        const all     = games.length;
+        const all = games.length;
         const onGoing = games.filter(g => g.gameStatus === 'IN_PROGRESS' || g.gameStatus === 'BREAK_TIME').length;
         const waiting = games.filter(g => g.gameStatus === 'READY').length;
-        const ended   = games.filter(g => ['FINAL', 'POSTPONED', 'CANCEL'].includes(g.gameStatus)).length;
+        const ended = games.filter(g => ['FINAL', 'POSTPONED', 'CANCEL'].includes(g.gameStatus)).length;
 
         await expect(this.allTab).toHaveText(`전체 (${all})`);
         await expect(this.onGoingTab).toHaveText(`진행 중(${onGoing})`);
@@ -95,5 +121,130 @@ export class SoccerListPage extends BasePage {
             await this.calendarBtn.click();
             await expect(this.calendarModal).toBeVisible({ timeout: 1000 });
         }).toPass();
+    }
+
+    /** Sum scores for periods 1-4 (regular + extra time). */
+    computeMainScore(periodData: any[] | null | undefined): number {
+        if (!periodData?.length) return 0;
+        return periodData
+            .filter(p => p.period >= 1 && p.period <= 4)
+            .reduce((sum, p) => sum + (p.score ?? 0), 0);
+    }
+
+    /** Returns period-5 (penalty) score, or null when there is no penalty period. */
+    getPenaltyScore(periodData: any[] | null | undefined): number | null {
+        if (!periodData?.length) return null;
+        const p5 = periodData.find(p => p.period === 5);
+        return p5 != null ? (p5.score ?? null) : null;
+    }
+
+    /**
+     * Returns the text the UI should display for the match status.
+     * For IN_PROGRESS the minute is calculated at call time, so call this as close to the assertion as possible and allow ±2 min tolerance.
+     */
+    getExpectedMatchStatusText(game: any): string {
+        switch (game.gameStatus) {
+            case 'FINAL': return '종료';
+            case 'POSTPONED': return '연기';
+            case 'CANCEL': return '취소';
+            case 'PENDING': return '중단';
+            case 'BREAK_TIME': return 'HT';
+            case 'READY': {
+                if (!game.realStartDateTime) return '대기 중';
+                // realStartDateTime is in KST (Seoul, UTC+9)
+                const realStart = new Date(game.realStartDateTime + '+09:00');
+                const remainingMs = realStart.getTime() - Date.now();
+                if (remainingMs <= 0) return '대기 중';
+                const totalSec = Math.ceil(remainingMs / 1_000);
+                const mm = String(Math.floor(totalSec / 60)).padStart(2, '0');
+                const ss = String(totalSec % 60).padStart(2, '0');
+                return `${mm}:${ss}`;
+            }
+            case 'IN_PROGRESS': {
+                if (!game.realStartDateTime) return '';
+                // realStartDateTime is in KST (Seoul, UTC+9)
+                const realStart = new Date(game.realStartDateTime + '+09:00');
+                const elapsedMin = Math.floor((Date.now() - realStart.getTime()) / 60_000);
+
+                if (game.period === 1) {
+                    return elapsedMin > 45 ? "45'+" : `${elapsedMin}'`;
+                } else if (game.period === 2) {
+                    return elapsedMin > 45 ? "90'+" : `${elapsedMin + 45}'`;
+                } else if (game.period === 3 || game.period === 4) {
+                    return '연장';
+                } else if (game.period === 5) {
+                    return '승부차기';
+                }
+
+                return elapsedMin >= 90 ? "90'+" : `${elapsedMin}'`;
+            }
+            default: return '';
+        }
+    }
+
+    getMatchCardElements(cardElement: Locator) {
+        return {
+            matchTime: cardElement.getByTestId('match-time'),
+            matchChatCount: cardElement.getByTestId('match-chat-number'),
+            matchEvent: cardElement.locator('div.bg-light-grey'),
+
+            homeTeam: cardElement.getByTestId('home-team'),
+            homeTeamLogo: cardElement.getByRole('img', { name: 'Home team logo' }),
+            homeTeamRank: cardElement.getByTestId('home-team-rank'),
+            homeTeamMainScore: cardElement.getByTestId('home-team-result').locator('> div').last(),
+            homeTeamPenaltyScore: cardElement.getByTestId('home-team-result').locator('span.absolute.text-xxs\\!.items-end'),
+
+            awayTeam: cardElement.getByTestId('away-team'),
+            awayTeamLogo: cardElement.getByRole('img', { name: 'Away team logo' }),
+            awayTeamRank: cardElement.getByTestId('away-team-rank'),
+            awayTeamMainScore: cardElement.getByTestId('away-team-result').locator('> div').first(),
+            awayTeamPenaltyScore: cardElement.getByTestId('away-team-result').locator('span.absolute.text-xxs\\!.items-end'),
+
+            matchStatus: cardElement.getByTestId('match-status'),
+            playBtn: cardElement.getByRole('button', { name: 'Play livestream' }),
+            favBtn: cardElement.getByRole('button', { name: 'Add to favorite' }),
+            broadCastBtn: cardElement.getByTestId('broadcast-button'),
+            openMatchBtn: cardElement.getByTestId('open-new-tab-button'),
+
+            threeDotsBtn: cardElement.getByTestId('3-dots-button')
+        };
+    }
+
+    getMockHelpers() {
+        const nowMs = Date.now();
+        const toKSTString = (ms: number) => {
+            const date = new Date(ms + 9 * 60 * 60 * 1000);
+            return date.toISOString().replace('Z', '');
+        };
+
+        const baseGame = {
+            sportsType: 'SOCCER',
+            startDatetime: toKSTString(nowMs + 3 * 60 * 60 * 1000),
+            realStartDateTime: null,
+            venueName: null,
+            result: 'UNKNOWN',
+            period: null,
+            displayTime: null,
+            videoLink: 'https://www.youtube.com/watch?v=Qh1TpY3VhRQ',
+            hasLineup: false,
+            oddsFlag: false,
+            boardFlag: false,
+            cheerCount: 0,
+            league: { id: 1, name: 'Mock League', shortName: 'ML', abbereviation: 'ML', color: '000000', nation: null, important: false },
+            season: { id: 1, name: 'Mock Season', shortName: '2026' },
+            broadcast: { score: { home: 0, away: 0 }, playText: null, locationType: null, eventType: null, displayTime: null, period: null },
+        };
+
+        const mkTeam = (name: string, idx: number, periodData: any[] = []) => ({
+            id: idx,
+            name,
+            shortName: name,
+            imgPath: null,
+            periodData,
+            seasonTeamRanking: null,
+            performance: null,
+        });
+
+        return { nowMs, toKSTString, baseGame, mkTeam };
     }
 }
