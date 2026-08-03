@@ -1,30 +1,30 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from '../../pages/LoginPage';
 import { MyInfoPage } from '../../pages/MyInfoPage';
 import loginData from '../../data-test/login-data.json';
+import { UNAUTHENTICATED_EMAIL_STATE, AUTHENTICATED_EMAIL_STATE } from './mypage.setup';
 
 test.describe('[MyInfor] Account Management Password Tests', () => {
-  let loginPage: LoginPage;
   let myInfoPage: MyInfoPage;
 
   test.beforeEach(async ({ page }) => {
-    loginPage = new LoginPage(page);
     myInfoPage = new MyInfoPage(page);
   });
-  test('Verify password change reminder dialog is visible after login', async ({ page }) => {
-    const user = loginData.unauthenticatedEmail;
-    await page.goto('/login?callbackUrl=/mypage/info?');
-    await loginPage.login(user.email, user.password);
+  test.describe('Password Change Reminder', () => {
+    test.use({ storageState: UNAUTHENTICATED_EMAIL_STATE });
 
-    await expect(page.getByRole('heading', { name: '비밀번호 변경' })).toBeVisible();
-    await expect(page.getByText('변경하지 않음')).toBeVisible();
+    test('Verify password change reminder dialog is visible after login', async ({ page }) => {
+      await page.goto('/mypage/info?');
+
+      await expect(page.getByRole('heading', { name: '비밀번호 변경' })).toBeVisible();
+      await expect(page.getByText('변경하지 않음')).toBeVisible();
+    });
   });
 
   test.describe('Change password dialog', () => {
+    test.use({ storageState: AUTHENTICATED_EMAIL_STATE });
+
     test.beforeEach(async ({ page }) => {
-      const user = loginData.authenticatedEmail;
-      await page.goto('/login?callbackUrl=/mypage/info?');
-      await loginPage.login(user.email, user.password);
+      await page.goto('/mypage/info?');
       await myInfoPage.openChangePasswordDialog();
     });
 
