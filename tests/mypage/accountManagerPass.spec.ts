@@ -61,41 +61,22 @@ test.describe('[MyInfor] Account Management Password Tests', () => {
     });
 
     test('Verify password length and complexity validation', async () => {
-      await test.step('Too short password (4 chars) shows length error', async () => {
-        await myInfoPage.fillChangePasswordForm({ newPass: 'a1B@' });
-        await myInfoPage.submitChangePassword();
-        await myInfoPage.verifyPasswordValidationMessage('비밀번호는 6~18자여야 합니다.');
-      });
+      const cases = [
+        { step: 'Too short password (4 chars) shows length error', newPass: 'a1B@', message: '비밀번호는 6~18자여야 합니다.' },
+        { step: 'Too long password (21 chars) shows length error', newPass: 'Abc123!Abc123!Abc123!', message: '비밀번호는 6~18자여야 합니다.' },
+        { step: 'Missing special char shows complexity error', newPass: 'Abc12345', message: '영문, 숫자, 특수문자를 모두 포함해야 합니다..' },
+        { step: 'Missing number shows complexity error', newPass: 'Abcdef!@', message: '영문, 숫자, 특수문자를 모두 포함해야 합니다..' },
+        { step: 'Missing letter shows complexity error', newPass: '123456!@', message: '영문, 숫자, 특수문자를 모두 포함해야 합니다..' },
+        { step: 'Only numbers shows complexity error', newPass: '12345678', message: '영문, 숫자, 특수문자를 모두 포함해야 합니다..' },
+      ];
 
-      await test.step('Too long password (21 chars) shows length error', async () => {
-        await myInfoPage.fillChangePasswordForm({ newPass: 'Abc123!Abc123!Abc123!' });
-        await myInfoPage.submitChangePassword();
-        await myInfoPage.verifyPasswordValidationMessage('비밀번호는 6~18자여야 합니다.');
-      });
-
-      await test.step('Missing special char shows complexity error', async () => {
-        await myInfoPage.fillChangePasswordForm({ newPass: 'Abc12345' });
-        await myInfoPage.submitChangePassword();
-        await myInfoPage.verifyPasswordValidationMessage('영문, 숫자, 특수문자를 모두 포함해야 합니다..');
-      });
-
-      await test.step('Missing number shows complexity error', async () => {
-        await myInfoPage.fillChangePasswordForm({ newPass: 'Abcdef!@' });
-        await myInfoPage.submitChangePassword();
-        await myInfoPage.verifyPasswordValidationMessage('영문, 숫자, 특수문자를 모두 포함해야 합니다..');
-      });
-
-      await test.step('Missing letter shows complexity error', async () => {
-        await myInfoPage.fillChangePasswordForm({ newPass: '123456!@' });
-        await myInfoPage.submitChangePassword();
-        await myInfoPage.verifyPasswordValidationMessage('영문, 숫자, 특수문자를 모두 포함해야 합니다..');
-      });
-
-      await test.step('Only numbers shows complexity error', async () => {
-        await myInfoPage.fillChangePasswordForm({ newPass: '12345678' });
-        await myInfoPage.submitChangePassword();
-        await myInfoPage.verifyPasswordValidationMessage('영문, 숫자, 특수문자를 모두 포함해야 합니다..');
-      });
+      for (const { step, newPass, message } of cases) {
+        await test.step(step, async () => {
+          await myInfoPage.fillChangePasswordForm({ newPass });
+          await myInfoPage.submitChangePassword();
+          await myInfoPage.verifyPasswordValidationMessage(message);
+        });
+      }
     });
 
     test('Verify dialog closes via 취소 button and close icon', async () => {
