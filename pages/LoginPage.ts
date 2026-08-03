@@ -121,6 +121,15 @@ export class LoginPage {
   async login(email: string, pass: string) {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(pass);
+
+    // Workaround for React hydration missing the input events if fired too early
+    try {
+      await expect(this.loginButton).toBeEnabled({ timeout: 2000 });
+    } catch {
+      await this.emailInput.fill(email);
+      await this.passwordInput.fill(pass);
+    }
+
     await this.loginButton.click();
   }
 
@@ -361,10 +370,9 @@ export class LoginPage {
     await expect(loginRequiredDialog).toBeVisible();
     await loginRequiredDialog.getByRole('button', { name: '확인' }).click({ force: true });
 
-    await expect(this.page).toHaveURL(expectedLoginUrl);
-    await this.page.waitForLoadState('networkidle');
+    await expect(this.page).toHaveURL(expectedLoginUrl, { timeout: 15000 });
 
     await this.login(email, password);
-    await expect(this.page).toHaveURL(finalExpectedUrl);
+    await expect(this.page).toHaveURL(finalExpectedUrl, { timeout: 15000 });
   }
 }

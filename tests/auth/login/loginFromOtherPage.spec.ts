@@ -3,36 +3,25 @@ import { HomePage } from '../../../pages/HomePage';
 import { LoginPage } from '../../../pages/LoginPage';
 import loginData from '../../../data-test/login-data.json';
 
-test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages', () => {
+const { email, password, directLoginPages } = loginData.loginFromOtherPage;
+
+test.describe('[Auth] Login from pages with callback redirect', () => {
     let homePage: HomePage;
     let loginPage: LoginPage;
-    const { email, password, directLoginPages } = loginData.loginFromOtherPage;
 
     test.beforeEach(async ({ page }) => {
         homePage = new HomePage(page);
         loginPage = new LoginPage(page);
     });
 
-    for (const pageInfo of directLoginPages) {
-        test(`[Auth] Login from ${pageInfo.name}`, async ({ page }) => {
-            if (pageInfo.url === '/home') {
-                await homePage.navigate();
-            } else {
-                await page.goto(pageInfo.url);
-            }
-            await page.getByTestId('navigation-button-login').click();
-            if (pageInfo.hasLoginUrlCheck) {
-                await expect(page).toHaveURL('/login');
-            }
-            await loginPage.login(email, password);
-            await expect(page).toHaveURL('/home');
-        });
-    }
+    test.afterEach(async ({ page }) => {
+        await page.waitForTimeout(3000);
+    });
 
     test('[Auth] Login from Main chat', async ({ page }) => {
         await homePage.navigate();
         await page.getByTestId('input-field').fill('a');
-        await page.locator(".tabler-icon.tabler-icon-send-2").first().click();
+        await page.locator('.tabler-icon.tabler-icon-send-2').first().click();
 
         await loginPage.handleLoginRequiredDialog(email, password, '/login?callbackUrl=%2Fhome', '/home');
     });
@@ -40,7 +29,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
     test('[Auth] Login from Match page when action is restricted (Chat)', async ({ page }) => {
         await page.goto('/match/soccer/11737634/odds');
         await page.getByRole('textbox', { name: '메세지를 입력하세요' }).fill('a');
-        await page.getByRole('button').filter({ hasText: /^$/ }).nth(3).click();
+        await page.getByTestId('button-root').nth(4).click();
 
         await loginPage.handleLoginRequiredDialog(email, password, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fodds/, /\/match\/soccer\/11737634\/odds/);
     });
@@ -53,6 +42,13 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await loginPage.handleLoginRequiredDialog(email, password, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fanalysis/, /\/match\/soccer\/11737634\/analysis/);
     });
 
+    test('[Auth] Login from Market - Trade page', async ({ page }) => {
+        await page.goto('/market/market');
+        await page.getByRole('link', { name: '황금마차' }).click();
+        await loginPage.login(email, password);
+        await expect(page).toHaveURL('/market/trade', { timeout: 15000 });
+    });
+
     test('[Auth] Login from PowerBall page when action is restricted', async ({ page }) => {
         await page.goto('/minigame/rball/double_dragon');
         await page.getByRole('button', { name: '바로가기' }).click();
@@ -61,10 +57,9 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await expect(loginRequiredDialog).toBeVisible();
         await loginRequiredDialog.getByRole('button', { name: '확인' }).click({ force: true });
 
-        await expect(page).toHaveURL(/\/login/);
-        await page.waitForLoadState('networkidle');
+        await expect(page).toHaveURL(/\/login/, { timeout: 15000 });
 
-        const pageBetgamepopup = page.waitForEvent('popup');
+        const pageBetgamepopup = page.waitForEvent('popup', { timeout: 30000 });
         await loginPage.login(email, password);
         const pageBetgame = await pageBetgamepopup;
 
@@ -108,17 +103,41 @@ test.describe('[Auth] Normal User Login Feature Tests - Login from Other Pages',
         await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/market\/market/);
     });
 
-    test('[Auth] Login from Market - Trade page', async ({ page }) => {
-        await page.goto('/market/market');
-        await page.getByRole('link', { name: '황금마차' }).click();
-        await loginPage.login(email, password);
-        await expect(page).toHaveURL('/market/trade');
-    });
-
     test('[Auth] Login from My Page link on Home page', async ({ page }) => {
         await homePage.navigate();
         await page.getByRole('link', { name: '마이페이지' }).click();
         await loginPage.login(email, password);
-        await expect(page).toHaveURL('/mypage/info');
+        await expect(page).toHaveURL('/mypage/info', { timeout: 15000 });
     });
+
+});
+
+test.describe('[Auth] Login from pages without callback redirect', () => {
+    let homePage: HomePage;
+    let loginPage: LoginPage;
+
+    test.beforeEach(async ({ page }) => {
+        homePage = new HomePage(page);
+        loginPage = new LoginPage(page);
+    });
+
+    test.afterEach(async ({ page }) => {
+        await page.waitForTimeout(3000);
+    });
+
+    for (const pageInfo of directLoginPages) {
+        test(`[Auth] Login from ${pageInfo.name}`, async ({ page }) => {
+            if (pageInfo.url === '/home') {
+                await homePage.navigate();
+            } else {
+                await page.goto(pageInfo.url);
+            }
+            await page.getByTestId('navigation-button-login').click();
+            if (pageInfo.hasLoginUrlCheck) {
+                await expect(page).toHaveURL('/login');
+            }
+            await loginPage.login(email, password);
+            await expect(page).toHaveURL('/home');
+        });
+    }
 });

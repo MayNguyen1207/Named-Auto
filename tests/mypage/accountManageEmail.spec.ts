@@ -1,24 +1,22 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from '../../pages/LoginPage';
 import { MyInfoPage } from '../../pages/MyInfoPage';
 import loginData from '../../data-test/login-data.json';
+import { UNAUTHENTICATED_EMAIL_STATE, AUTHENTICATED_EMAIL_STATE } from './mypage.setup';
 
 test.describe('[MyInfor] Account Management Tests', () => {
-  let loginPage: LoginPage;
   let myInfoPage: MyInfoPage;
 
   test.beforeEach(async ({ page }) => {
-    loginPage = new LoginPage(page);
     myInfoPage = new MyInfoPage(page);
   });
 
   test.describe('[MyInfo] Unauthenticated Email User Tests', () => {
+    test.use({ storageState: UNAUTHENTICATED_EMAIL_STATE });
     let userNotVerifiedEmail: any;
 
     test.beforeEach(async ({ page }) => {
       userNotVerifiedEmail = loginData.unauthenticatedEmail;
-      await page.goto('/login?callbackUrl=/mypage/info?');
-      await loginPage.login(userNotVerifiedEmail.email, userNotVerifiedEmail.password);
+      await page.goto('/mypage/info?');
     });
 
     test('Verify unauthenticated email display and dialog', async ({ page }) => {
@@ -29,8 +27,9 @@ test.describe('[MyInfor] Account Management Tests', () => {
     });
 
     test.describe('[MyInfo] OTP Error Handling', () => {
-      
+
       test.beforeEach(async ({ page }) => {
+        await myInfoPage.mockOtpSendSuccess();
         await myInfoPage.openVerificationDialog();
       });
 
@@ -79,13 +78,11 @@ test.describe('[MyInfor] Account Management Tests', () => {
       });
 
       test('Verify clicking cancel closes verification dialog and keeps email unchanged', async ({ page }) => {
-        await myInfoPage.requestOtp();
         await myInfoPage.cancelVerificationDialog();
         await myInfoPage.verifyVerificationDialogClosedAndEmailUnchanged(userNotVerifiedEmail.email);
       });
 
       test('Verify clicking dialog close icon returns to previous screen and keeps email unchanged', async ({ page }) => {
-        await myInfoPage.requestOtp();
         await myInfoPage.closeVerificationDialogWithIcon();
         await myInfoPage.verifyVerificationDialogClosedAndEmailUnchanged(userNotVerifiedEmail.email);
       });
@@ -101,7 +98,6 @@ test.describe('[MyInfor] Account Management Tests', () => {
 
       test('Verify OTP resend button visibility before and after 3 minutes', async ({ page }) => {
         await page.clock.install();
-        await myInfoPage.mockOtpSendSuccess();
         await myInfoPage.requestOtp();
         await myInfoPage.verifyResendButtonHidden();
         await page.clock.fastForward('03:00');
@@ -119,7 +115,6 @@ test.describe('[MyInfor] Account Management Tests', () => {
 
       test('Verify resend OTP sends a new code after 3 minutes', async ({ page }) => {
         await page.clock.install();
-        await myInfoPage.mockOtpSendSuccess();
         await myInfoPage.requestOtp();
         await page.clock.fastForward('03:00');
         await myInfoPage.verifyResendButtonVisible();
@@ -131,18 +126,126 @@ test.describe('[MyInfor] Account Management Tests', () => {
   });
 
   test.describe('[MyInfo] Authenticated Email User Tests', () => {
+    test.use({ storageState: AUTHENTICATED_EMAIL_STATE });
     let userVerifiedEmail: any;
 
     test.beforeEach(async ({ page }) => {
       userVerifiedEmail = loginData.authenticatedEmail;
-      await page.goto('/login?callbackUrl=/mypage/info?');
-      await loginPage.login(userVerifiedEmail.email, userVerifiedEmail.password);
+      await page.goto('/mypage/info?');
     });
 
     test('Verify authenticated email display and change dialog', async ({ page }) => {
       await myInfoPage.verifyAuthenticatedEmailUI(userVerifiedEmail.email);
       await myInfoPage.openChangeEmailDialog();
       await myInfoPage.verifyChangeEmailDialogVisible();
+    });
+
+    test('Verify new email validation messages', async ({ page }) => {
+      await myInfoPage.openChangeEmailDialog();
+      await myInfoPage.verifyChangeEmailDialogVisible();
+
+      const validationScenarios = [
+        { email: '', expectedMsg: userVerifiedEmail.validation.emptyEmailMessage },
+        { email: userVerifiedEmail.validation.invalidEmail, expectedMsg: userVerifiedEmail.validation.invalidEmailMessage }
+      ];
+      for (const { email, expectedMsg } of validationScenarios) {
+        await myInfoPage.fillNewEmail(email);
+        await myInfoPage.verifyNewEmailValidationMessage(expectedMsg);
+      }
+
+      await myInfoPage.fillNewEmail(userVerifiedEmail.email);
+      await myInfoPage.requestOtp();
+      await myInfoPage.verifyNewEmailValidationMessage(`${userVerifiedEmail.email}${userVerifiedEmail.validation.registeredEmailMessage}`, true);
+    });
+
+    test('Verify successful OTP request for new email', async ({ page }) => {
+      await myInfoPage.openChangeEmailDialog();
+      await myInfoPage.verifyChangeEmailDialogVisible();
+
+      await myInfoPage.fillNewEmail(userVerifiedEmail.validation.newEmail);
+      await myInfoPage.mockOtpChangeEmailSuccess();
+      await myInfoPage.requestOtp();
+      await myInfoPage.verifyNewEmailValidationMessage(userVerifiedEmail.validation.otpSentMessage, true);
+      await myInfoPage.verifyChangeEmailButtonVisible();
+      await myInfoPage.verifyOtpResendCountdownMessage();
+    });
+
+    test('Verify OTP email failure shows error', async ({ page }) => {
+      await myInfoPage.openChangeEmailDialog();
+      await myInfoPage.fillNewEmail(userVerifiedEmail.validation.newEmail);
+      await myInfoPage.mockOtpChangeEmailError(
+        userVerifiedEmail.validation.mockedOtpSendErrorCode,
+        userVerifiedEmail.validation.mockedOtpSendErrorMessage
+      );
+      await myInfoPage.requestOtp();
+      await myInfoPage.verifyNewEmailValidationMessage(userVerifiedEmail.validation.mockedOtpSendErrorMessage);
+      await page.unroute('**/send-code-change-email**');
+    });
+
+    test.describe('[MyInfo] After OTP Requested for New Email', () => {
+
+      test.beforeEach(async ({ page }) => {
+        await myInfoPage.openChangeEmailDialog();
+        await myInfoPage.fillNewEmail(userVerifiedEmail.validation.newEmail);
+        await myInfoPage.mockOtpChangeEmailSuccess();
+        await myInfoPage.requestOtp();
+      });
+
+      test('Verify incorrect OTP is rejected', async ({ page }) => {
+        await myInfoPage.submitOtp(userVerifiedEmail.validation.invalidOtp);
+        await myInfoPage.clickSubmitChangeEmail();
+        await myInfoPage.verifyNewEmailValidationMessage(userVerifiedEmail.validation.invalidOtpMessage);
+      });
+
+      test('Verify incomplete OTP code (<6) shows error', async ({ page }) => {
+        await myInfoPage.submitOtp(userVerifiedEmail.validation.incompleteOtp);
+        await myInfoPage.verifyNewEmailValidationMessage(userVerifiedEmail.validation.incompleteOtpMessage, true);
+      });
+
+      test('Verify expired OTP displays 1006 expiration message', async ({ page }) => {
+        await myInfoPage.mockExpiredOtpChangeEmailError();
+        await myInfoPage.submitOtp('123456');
+        await myInfoPage.clickSubmitChangeEmail();
+        await myInfoPage.verifyNewEmailValidationMessage('인증 시간이 만료 되었습니다. 인증 번호를 다시 요청해 주세요.');
+        await page.unroute('**/confirm-change-email**');
+      });
+
+      test('Verify "취소" (Cancel) and "X" button both close the email change dialog without saving', async ({ page }) => {
+        await myInfoPage.cancelVerificationDialog();
+        await myInfoPage.verifyChangeEmailDialogClosed();
+        await myInfoPage.verifyAuthenticatedEmailUI(userVerifiedEmail.email);
+
+        await page.reload();
+        await myInfoPage.openChangeEmailDialog();
+        await myInfoPage.closeVerificationDialogWithIcon();
+        await myInfoPage.verifyChangeEmailDialogClosedAndEmailUnchanged(userVerifiedEmail.email);
+      });
+    });
+
+    test.describe('[MyInfo] OTP Resend Countdown for Email Change', () => {
+
+      test.beforeEach(async ({ page }) => {
+        await page.clock.install();
+        await myInfoPage.mockOtpChangeEmailSuccess();
+        await myInfoPage.openChangeEmailDialog();
+        await myInfoPage.fillNewEmail(userVerifiedEmail.validation.newEmail);
+        await myInfoPage.requestOtp();
+      });
+
+      test('Verify "Resend OTP" link is hidden during countdown and appears after countdown reaches 00:00', async ({ page }) => {
+        await myInfoPage.verifyResendButtonHidden();
+        await page.clock.fastForward('03:00');
+        await myInfoPage.verifyResendButtonVisible();
+        await page.unroute('**/send-code-change-email**');
+      });
+
+      test('Verify user can request OTP again after countdown and resend link appears', async ({ page }) => {
+        await page.clock.fastForward('03:00');
+        await myInfoPage.verifyResendButtonVisible();
+        await page.unroute('**/send-code-change-email**');
+        await myInfoPage.clickResendOtp();
+        await myInfoPage.verifyResendOtpSuccess(userVerifiedEmail.validation.otpResendSuccessMessage);
+      });
     });
   });
 });

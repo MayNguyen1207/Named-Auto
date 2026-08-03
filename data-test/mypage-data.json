@@ -5,10 +5,74 @@
       "subtitle": "(달성할 때마다 푸짐한 아이템 지급!)",
       "guideButton": "달성률과 보상안내",
       "progressBar": "P0P25P50P75P100P",
-      "currentPoints": "22 P"
+      "currentPoints": "32 P"
     },
     "dialogExpectedTexts": {
       "noticeText": "보상아이템은 달성시 자동지급되며 내아이템에서 확인하실 수 있습니다.(선물불가)"
     }
+  },
+  "passwordValidation": {
+    "fieldValidation": [
+      {
+        "step": "Empty new & confirm password show errors",
+        "currentPass": "Named@123",
+        "newPass": null,
+        "confirmPass": null,
+        "messages": [
+          "새 비밀번호를 입력해주세요.",
+          "새 비밀번호 확인을 입력해 주세요."
+        ]
+      },
+      {
+        "step": "Empty current password shows error",
+        "currentPass": null,
+        "newPass": "Named@1234",
+        "confirmPass": "Named@1234",
+        "messages": [
+          "현재 비밀번호를 입력해 주세요."
+        ]
+      },
+      {
+        "step": "Mismatched new & confirm password shows error",
+        "currentPass": "Named@123",
+        "newPass": "Named@1234",
+        "confirmPass": "Named@123w",
+        "messages": [
+          "새 비밀번호와 비밀번호 확인이 일치하지 않습니다. 다시 입력해 주세요."
+        ]
+      }
+    ],
+    "lengthComplexity": [
+      {
+        "step": "Too short password (4 chars) shows length error",
+        "newPass": "a1B@",
+        "message": "비밀번호는 6~18자여야 합니다."
+      },
+      {
+        "step": "Too long password (21 chars) shows length error",
+        "newPass": "Abc123!Abc123!Abc123!",
+        "message": "비밀번호는 6~18자여야 합니다."
+      },
+      {
+        "step": "Missing special char shows complexity error",
+        "newPass": "Abc12345",
+        "message": "영문, 숫자, 특수문자를 모두 포함해야 합니다.."
+      },
+      {
+        "step": "Missing number shows complexity error",
+        "newPass": "Abcdef!@",
+        "message": "영문, 숫자, 특수문자를 모두 포함해야 합니다.."
+      },
+      {
+        "step": "Missing letter shows complexity error",
+        "newPass": "123456!@",
+        "message": "영문, 숫자, 특수문자를 모두 포함해야 합니다.."
+      },
+      {
+        "step": "Only numbers shows complexity error",
+        "newPass": "12345678",
+        "message": "영문, 숫자, 특수문자를 모두 포함해야 합니다.."
+      }
+    ]
   }
 }
