@@ -9,6 +9,7 @@ test.describe('[MyInfor] Account Management Password Tests', () => {
   test.beforeEach(async ({ page }) => {
     myInfoPage = new MyInfoPage(page);
   });
+
   test.describe('Password Change Reminder', () => {
     test.use({ storageState: UNAUTHENTICATED_EMAIL_STATE });
 
@@ -28,76 +29,89 @@ test.describe('[MyInfor] Account Management Password Tests', () => {
       await myInfoPage.openChangePasswordDialog();
     });
 
-    test('Verify change password dialog UI elements are visible', async () => {
-      await myInfoPage.verifyChangePasswordDialogVisible();
-    });
-
-    test('Verify placeholder text disappears when user types in each password field', async () => {
-      await myInfoPage.verifyPasswordPlaceholdersDisappearWhenTyping();
-    });
-
-    test('Verify validation message when current password is empty', async () => {
-      await myInfoPage.fillChangePasswordForm({
-        newPass: 'Named@1234',
-        confirmPass: 'Named@1234',
+    test('Verify change password dialog UI and placeholder behavior', async () => {
+      await test.step('Dialog UI elements are visible', async () => {
+        await myInfoPage.verifyChangePasswordDialogVisible();
       });
-      await myInfoPage.submitChangePassword();
-      await myInfoPage.verifyPasswordValidationMessage('현재 비밀번호를 입력해 주세요.');
-    });
 
-    test('Verify validation messages when new password and confirm password are empty', async () => {
-      await myInfoPage.fillChangePasswordForm({ currentPass: 'Named@123' });
-      await myInfoPage.submitChangePassword();
-      await myInfoPage.verifyPasswordValidationMessage('새 비밀번호를 입력해주세요.');
-      await myInfoPage.verifyPasswordValidationMessage('새 비밀번호 확인을 입력해 주세요.');
-    });
-
-    test('Verify validation message when new password and confirm password do not match', async () => {
-      await myInfoPage.fillChangePasswordForm({
-        currentPass: 'Named@123',
-        newPass: 'Named@1234',
-        confirmPass: 'Named@123w',
+      await test.step('Placeholder text disappears when user types', async () => {
+        await myInfoPage.verifyPasswordPlaceholdersDisappearWhenTyping();
       });
-      await myInfoPage.submitChangePassword();
-      await myInfoPage.verifyPasswordValidationMessage('새 비밀번호와 비밀번호 확인이 일치하지 않습니다. 다시 입력해 주세요.');
     });
 
-    const invalidLengthPasswords = [
-      { label: 'too short (4 chars)', password: 'a1B@' },
-      { label: 'too long (21 chars)', password: 'Abc123!Abc123!Abc123!' },
-    ];
+    test('Verify password field validation messages', async () => {
+      await test.step('Empty new & confirm password show errors', async () => {
+        await myInfoPage.fillChangePasswordForm({ currentPass: 'Named@123' });
+        await myInfoPage.submitChangePassword();
+        await myInfoPage.verifyPasswordValidationMessage('새 비밀번호를 입력해주세요.');
+        await myInfoPage.verifyPasswordValidationMessage('새 비밀번호 확인을 입력해 주세요.');
+      });
 
-    for (const { label, password } of invalidLengthPasswords) {
-      test(`Verify password length validation when new password is ${label}`, async () => {
-        await myInfoPage.fillChangePasswordForm({ newPass: password });
+      await test.step('Empty current password shows error', async () => {
+        await myInfoPage.fillChangePasswordForm({ newPass: 'Named@1234', confirmPass: 'Named@1234' });
+        await myInfoPage.submitChangePassword();
+        await myInfoPage.verifyPasswordValidationMessage('현재 비밀번호를 입력해 주세요.');
+      });
+
+      await test.step('Mismatched new & confirm password shows error', async () => {
+        await myInfoPage.fillChangePasswordForm({ currentPass: 'Named@123', newPass: 'Named@1234', confirmPass: 'Named@123w' });
+        await myInfoPage.submitChangePassword();
+        await myInfoPage.verifyPasswordValidationMessage('새 비밀번호와 비밀번호 확인이 일치하지 않습니다. 다시 입력해 주세요.');
+      });
+    });
+
+    test('Verify password length and complexity validation', async () => {
+      await test.step('Too short password (4 chars) shows length error', async () => {
+        await myInfoPage.fillChangePasswordForm({ newPass: 'a1B@' });
         await myInfoPage.submitChangePassword();
         await myInfoPage.verifyPasswordValidationMessage('비밀번호는 6~18자여야 합니다.');
       });
-    }
 
-    const invalidComplexityPasswords = [
-      { label: 'missing special char (Abc12345)', password: 'Abc12345' },
-      { label: 'missing number (Abcdef!@)', password: 'Abcdef!@' },
-      { label: 'missing letter (123456!@)', password: '123456!@' },
-      { label: 'only numbers (12345678)', password: '12345678' },
-    ];
+      await test.step('Too long password (21 chars) shows length error', async () => {
+        await myInfoPage.fillChangePasswordForm({ newPass: 'Abc123!Abc123!Abc123!' });
+        await myInfoPage.submitChangePassword();
+        await myInfoPage.verifyPasswordValidationMessage('비밀번호는 6~18자여야 합니다.');
+      });
 
-    for (const { label, password } of invalidComplexityPasswords) {
-      test(`Verify password complexity validation when new password is ${label}`, async () => {
-        await myInfoPage.fillChangePasswordForm({ newPass: password });
+      await test.step('Missing special char shows complexity error', async () => {
+        await myInfoPage.fillChangePasswordForm({ newPass: 'Abc12345' });
         await myInfoPage.submitChangePassword();
         await myInfoPage.verifyPasswordValidationMessage('영문, 숫자, 특수문자를 모두 포함해야 합니다..');
       });
-    }
 
-    test('Verify dialog is hidden after clicking 취소 button', async () => {
-      await myInfoPage.cancelChangePassword();
-      await myInfoPage.verifyChangePasswordDialogHidden();
+      await test.step('Missing number shows complexity error', async () => {
+        await myInfoPage.fillChangePasswordForm({ newPass: 'Abcdef!@' });
+        await myInfoPage.submitChangePassword();
+        await myInfoPage.verifyPasswordValidationMessage('영문, 숫자, 특수문자를 모두 포함해야 합니다..');
+      });
+
+      await test.step('Missing letter shows complexity error', async () => {
+        await myInfoPage.fillChangePasswordForm({ newPass: '123456!@' });
+        await myInfoPage.submitChangePassword();
+        await myInfoPage.verifyPasswordValidationMessage('영문, 숫자, 특수문자를 모두 포함해야 합니다..');
+      });
+
+      await test.step('Only numbers shows complexity error', async () => {
+        await myInfoPage.fillChangePasswordForm({ newPass: '12345678' });
+        await myInfoPage.submitChangePassword();
+        await myInfoPage.verifyPasswordValidationMessage('영문, 숫자, 특수문자를 모두 포함해야 합니다..');
+      });
     });
 
-    test('Verify dialog is hidden after clicking close icon', async () => {
-      await myInfoPage.closeChangePasswordDialog();
-      await myInfoPage.verifyChangePasswordDialogHidden();
+    test('Verify dialog closes via 취소 button and close icon', async () => {
+      await test.step('취소 button closes the dialog', async () => {
+        await myInfoPage.cancelChangePassword();
+        await myInfoPage.verifyChangePasswordDialogHidden();
+      });
+
+      await test.step('Reopen dialog', async () => {
+        await myInfoPage.openChangePasswordDialog();
+      });
+
+      await test.step('Close icon closes the dialog', async () => {
+        await myInfoPage.closeChangePasswordDialog();
+        await myInfoPage.verifyChangePasswordDialogHidden();
+      });
     });
   });
 });

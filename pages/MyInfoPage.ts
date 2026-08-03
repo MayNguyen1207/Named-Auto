@@ -330,6 +330,10 @@ export class MyInfoPage {
         }
     }
     async fillChangePasswordForm(options: { currentPass?: string; newPass?: string; confirmPass?: string }) {
+        // Clear all fields first to avoid data leaking between steps
+        for (const locator of [this.currentPasswordInput, this.newPasswordInput, this.confirmNewPasswordInput]) {
+            await locator.clear();
+        }
         const fields: [string | undefined, Locator][] = [
             [options.currentPass, this.currentPasswordInput],
             [options.newPass, this.newPasswordInput],
