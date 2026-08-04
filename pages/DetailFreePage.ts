@@ -131,8 +131,7 @@ export class DetailFreePage extends BasePage {
     }
 
     async navigate(url: string) {
-        await this.page.goto(url);
-        await this.page.waitForTimeout(1000);
+        await this.page.goto(url, { waitUntil: 'domcontentloaded' });
     }
 
     async writeCmt(content: string) {

@@ -45,7 +45,13 @@ export class SoccerListPage extends BasePage {
     readonly firstLeagueHeader: Locator;
     readonly leagueHeaders: Locator;
     readonly matchCards: Locator;
-    readonly broadcastContainer: Locator;
+    readonly broadCastContainer: Locator;
+
+    readonly adminOpenMatchBtn: Locator;
+    readonly adminCasterBtn: Locator;
+
+    readonly likedMatchArea: Locator;
+    readonly likedMatchCards: Locator;
 
     constructor(page: Page) {
         super(page);
@@ -92,12 +98,17 @@ export class SoccerListPage extends BasePage {
         this.firstLeagueHeader = page.getByTestId('virtuoso-top-item-list')
         this.leagueHeaders = page.locator('div[data-index]:not([data-item-group-index])');
         this.matchCards = page.locator('div[data-item-group-index]');
-        this.broadcastContainer = page.getByTestId('broadcast-content');
+        this.broadCastContainer = page.getByTestId('broadcast-content');
+
+        this.adminOpenMatchBtn = page.getByTestId('open-new-tab-button');
+        this.adminCasterBtn = page.getByRole('button', { name: 'Caster' });
+
+        this.likedMatchArea = page.locator(".mb-1[data-testid='accordion-root']");
+        this.likedMatchCards = page.locator('.overflow-hidden .bg-primary-foreground');
     }
 
     async navigate() {
         await this.page.goto('/scorecenter/soccer', { waitUntil: 'domcontentloaded' });
-        await this.page.waitForTimeout(3000);
     }
 
     extractGames(body: any): any[] {
@@ -203,11 +214,46 @@ export class SoccerListPage extends BasePage {
             matchStatus: cardElement.getByTestId('match-status'),
             playBtn: cardElement.getByRole('button', { name: 'Play livestream' }),
             favBtn: cardElement.getByRole('button', { name: 'Add to favorite' }),
+            removeFavBtn: cardElement.getByRole('button', { name: 'Remove from favorite' }),
             broadCastBtn: cardElement.getByTestId('broadcast-button'),
             openMatchBtn: cardElement.getByTestId('open-new-tab-button'),
 
             threeDotsBtn: cardElement.getByTestId('3-dots-button')
         };
+    }
+
+    async likeMatchCards(indices: number[]): Promise<string[]> {
+        const likedHrefs: string[] = [];
+        for (const index of indices) {
+            const card = this.matchCards.nth(index);
+            const href = await card.locator('a').first().getAttribute('href');
+            likedHrefs.push(href!);
+            const { favBtn, removeFavBtn } = this.getMatchCardElements(card);
+            await favBtn.click();
+            await expect(removeFavBtn).toBeVisible();
+            await expect(favBtn).not.toBeVisible();
+        }
+        return likedHrefs;
+    }
+
+    async unlikeAllLikedMatchCards(verifyIndices: number[] = []) {
+        await this.allTab.click();
+        const count = await this.likedMatchCards.count();
+
+        for (let i = 0; i < count; i++) {
+            const { removeFavBtn } = this.getMatchCardElements(this.likedMatchCards.first());
+            await removeFavBtn.click({ delay: 600 });
+            await expect(this.likedMatchCards).toHaveCount(count - i - 1);
+        }
+
+        await expect(this.likedMatchArea).not.toBeVisible();
+
+        for (const index of verifyIndices) {
+            const card = this.matchCards.nth(index);
+            const { favBtn, removeFavBtn } = this.getMatchCardElements(card);
+            await expect(favBtn).toBeVisible();
+            await expect(removeFavBtn).not.toBeVisible();
+        }
     }
 
     getMockHelpers() {
@@ -225,7 +271,7 @@ export class SoccerListPage extends BasePage {
             result: 'UNKNOWN',
             period: null,
             displayTime: null,
-            videoLink: 'https://www.youtube.com/watch?v=Qh1TpY3VhRQ',
+            videoLink: null,
             hasLineup: false,
             oddsFlag: false,
             boardFlag: false,

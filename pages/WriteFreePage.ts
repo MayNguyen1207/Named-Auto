@@ -107,7 +107,7 @@ export class WriteFreePage extends BasePage {
     }
 
     async navigate() {
-        await this.page.goto('/community/create?boardType=free');
+        await this.page.goto('/community/create?boardType=free', { waitUntil: 'domcontentloaded' });
     }
 
     async enterTitle(title: string) {
