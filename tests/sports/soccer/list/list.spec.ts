@@ -1,5 +1,5 @@
-import { test, expect } from '../../../utils/fixtures';
-import { SoccerListPage } from '../../../pages/SoccerListPage';
+import { test, expect } from '../../../../utils/fixtures';
+import { SoccerListPage } from '../../../../pages/SoccerListPage';
 
 test.describe('Guest Flow', () => {
 

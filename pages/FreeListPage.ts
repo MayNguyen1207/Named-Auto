@@ -46,8 +46,7 @@ export class FreeListPage extends BasePage {
     }
 
     async navigate() {
-        await this.page.goto('/community/free');
-        await this.page.waitForTimeout(3000);
+        await this.page.goto('/community/free', { waitUntil: 'domcontentloaded' });
     }
 
     getListItemElements(index: number) {
