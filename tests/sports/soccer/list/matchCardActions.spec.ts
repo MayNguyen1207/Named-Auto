@@ -1,6 +1,6 @@
-import { test, expect } from '../../../utils/fixtures';
-import { SoccerListPage } from '../../../pages/SoccerListPage';
-import matchData from '../../../data-test/match-list-data.json';
+import { test, expect } from '../../../../utils/fixtures';
+import { SoccerListPage } from '../../../../pages/SoccerListPage';
+import matchData from '../../../../data-test/match-list-data.json';
 
 test.describe('Guest Flow', () => {
 

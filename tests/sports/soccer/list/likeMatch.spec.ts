@@ -1,7 +1,7 @@
-import { test, expect } from '../../../utils/fixtures';
-import { SoccerListPage } from '../../../pages/SoccerListPage';
-import { LoginPage } from '../../../pages/LoginPage';
-import loginData from '../../../data-test/login-data.json';
+import { test, expect } from '../../../../utils/fixtures';
+import { SoccerListPage } from '../../../../pages/SoccerListPage';
+import { LoginPage } from '../../../../pages/LoginPage';
+import loginData from '../../../../data-test/login-data.json';
 
 
 test.describe('Guest Flow', () => {
