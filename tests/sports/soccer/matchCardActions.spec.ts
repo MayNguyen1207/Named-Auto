@@ -96,6 +96,14 @@ test.describe('Guest Flow', () => {
         await newPage.waitForLoadState();
         expect(newPage.url()).toContain(matchLink!);
     });
+
+    test('[Soccer] User can click to open the match', async ({ page }) => {
+        const card = soccerListPage.matchCards.first();
+        const matchLink = await card.locator('a').first().getAttribute('href');
+
+        await card.click();
+        await expect(page).toHaveURL(`${matchLink}`);
+    })
 });
 
 test.describe('Admin Flow', () => {
