@@ -41,8 +41,8 @@ test.describe('Admin Flow', () => {
         await freeListPage.deletePostBtn.click();
         await freeListPage.dialogConfirmBtn.click();
 
-        await expect(page.getByText(lastPostTitle)).toBeHidden({ timeout: 5000 });
-        await expect(page.getByText(secondLastPostTitle)).toBeHidden({ timeout: 5000 });
+        await expect(freeListPage.listItems.filter({ hasText: lastPostTitle })).toHaveCount(0, { timeout: 5000 });
+        await expect(freeListPage.listItems.filter({ hasText: secondLastPostTitle })).toHaveCount(0, { timeout: 5000 });
     });
 
     test('[Community] List of boards to move post should be displayed correctly', async ({ page, request, apiBaseURL }) => {

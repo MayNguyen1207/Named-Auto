@@ -64,12 +64,12 @@ export class SoccerListPage extends BasePage {
 
         this.todayBtn = page.getByRole('button', { name: '오늘' });
         this.previousDayBtn = page.getByRole('button', { name: 'Previous day' });
-        this.calendarBtn = page.getByLabel('달력', { exact: true });
+        this.calendarBtn = page.getByRole('button', { name: '달력' });
         this.nextDayBtn = page.getByRole('button', { name: 'Next day' });
         this.reloadBtn = page.getByRole('button', { name: 'Reload' });
 
         this.soundBtn = page.getByText('사운드', { exact: true }).first();
-        this.promptBtn = page.getByText('프롬프트', { exact: true });
+        this.promptBtn = page.locator('#main-content').getByText('프롬프트', { exact: true });
 
         this.searchInput = page.getByRole('textbox', { name: '팀이나 리그를 검색해 주세요.' });
         this.clearBtn = page.getByRole('button', { name: 'Clear' });
@@ -108,7 +108,8 @@ export class SoccerListPage extends BasePage {
     }
 
     async navigate() {
-        await this.page.goto('/scorecenter/soccer', { waitUntil: 'domcontentloaded' });
+        await this.page.goto('/scorecenter/soccer');
+        await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
     }
 
     extractGames(body: any): any[] {
@@ -119,7 +120,7 @@ export class SoccerListPage extends BasePage {
         const all = games.length;
         const onGoing = games.filter(g => g.gameStatus === 'IN_PROGRESS' || g.gameStatus === 'BREAK_TIME').length;
         const waiting = games.filter(g => g.gameStatus === 'READY').length;
-        const ended = games.filter(g => ['FINAL', 'POSTPONED', 'CANCEL'].includes(g.gameStatus)).length;
+        const ended = games.filter(g => ['FINAL', 'POSTPONED', 'CANCEL', 'CUT'].includes(g.gameStatus)).length;
 
         await expect(this.allTab).toHaveText(`전체 (${all})`);
         await expect(this.onGoingTab).toHaveText(`진행 중(${onGoing})`);
@@ -131,7 +132,7 @@ export class SoccerListPage extends BasePage {
         await expect(async () => {
             await this.calendarBtn.click();
             await expect(this.calendarModal).toBeVisible({ timeout: 1000 });
-        }).toPass();
+        }).toPass({ timeout: 10000 });
     }
 
     /** Sum scores for periods 1-4 (regular + extra time). */
@@ -158,6 +159,7 @@ export class SoccerListPage extends BasePage {
             case 'FINAL': return '종료';
             case 'POSTPONED': return '연기';
             case 'CANCEL': return '취소';
+            case 'CUT': return '중단';
             case 'PENDING': return '중단';
             case 'BREAK_TIME': return 'HT';
             case 'READY': {

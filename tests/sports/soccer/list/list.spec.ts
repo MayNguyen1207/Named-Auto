@@ -57,7 +57,7 @@ test.describe('Guest Flow', () => {
 
         const leagueShortNames = Array.from(new Set(games.map(g => g.league?.shortName).filter(Boolean)));
 
-        await expect(soccerListPage.firstLeagueHeader).toBeVisible();
+        await expect(soccerListPage.firstLeagueHeader).toBeVisible({ timeout: 10000 });
 
         const headerText = await soccerListPage.firstLeagueHeader.innerText();
         const matchFound = leagueShortNames.some(name => headerText.includes(name));

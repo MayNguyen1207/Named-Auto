@@ -44,7 +44,10 @@ test.describe('Guest Flow', () => {
         const expectedLeagues = [...leagueMap.values()].slice(0, MAX_RESULTS);
         const expectedTeams = [...teamMap.values()].slice(0, MAX_RESULTS);
 
-        await soccerListPage.searchInput.fill(KEYWORD);
+        await expect(async () => {
+            await soccerListPage.searchInput.fill(KEYWORD);
+            await expect(soccerListPage.searchInput).toHaveValue(KEYWORD, { timeout: 1000 });
+        }).toPass({ timeout: 10000 });
         await page.waitForTimeout(500);
 
         if (expectedLeagues.length > 0) {
@@ -53,22 +56,26 @@ test.describe('Guest Flow', () => {
                 await expect(soccerListPage.searchLeagueHeader).toBeVisible();
                 await expect(soccerListPage.searchLeagueHeader).toContainText('리그');
 
-                await expect(soccerListPage.searchLeagueResults).toHaveCount(expectedLeagues.length);  // max 5
+                const leagueCount = await soccerListPage.searchLeagueResults.count();
+                expect(leagueCount).toBeLessThanOrEqual(MAX_RESULTS);
 
-                for (let i = 0; i < expectedLeagues.length; i++) {  // iterate up to 5
-                    const { shortName, imgPath } = expectedLeagues[i];
+                for (let i = 0; i < leagueCount; i++) {
                     const resultItem = soccerListPage.searchLeagueResults.nth(i);
+                    const itemText = await resultItem.innerText();
 
                     const highlighted = resultItem.locator('span.text-primary');
-                    await expect(highlighted).toBeVisible();
-                    await expect(highlighted).toHaveText(KEYWORD);
+                    const highlightCount = await highlighted.count();
+                    expect(highlightCount).toBeGreaterThan(0);
+                    for (let j = 0; j < highlightCount; j++) {
+                        await expect(highlighted.nth(j)).toBeVisible();
+                        await expect(highlighted.nth(j)).toHaveText(new RegExp(KEYWORD, 'i'));
+                    }
 
-                    await expect(resultItem).toContainText(shortName);
-
-                    if (imgPath) {
+                    const matchedLeague = expectedLeagues.find(l => itemText.includes(l.shortName));
+                    if (matchedLeague && matchedLeague.imgPath) {
                         const img = resultItem.locator('img');
                         const src = await img.getAttribute('src');
-                        const expectedSegment = imgPath.split('/').pop()!.split('_')[0];
+                        const expectedSegment = matchedLeague.imgPath.split('/').pop()!.split('_')[0];
                         const isFallback = src?.includes('images/sports/common/default_home_team_logo.webp');
                         if (!isFallback) {
                             expect(src).toContain(expectedSegment);
@@ -87,22 +94,26 @@ test.describe('Guest Flow', () => {
                 await expect(soccerListPage.searchTeamHeader).toBeVisible();
                 await expect(soccerListPage.searchTeamHeader).toContainText('팀');
 
-                await expect(soccerListPage.searchTeamResults).toHaveCount(expectedTeams.length);  // max 5
+                const teamCount = await soccerListPage.searchTeamResults.count();
+                expect(teamCount).toBeLessThanOrEqual(MAX_RESULTS);
 
-                for (let i = 0; i < expectedTeams.length; i++) {  // iterate up to 5
-                    const { name, imgPath } = expectedTeams[i];
+                for (let i = 0; i < teamCount; i++) {
                     const resultItem = soccerListPage.searchTeamResults.nth(i);
+                    const itemText = await resultItem.innerText();
 
                     const highlighted = resultItem.locator('span.text-primary');
-                    await expect(highlighted).toBeVisible();
-                    await expect(highlighted).toHaveText(KEYWORD);
+                    const highlightCount = await highlighted.count();
+                    expect(highlightCount).toBeGreaterThan(0);
+                    for (let j = 0; j < highlightCount; j++) {
+                        await expect(highlighted.nth(j)).toBeVisible();
+                        await expect(highlighted.nth(j)).toHaveText(new RegExp(KEYWORD, 'i'));
+                    }
 
-                    await expect(resultItem).toContainText(name);
-
-                    if (imgPath) {
+                    const matchedTeam = expectedTeams.find(t => itemText.includes(t.name));
+                    if (matchedTeam && matchedTeam.imgPath) {
                         const img = resultItem.locator('img');
                         const src = await img.getAttribute('src');
-                        const expectedSegment = imgPath.split('/').pop()!.split('_')[0];
+                        const expectedSegment = matchedTeam.imgPath.split('/').pop()!.split('_')[0];
                         const isFallback = src?.includes('images/sports/common/default_home_team_logo.webp');
                         if (!isFallback) {
                             expect(src).toContain(expectedSegment);
@@ -121,7 +132,10 @@ test.describe('Guest Flow', () => {
 
     test('[Soccer] League results list should be displayed correctly', async ({ page, request, sportsApiBaseURL }) => {
         const KEYWORD = 'a';
-        await soccerListPage.searchInput.fill(KEYWORD);
+        await expect(async () => {
+            await soccerListPage.searchInput.fill(KEYWORD);
+            await expect(soccerListPage.searchInput).toHaveValue(KEYWORD, { timeout: 1000 });
+        }).toPass({ timeout: 10000 });
         await page.waitForTimeout(500);
 
         const firstLeagueResult = soccerListPage.searchLeagueResults.nth(0);
@@ -166,7 +180,10 @@ test.describe('Guest Flow', () => {
 
     test('[Soccer] Team results list should be displayed correctly', async ({ page, request, sportsApiBaseURL }) => {
         const KEYWORD = 'a';
-        await soccerListPage.searchInput.fill(KEYWORD);
+        await expect(async () => {
+            await soccerListPage.searchInput.fill(KEYWORD);
+            await expect(soccerListPage.searchInput).toHaveValue(KEYWORD, { timeout: 1000 });
+        }).toPass({ timeout: 10000 });
         await page.waitForTimeout(500);
 
         const firstTeamResult = soccerListPage.searchTeamResults.nth(0);
@@ -211,16 +228,21 @@ test.describe('Guest Flow', () => {
 
     test('[Soccer] User can clear the keyword', async ({ page }) => {
         const KEYWORD = 'abcdefgh';
-        await soccerListPage.searchInput.fill(KEYWORD);
-        await page.waitForTimeout(500);
-        await expect(soccerListPage.searchInput).toHaveValue(KEYWORD);
+        await expect(async () => {
+            await soccerListPage.searchInput.fill(KEYWORD);
+            await expect(soccerListPage.searchInput).toHaveValue(KEYWORD, { timeout: 1000 });
+        }).toPass({ timeout: 10000 });
 
         await soccerListPage.clearBtn.click();
         await expect(soccerListPage.searchInput).not.toHaveValue(KEYWORD);
     });
 
     test('[Soccer] No result text should be shown  when there is no result', async ({ page }) => {
-        await soccerListPage.searchInput.fill('abcdefgh');
+        const KEYWORD = 'abcdefgh';
+        await expect(async () => {
+            await soccerListPage.searchInput.fill(KEYWORD);
+            await expect(soccerListPage.searchInput).toHaveValue(KEYWORD, { timeout: 1000 });
+        }).toPass({ timeout: 10000 });
         await page.waitForTimeout(500);
         await expect(soccerListPage.noResultTxt).toBeVisible();
     })

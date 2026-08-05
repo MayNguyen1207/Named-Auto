@@ -2,7 +2,6 @@ import { test, expect } from '../../../utils/fixtures';
 import { DetailFreePage } from '../../../pages/DetailFreePage';
 import freePostData from '../../../data-test/free-post-data.json';
 import loginData from '../../../data-test/login-data.json';
-import { getExpectedRelativeTime } from '../../../utils/testRelativeTime';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -103,17 +102,13 @@ test.describe('Admin Flow', () => {
     });
 
     test('[Community] Admin can mark a post as Read', async ({ request, apiBaseURL }) => {
-        const loginRes = await request.post(`${apiBaseURL}/login`, {
-            form: {
-                email: loginData.userC.email,
-                password: loginData.userC.password,
-            }
-        });
-        const loginJson = await loginRes.json();
-        const userCToken = loginJson.session_id;
+        const fs = require('fs');
+        const adminStorageState = JSON.parse(fs.readFileSync('playwright/.auth/admin.json', 'utf8'));
+        const sessionCookie = adminStorageState.cookies.find((c: any) => c.name.includes('session_id'));
+        const adminToken = sessionCookie?.value;
 
         const createRes = await request.post(`${apiBaseURL}/community/board/`, {
-            headers: { 'NAMED-SESSION': userCToken },
+            headers: { 'NAMED-SESSION': adminToken },
             form: {
                 board_type: 'free',
                 subject: `Auto Test Read Mark ${Date.now()}`,

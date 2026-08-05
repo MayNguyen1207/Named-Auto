@@ -148,8 +148,11 @@ test.describe('Normal User Flow', () => {
         await detailFreePage.verifyToastMsg("error", freePostData.deleteCmtMsg.unableDelete);
     });
 
-    test('[Community] User can comment to depth3', async () => {
+    test('[Community] User can comment to depth3', async ({ page }) => {
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
+
+        const initialCountText = await detailFreePage.cmtCount.textContent();
+        const initialCount = parseInt(initialCountText?.replace(/[^0-9]/g, '') || '0', 10);
 
         const t = Date.now();
         const cmts = [`Depth 1 ${t}`, `Depth 2 ${t}`, `Depth 3 ${t}`];
@@ -162,20 +165,22 @@ test.describe('Normal User Flow', () => {
         await detailFreePage.submitCmtBtn.last().click();
         const el2 = detailFreePage.getCmtElementByText(cmts[1]);
 
+        await page.waitForTimeout(1000);
         await el2.replyBtn.click();
         await detailFreePage.replyCmtInput.first().fill(cmts[2]);
-        await detailFreePage.submitCmtBtn.nth(3).click();
+        await detailFreePage.submitCmtBtn.nth(-2).click();
         const el3 = detailFreePage.getCmtElementByText(cmts[2]);
 
         await expect(el3.replyBtn).toBeHidden();
         await expect(el1.item.getByRole('button', { name: '답글 1', exact: true })).toBeVisible();
         await expect(el2.item.getByRole('button', { name: '답글 1', exact: true })).toBeVisible();
-        await expect(detailFreePage.cmtCount).toHaveText('3');
+        await expect(detailFreePage.cmtCount).toHaveText(`${initialCount + 3}`);
 
         for (const el of [el3, el2, el1]) {
-            await el.deleteCmtBtn.click();
+            await el.deleteCmtBtn.last().click();
             await detailFreePage.dialogConfirmBtn.click();
             await detailFreePage.verifyToastMsg("success", freePostData.deleteCmtMsg.success);
+            await page.waitForTimeout(1000);
         }
     });
 });
