@@ -16,8 +16,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep', () => {
     { method: 'phone', data: loginData.inactivePhone }
   ] as const;
   for (const testData of sleepAccountData) {
-    test.skip(`[Auth] Sleep account - ${testData.method.toUpperCase()} verification flow`, async ({ page }) => {
-      test.skip(testData.method === 'email', 'Skipping email cases; phone-only run.');
+    test(`[Auth] Sleep account - ${testData.method.toUpperCase()} verification flow`, async ({ page }) => {
       await loginPage.login(testData.data.email, testData.data.password);
       await loginPage.verifyInactiveAccountDialog(testData.data.expectedTexts);
 
@@ -72,8 +71,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep', () => {
     { method: 'phone', data: loginData.inactivePhone }
   ] as const;
   for (const { method, data } of inactiveTestData) {
-    test.skip(`[Auth] Check OTP countdown time, Resend OTP and Go Back button - ${method.toUpperCase()}`, async ({ page }) => {
-      test.skip(method === 'email', 'Skipping email cases; phone-only run.');
+    test(`[Auth] Check OTP countdown time, Resend OTP and Go Back button - ${method.toUpperCase()}`, async ({ page }) => {
       await loginPage.login(data.email, data.password);
       await loginPage.proceedToVerification(method);
       await loginPage.sendOtpAndProceedToInputScreen();
@@ -87,8 +85,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep', () => {
       await loginPage.verifyVerificationDefaultUI(method, data.email);
     });
 
-    test.skip(`[Auth] Check what happens when clicking the button: OTP expired - ${method.toUpperCase()}`, async ({ page }) => {
-      test.skip(method === 'email', 'Skipping email cases; phone-only run.');
+    test(`[Auth] Check what happens when clicking the button: OTP expired - ${method.toUpperCase()}`, async ({ page }) => {
       await loginPage.login(data.email, data.password);
       await loginPage.proceedToVerification(method);
       await loginPage.sendOtpAndProceedToInputScreen();
@@ -126,7 +123,6 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep', () => {
   for (const { method, data } of reactiveTestData) {
 
     test(`[Auth] Inactive account reactivation flow only runs on Chromium - ${method.toUpperCase()}`, async ({ page, browserName }) => {
-      test.skip(method === 'email', 'Skipping email cases; phone-only run.');
       test.skip(browserName !== 'chromium', 'Chromium is required for this test due to specific browser behavior.');
 
       await loginPage.login(data.email, data.password);

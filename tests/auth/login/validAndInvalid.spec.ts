@@ -45,7 +45,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Success and Invalid', ()
     await expect(page).toHaveURL('/home');
   });
 
-  test.skip('[Auth] Hacking account shows hacking block message', async ({ page }) => {
+  test('[Auth] Hacking account shows hacking block message', async ({ page }) => {
     const { email, password, expectedMessages } = loginData.lockedAccount;
     await loginPage.login(email, password);
     for (const message of expectedMessages) {
@@ -56,7 +56,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Success and Invalid', ()
     await expect(page).toHaveURL(expectedUrl);
   });
 
-  test.skip('[Auth] Blocked account shows block message', async ({ page }) => {
+  test('[Auth] Blocked account shows block message', async ({ page }) => {
     const { email, password, expectedMessages } = loginData.blockedAccount;
     await loginPage.login(email, password);
     for (const message of expectedMessages) {
@@ -64,7 +64,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Success and Invalid', ()
     }
   });
 
-  test.skip('[Auth] Deleted account shows deletion message', async ({ page }) => {
+  test('[Auth] Deleted account shows deletion message', async ({ page }) => {
     const { email, password, expectedMessages } = loginData.deletedAccount;
     await loginPage.login(email, password);
     for (const message of expectedMessages) {
@@ -91,7 +91,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Success and Invalid', ()
     await expect(page).toHaveURL('/register');
   });
 
-  test.skip('[Auth] Login without keeping session after browser restart', async ({ browser, page }) => {
+  test('[Auth] Login without keeping session after browser restart', async ({ browser, page }) => {
     await loginPage.loginAs(loginData.valid.email, loginData.valid.password, { keepLogin: false });
     await expect(page).toHaveURL('/home');
 
@@ -107,7 +107,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Success and Invalid', ()
     await newContext.close();
   });
 
-  test.skip('[Auth] Keep login maintains session after browser restart', async ({ browser, page }) => {
+  test('[Auth] Keep login maintains session after browser restart', async ({ browser, page }) => {
     await loginPage.loginAs(loginData.valid.email, loginData.valid.password, { keepLogin: true });
     await expect(page).toHaveURL('/home');
     const storageState = await page.context().storageState();
@@ -122,13 +122,13 @@ test.describe('[Auth] Normal User Login Feature Tests - Success and Invalid', ()
     await newContext.close();
   });
 
-  test.skip('[Auth] ReCAPTCHA appears after repeated failed login attempts', async ({ page }) => {
+  test('[Auth] ReCAPTCHA appears after repeated failed login attempts', async ({ page }) => {
     const recaptcha = buildRecaptchaData(loginData.recaptcha);
     await loginPage.triggerFailedLoginAttempts(recaptcha.email, recaptcha.password, recaptcha.attempts);
     await loginPage.waitForRecaptchaChallenge(recaptcha.text);
   });
 
-  test.skip('[Auth] Password reset dialog appears after failed attempts', async ({ page }) => {
+  test('[Auth] Password reset dialog appears after failed attempts', async ({ page }) => {
     await loginPage.login(loginData.passwordReset.email, loginData.passwordReset.password);
     await page.getByRole('button', { name: '확인' }).click();
     const expectedUrl = `/reset-password?email=${encodeURIComponent(loginData.passwordReset.email)}`;
@@ -155,7 +155,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Success and Invalid', ()
 
   const invalidLoginData = buildInvalidLoginData(loginData.invalid);
   for (const data of invalidLoginData) {
-    test.skip(`[Auth] Verify login fails - ${data.scenario}`, async ({ page }) => {
+    test(`[Auth] Verify login fails - ${data.scenario}`, async ({ page }) => {
       await loginPage.login(data.email, data.password);
       await expect(loginPage.loginErrorForm).toContainText(data.expectedErrorMsg);
     });

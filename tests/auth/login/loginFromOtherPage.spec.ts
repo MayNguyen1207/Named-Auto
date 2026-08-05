@@ -6,7 +6,7 @@ import loginData from '../../../data-test/login-data.json';
 
 const { email, password, directLoginPages } = loginData.loginFromOtherPage;
 
-test.describe.skip('[Auth] Login from pages with callback redirect', () => {
+test.describe('[Auth] Login from pages with callback redirect', () => {
     let homePage: HomePage;
     let loginPage: LoginPage;
 

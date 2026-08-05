@@ -17,8 +17,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep and Authorize IP',
   ] as const;
 
   for (const { method, data } of sleepAndUnauthorizedDataOTP) {
-    test.skip(`[Auth] Sleep + Unauthorized IP - Check OTP expired alert - ${method.toUpperCase()}`, async ({ page, browserName }) => {
-      test.skip(method === 'email', 'Skipping email cases; phone-only run.');
+    test(`[Auth] Sleep + Unauthorized IP - Check OTP expired alert - ${method.toUpperCase()}`, async ({ page, browserName }) => {
       test.skip(browserName !== 'chromium', 'Chromium is required for this test due to specific browser behavior.');
       await loginPage.login(data.email, data.password);
       await expect(loginPage.inactiveAccountDialog).toBeVisible();
@@ -86,7 +85,6 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep and Authorize IP',
 
   for (const { method, data } of sleepAndUnauthorizedData) {
     test(`[Auth] Sleep + Unauthorized IP account reactivation flow - ${method.toUpperCase()}`, async ({ page, browserName }) => {
-      test.skip(method === 'email', 'Skipping email cases; phone-only run.');
       test.skip(browserName !== 'chromium', 'Chromium is required for this test due to specific browser behavior.');
 
       await loginPage.login(data.email, data.password);
