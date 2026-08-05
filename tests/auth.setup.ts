@@ -1,4 +1,4 @@
-import { test as setup, type Page } from '@playwright/test';
+﻿import { test as setup, type Page } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import loginData from '../data-test/login-data.json';
 import path from 'path';
@@ -68,3 +68,4 @@ setup('Authenticate as Non-verified user', async ({ page }) => {
   const adminStatePath = path.resolve(__dirname, '../playwright/.auth/non-verified-user.json');
   await page.context().storageState({ path: adminStatePath });
 });
+

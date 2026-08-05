@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import './authSetupCooldown';
 import { LoginPage } from '../../../pages/LoginPage';
 import loginData from '../../../data-test/login-data.json';
 
@@ -16,8 +17,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Verify IP', () => {
   ] as const;
 
   for (const { method, data } of unauthorizedIpData) {
-    test(`[Auth] Verify IP shows dialog and allows verification flow - ${method.toUpperCase()}`, async ({ page }) => {
-
+    test(`[Auth] Verify IP shows dialog and allows verification flow - ${method.toUpperCase()}`, async ({ page }) => {      
       await loginPage.login(data.email, data.password);
       await loginPage.verifyUnauthorizedIpDialog();
 
