@@ -146,7 +146,7 @@ test.describe('Guest Flow', () => {
         }
     });
 
-    test('[Soccer] matchStatus should display correctly for all possible states with mocked API', async ({ page, sportsApiBaseURL }) => {
+    test('[Soccer] matchStatus should display correctly', async ({ page, sportsApiBaseURL }) => {
         const { nowMs, toKSTString, baseGame, mkTeam } = soccerListPage.getMockHelpers();
 
         const mockGames: any[] = [
@@ -164,6 +164,7 @@ test.describe('Guest Flow', () => {
             { id: 2, ...baseGame, gameStatus: 'POSTPONED', teams: { home: mkTeam('T3', 103), away: mkTeam('T4', 104) } },
             { id: 3, ...baseGame, gameStatus: 'CANCEL', teams: { home: mkTeam('T5', 105), away: mkTeam('T6', 106) } },
             { id: 14, ...baseGame, gameStatus: 'PENDING', teams: { home: mkTeam('T27', 127), away: mkTeam('T28', 128) } },
+            { id: 15, ...baseGame, gameStatus: 'CUT', teams: { home: mkTeam('T29', 129), away: mkTeam('T30', 130) } },
         ];
 
         await page.route('**/v1.0/sports/soccer/today-games*', async route => {
@@ -178,7 +179,12 @@ test.describe('Guest Flow', () => {
         await page.waitForTimeout(3000);
 
         const cards = soccerListPage.matchCards;
-        await expect(cards).toHaveCount(mockGames.length);
+        
+        // Scroll down to render all cards in the virtual list
+        await expect(async () => {
+            await page.mouse.wheel(0, 500);
+            await expect(cards).toHaveCount(mockGames.length, { timeout: 1000 });
+        }).toPass({ timeout: 10000 });
 
         for (let i = 0; i < mockGames.length; i++) {
             const card = cards.nth(i);

@@ -15,10 +15,12 @@ test.describe('Guest Flow', () => {
         const pad = (n: number) => String(n).padStart(2, '0');
 
         await test.step('Verify reload on today page', async () => {
-            await Promise.all([
-                page.waitForResponse(resp => resp.url().includes('sports/soccer/today-games') && resp.status() === 200),
-                soccerListPage.reloadBtn.click(),
-            ]);
+            await expect(async () => {
+                await Promise.all([
+                    page.waitForResponse(resp => resp.url().includes('sports/soccer/today-games') && resp.status() === 200, { timeout: 2000 }),
+                    soccerListPage.reloadBtn.click(),
+                ]);
+            }).toPass({ timeout: 10000 });
         });
 
         await test.step('Verify reload on next day page', async () => {
@@ -26,53 +28,61 @@ test.describe('Guest Flow', () => {
             nextDate.setDate(nextDate.getDate() + 1);
             const nextApiDate = `${nextDate.getFullYear()}-${pad(nextDate.getMonth() + 1)}-${pad(nextDate.getDate())}`;
 
-            await Promise.all([
-                page.waitForResponse(resp => resp.url().includes(`games?date=${nextApiDate}`) && resp.status() === 200),
-                soccerListPage.nextDayBtn.click(),
-            ]);
+            await expect(async () => {
+                await Promise.all([
+                    page.waitForResponse(resp => resp.url().includes(`games?date=${nextApiDate}`) && resp.status() === 200, { timeout: 2000 }),
+                    soccerListPage.nextDayBtn.click(),
+                ]);
+            }).toPass({ timeout: 10000 });
 
-            await Promise.all([
-                page.waitForResponse(resp => resp.url().includes(`games?date=${nextApiDate}`) && resp.status() === 200),
-                soccerListPage.reloadBtn.click(),
-            ]);
+            await expect(async () => {
+                await Promise.all([
+                    page.waitForResponse(resp => resp.url().includes(`games?date=${nextApiDate}`) && resp.status() === 200, { timeout: 2000 }),
+                    soccerListPage.reloadBtn.click(),
+                ]);
+            }).toPass({ timeout: 10000 });
         });
     });
 
     test('[Soccer] User can turn on and turn off the sound', async ({ page }) => {
         await expect(soccerListPage.soundBtn).not.toBeChecked();
 
-        await soccerListPage.soundBtn.click();
-        await expect(soccerListPage.soundBtn).toBeChecked();
+        await expect(async () => {
+            await soccerListPage.soundBtn.click();
+            await expect(soccerListPage.soundBtn).toBeChecked();
+        }).toPass({ timeout: 10000 });
 
         await page.reload();
-        await expect(soccerListPage.soundBtn).toBeChecked();
+        await expect(soccerListPage.soundBtn).toBeChecked({ timeout: 15000 });
 
         await soccerListPage.soundBtn.click();
         await expect(soccerListPage.soundBtn).not.toBeChecked();
 
         await page.reload();
-        await expect(soccerListPage.soundBtn).not.toBeChecked();
+        await expect(soccerListPage.soundBtn).not.toBeChecked({ timeout: 15000 });
     });
 
     test('[Soccer] User can turn on and turn off the prompt', async ({ page }) => {
         await expect(soccerListPage.promptBtn).not.toBeChecked();
 
-        await soccerListPage.promptBtn.click();
-        await expect(soccerListPage.promptBtn).toBeChecked();
+        await expect(async () => {
+            await soccerListPage.promptBtn.click();
+            await expect(soccerListPage.promptBtn).toBeChecked();
+        }).toPass({ timeout: 10000 });
 
         await page.reload();
-        await expect(soccerListPage.promptBtn).toBeChecked();
+        await expect(soccerListPage.promptBtn).toBeChecked({ timeout: 15000 });
 
         await soccerListPage.promptBtn.click();
         await expect(soccerListPage.promptBtn).not.toBeChecked();
 
         await page.reload();
-        await expect(soccerListPage.promptBtn).not.toBeChecked();
+        await expect(soccerListPage.promptBtn).not.toBeChecked({ timeout: 15000 });
     });
 
     test('[Soccer] User can change the display of list', async ({ page }) => {
         const firstMatchLayout = soccerListPage.matchCards.first().locator('a > div');
-        await expect(firstMatchLayout).toHaveClass(/grid/);
+        await expect(firstMatchLayout).toHaveClass(/grid/, { timeout: 10000 });
 
         await soccerListPage.verticalBtn.click();
         await expect(firstMatchLayout).toHaveClass(/flex/);

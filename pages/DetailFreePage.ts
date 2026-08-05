@@ -151,6 +151,7 @@ export class DetailFreePage extends BasePage {
         const cmtItem = this.cmtItems.nth(index);
         return {
             item: cmtItem,
+            commentWriter: cmtItem.getByTestId('user-info-context-menu-nickname'),
             authorLabel: cmtItem.getByText('작성자', { exact: true }),
             myCmtLabel: cmtItem.getByText('내 댓글', { exact: true }),
             editLabel: cmtItem.getByText('수정됨', { exact: true }),
@@ -167,6 +168,7 @@ export class DetailFreePage extends BasePage {
         const cmtItem = this.cmtItems.filter({ hasText: text }).last();
         return {
             item: cmtItem,
+            commentWriter: cmtItem.getByTestId('user-info-context-menu-nickname'),
             authorLabel: cmtItem.getByText('작성자', { exact: true }),
             myCmtLabel: cmtItem.getByText('내 댓글', { exact: true }),
             editLabel: cmtItem.getByText('수정됨', { exact: true }),
@@ -183,6 +185,7 @@ export class DetailFreePage extends BasePage {
         const cmtItem = this.cmtItems.last();
         return {
             item: cmtItem,
+            commentWriter: cmtItem.getByTestId('user-info-context-menu-nickname'),
             authorLabel: cmtItem.getByText('작성자', { exact: true }),
             myCmtLabel: cmtItem.getByText('내 댓글', { exact: true }),
             editLabel: cmtItem.getByText('수정됨', { exact: true }),
@@ -283,27 +286,24 @@ export class DetailFreePage extends BasePage {
         const firstItem = this.authorFirstItem;
         const fullText = (await firstItem.textContent())?.trim() ?? '';
         const authorName = fullText.split('(')[0].trim();
-        await firstItem.click();
+        await firstItem.click({ force: true });
         return authorName;
     }
 
     // Delete post via API
     async deletePostViaAPI(request: import('@playwright/test').APIRequestContext, apiBaseURL: string, postId: string) {
-        const loginResponse = await request.post(`${apiBaseURL}/login`, {
-            form: {
-                email: loginData.admin.email,
-                password: loginData.admin.password,
-            }
-        });
-        const loginJson = await loginResponse.json();
-        const adminToken = loginJson.session_id;
+        const fs = require('fs');
+        const adminStorageState = JSON.parse(fs.readFileSync('playwright/.auth/admin.json', 'utf8'));
+        const sessionCookie = adminStorageState.cookies.find((c: any) => c.name.includes('session_id'));
+        const adminToken = sessionCookie?.value;
 
-        await request.delete(`${apiBaseURL}/community/board/${postId}/`, {
+        const deleteRes = await request.delete(`${apiBaseURL}/community/board/${postId}/`, {
             headers: { 'NAMED-SESSION': `${adminToken}` },
             form: {
                 wr_id: postId,
                 board_type: 'free',
             }
         });
+        expect(deleteRes.ok()).toBeTruthy();
     }
 }

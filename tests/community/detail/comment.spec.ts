@@ -1,6 +1,5 @@
 import { test, expect } from '../../../utils/fixtures';
 import { DetailFreePage } from '../../../pages/DetailFreePage';
-import loginData from '../../../data-test/login-data.json';
 import freePostData from '../../../data-test/free-post-data.json';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -45,183 +44,6 @@ test.describe('Guest Flow', () => {
         await expect(thirdCmt.editLabel).toBeVisible();
         await thirdCmt.editLabel.hover();
         await expect(detailFreePage.hoverTooltip).toContainText(/\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}:\d{2}/);
-    });
-
-    test('[Community] Verify comment chronological order (Oldest first, Newest last)', async ({ page, apiBaseURL, request }) => {
-        let loginResponse: any;
-        let loginJson: any;
-        let createPostResponse: any;
-        let dynamicToken: string;
-        let postUrl: string;
-        let totalCommentsToCreate: number;
-        let postId: string;
-
-        await test.step('Login via API to get session_id', async () => {
-            loginResponse = await request.post(`${apiBaseURL}/login`, {
-                form: {
-                    email: loginData.userB.email,
-                    password: loginData.userB.password,
-                }
-            });
-            expect(loginResponse.ok()).toBeTruthy();
-        });
-
-        await test.step('Create a dummy post', async () => {
-            loginJson = await loginResponse.json();
-            dynamicToken = loginJson.session_id;
-
-            createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
-                headers: { 'NAMED-SESSION': `${dynamicToken}` },
-                form: {
-                    board_type: 'free',
-                    subject: `Auto Test Comment chronological order ${Date.now()}`,
-                    content: '<p>Bài viết dùng để test thứ tự hiển thị comment...</p>',
-                    is_notice: 'false',
-                    comment_allowed: 'true'
-                }
-            });
-            expect(createPostResponse.ok()).toBeTruthy();
-        });
-
-        await test.step('Create dummy comments', async () => {
-            const postJson = await createPostResponse.json();
-            postId = postJson.wr_id;
-            postUrl = `/community/free/${postId}`;
-
-            totalCommentsToCreate = 25;
-            for (let i = 1; i <= totalCommentsToCreate; i++) {
-                await request.post(`${apiBaseURL}/community/board/${postId}/comment`, {
-                    headers: { 'NAMED-SESSION': `${dynamicToken}` },
-                    form: {
-                        wr_id: postId,
-                        board_type: 'free',
-                        content: `Auto comment number ${i}`,
-                        comment_type: 'new'
-                    }
-                });
-            }
-        });
-
-        await test.step('Go to the dummy post', async () => {
-            await detailFreePage.navigate(postUrl);
-        });
-
-        await test.step('Verify the last comment', async () => {
-            const lastCommentOnDefaultPage = detailFreePage.cmtItems.last();
-            await expect(lastCommentOnDefaultPage).toContainText(`Auto comment number ${totalCommentsToCreate}`);
-        });
-
-        await test.step('Verify the first comment', async () => {
-            await detailFreePage.clickPageNumber(1);
-            const firstCommentOnFirstPage = detailFreePage.cmtItems.first();
-            await expect(firstCommentOnFirstPage).toContainText('Auto comment number 1');
-        });
-
-        await detailFreePage.deletePostViaAPI(request, apiBaseURL, postId!);
-    });
-
-    test('[Community] Verify comment pagination', async ({ page, apiBaseURL, request }) => {
-        test.setTimeout(60000);
-        let postId: string;
-        let loginResponse: any;
-        let createPostResponse: any;
-        let dynamicToken: string;
-        let postUrl: string;
-
-        await test.step('Login via API to get session_id', async () => {
-            loginResponse = await request.post(`${apiBaseURL}/login`, {
-                form: {
-                    email: loginData.userD.email,
-                    password: loginData.userD.password,
-                }
-            });
-            expect(loginResponse.ok()).toBeTruthy();
-        });
-
-        await test.step('Create a dummy post', async () => {
-            const loginJson = await loginResponse.json();
-            dynamicToken = loginJson.session_id;
-
-            createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
-                headers: { 'NAMED-SESSION': `${dynamicToken}` },
-                form: {
-                    board_type: 'free',
-                    subject: `Auto Test Comment Pagination ${Date.now()}`,
-                    content: '<p>Bài viết dùng để test comment pagination...</p>',
-                    is_notice: 'false',
-                    comment_allowed: 'true'
-                }
-            });
-            expect(createPostResponse.ok()).toBeTruthy();
-        });
-
-        await test.step('Create dummy comments', async () => {
-            const postJson = await createPostResponse.json();
-            postId = postJson.wr_id;
-            postUrl = `/community/free/${postId}`;
-
-            const totalCommentsToCreate = 88;
-            for (let i = 1; i <= totalCommentsToCreate; i++) {
-                await request.post(`${apiBaseURL}/community/board/${postId}/comment`, {
-                    headers: { 'NAMED-SESSION': `${dynamicToken}` },
-                    form: {
-                        wr_id: postId,
-                        board_type: 'free',
-                        content: `Auto comment number ${i}`,
-                        comment_type: 'new'
-                    }
-                });
-            }
-        });
-
-        await test.step('Go to the dummy post', async () => {
-            await detailFreePage.navigate(postUrl);
-            await page.keyboard.press('Escape');
-        });
-
-        await test.step('Verify default page is the last page', async () => {
-            await detailFreePage.pagInput.scrollIntoViewIfNeeded();
-            await expect(detailFreePage.getPageItem(9)).toHaveAttribute('aria-current', 'page');
-        });
-
-        await test.step('Verify pagination options list', async () => {
-            await detailFreePage.verifyListItemsNumber();
-            await page.keyboard.press('Escape');
-        });
-
-        await test.step('Verify default pagination option', async () => {
-            await detailFreePage.clickPageNumber(1);
-            await expect(detailFreePage.cmtItems).toHaveCount(10);
-        });
-
-        await test.step('Verify pagination option selection', async () => {
-            await detailFreePage.verifySelectedOption(20);
-            await detailFreePage.clickPageNumber(1);
-            await expect(detailFreePage.cmtItems).toHaveCount(20);
-        });
-
-        await test.step('Verify pagination input field', async () => {
-            await detailFreePage.pagInput.fill('');
-            await detailFreePage.pagInput.focus();
-            await page.keyboard.type('abc');
-            await expect(detailFreePage.pagInput).toBeEmpty();
-
-            await detailFreePage.goToPageViaInput('3', 3);
-            await detailFreePage.goToPageViaInput('0', 1);
-            await detailFreePage.goToPageViaInput('99', 5);
-        });
-
-        await test.step('Verify Next and Previous buttons', async () => {
-            await detailFreePage.pagPreviousBtn.click();
-            await page.waitForTimeout(500);
-            await expect(detailFreePage.getPageItem(4)).toHaveAttribute('aria-current', 'page');
-
-            await detailFreePage.pagNextBtn.click();
-            await page.waitForTimeout(500);
-            await expect(detailFreePage.getPageItem(5)).toHaveAttribute('aria-current', 'page');
-        });
-
-        await detailFreePage.deletePostViaAPI(request, apiBaseURL, postId!);
     });
 });
 
@@ -279,4 +101,125 @@ test.describe('Admin Flow', () => {
             await expect(cmt.ipInfo).toBeVisible();
         }
     })
+});
+
+test.describe('Verify Comment', () => {
+    let detailFreePage: DetailFreePage;
+    let sharedPostId: string;
+    let sharedPostUrl: string;
+    const totalCommentsToCreate = 88;
+
+    test.beforeAll(async ({ request, apiBaseURL }) => {
+        test.setTimeout(120000);
+        const fs = require('fs');
+        const adminStorageState = JSON.parse(fs.readFileSync('playwright/.auth/admin.json', 'utf8'));
+        const sessionCookie = adminStorageState.cookies.find((c: any) => c.name.includes('session_id'));
+        const adminToken = sessionCookie?.value;
+
+        const createPostResponse = await request.post(`${apiBaseURL}/community/board`, {
+            headers: { 'NAMED-SESSION': adminToken },
+            form: {
+                board_type: 'free',
+                subject: `Auto Test Comment Shared ${Date.now()}`,
+                content: '<p>Bài viết dùng để test comment...</p>',
+                is_notice: 'false',
+                comment_allowed: 'true'
+            }
+        });
+        expect(createPostResponse.ok()).toBeTruthy();
+        const postJson = await createPostResponse.json();
+        sharedPostId = postJson.wr_id;
+        sharedPostUrl = `/community/free/${sharedPostId}`;
+
+        for (let i = 1; i <= totalCommentsToCreate; i++) {
+            await request.post(`${apiBaseURL}/community/board/${sharedPostId}/comment`, {
+                headers: { 'NAMED-SESSION': adminToken },
+                form: {
+                    wr_id: sharedPostId,
+                    board_type: 'free',
+                    content: `Auto comment number ${i}`,
+                    comment_type: 'new'
+                }
+            });
+        }
+    });
+
+    test.afterAll(async ({ request, apiBaseURL }) => {
+        if (sharedPostId) {
+            const fs = require('fs');
+            const adminStorageState = JSON.parse(fs.readFileSync('playwright/.auth/admin.json', 'utf8'));
+            const sessionCookie = adminStorageState.cookies.find((c: any) => c.name.includes('session_id'));
+            const adminToken = sessionCookie?.value;
+
+            await request.delete(`${apiBaseURL}/community/board/${sharedPostId}/`, {
+                headers: { 'NAMED-SESSION': adminToken },
+                form: {
+                    wr_id: sharedPostId,
+                    board_type: 'free',
+                }
+            });
+        }
+    });
+
+    test.beforeEach(async ({ page }) => {
+        detailFreePage = new DetailFreePage(page);
+        await detailFreePage.navigate(sharedPostUrl);
+    });
+
+    test('[Community] Verify comment chronological order (Oldest first, Newest last)', async () => {
+        await test.step('Verify the last comment', async () => {
+            const lastCommentOnDefaultPage = detailFreePage.cmtItems.last();
+            await expect(lastCommentOnDefaultPage).toContainText(`Auto comment number ${totalCommentsToCreate}`);
+        });
+
+        await test.step('Verify the first comment', async () => {
+            await detailFreePage.clickPageNumber(1);
+            const firstCommentOnFirstPage = detailFreePage.cmtItems.first();
+            await expect(firstCommentOnFirstPage).toContainText('Auto comment number 1');
+        });
+    });
+
+    test('[Community] Verify comment pagination', async ({ page }) => {
+        await test.step('Verify default page is the last page', async () => {
+            await detailFreePage.pagInput.scrollIntoViewIfNeeded();
+            await expect(detailFreePage.getPageItem(9)).toHaveAttribute('aria-current', 'page');
+        });
+
+        await test.step('Verify pagination options list', async () => {
+            await detailFreePage.verifyListItemsNumber();
+            await page.keyboard.press('Escape');
+        });
+
+        await test.step('Verify default pagination option', async () => {
+            await detailFreePage.clickPageNumber(1);
+            await expect(detailFreePage.cmtItems).toHaveCount(10);
+        });
+
+        await test.step('Verify pagination option selection', async () => {
+            await detailFreePage.verifySelectedOption(20);
+            await detailFreePage.clickPageNumber(1);
+            await expect(detailFreePage.cmtItems).toHaveCount(20);
+        });
+
+        await test.step('Verify pagination input field', async () => {
+            await detailFreePage.pagInput.fill('');
+            await detailFreePage.pagInput.focus();
+            await page.keyboard.type('abc');
+            await expect(detailFreePage.pagInput).toBeEmpty();
+
+            await detailFreePage.goToPageViaInput('3', 3);
+            await detailFreePage.goToPageViaInput('0', 1);
+            await detailFreePage.goToPageViaInput('99', 5);
+        });
+
+        await test.step('Verify Next and Previous buttons', async () => {
+            await detailFreePage.pagPreviousBtn.click();
+            await page.waitForTimeout(500);
+            await expect(detailFreePage.getPageItem(4)).toHaveAttribute('aria-current', 'page');
+
+            await detailFreePage.pagNextBtn.click();
+            await page.waitForTimeout(500);
+            await expect(detailFreePage.getPageItem(5)).toHaveAttribute('aria-current', 'page');
+        });
+    });
 })

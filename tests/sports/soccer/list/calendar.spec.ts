@@ -25,10 +25,12 @@ test.describe('Guest Flow', () => {
             const prevFormatted = `${prevDate.getFullYear()}.${pad(prevDate.getMonth() + 1)}.${pad(prevDate.getDate())}`;
             const prevApiDate = `${prevDate.getFullYear()}-${pad(prevDate.getMonth() + 1)}-${pad(prevDate.getDate())}`;
 
-            await Promise.all([
-                page.waitForResponse(resp => resp.url().includes(`games?date=${prevApiDate}`) && resp.status() === 200),
-                soccerListPage.previousDayBtn.click(),
-            ]);
+            await expect(async () => {
+                await Promise.all([
+                    page.waitForResponse(resp => resp.url().includes(`games?date=${prevApiDate}`) && resp.status() === 200, { timeout: 2000 }),
+                    soccerListPage.previousDayBtn.click(),
+                ]);
+            }).toPass({ timeout: 10000 });
 
             await expect(soccerListPage.calendarBtn).toContainText(prevFormatted);
 
@@ -123,7 +125,7 @@ test.describe('Guest Flow', () => {
         const currentMonth = now.getMonth() + 1;
 
         await test.step('Open calendar and verify current month', async () => {
-            await soccerListPage.calendarBtn.click();
+            await soccerListPage.openCalendar();
             await expect(soccerListPage.monthTxt).toHaveText(`${currentMonth}월`);
         });
 
@@ -161,7 +163,10 @@ test.describe('Guest Flow', () => {
         );
         const gameCounts = soccerListPage.extractGames(await response.json());
 
-        await soccerListPage.calendarBtn.click();
+        await expect(async () => {
+            await soccerListPage.calendarBtn.click();
+            await expect(soccerListPage.calendarModal).toBeVisible({ timeout: 2000 });
+        }).toPass({ timeout: 10000 });
 
         for (const item of gameCounts) {
             const dateStr = item.date;

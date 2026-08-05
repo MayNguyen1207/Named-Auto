@@ -17,7 +17,7 @@ test.describe('Admin Flow', () => {
         await detailFreePage.verifyToastMsg("success", freePostData.cmtMsg.success);
 
         const cmtEl = detailFreePage.getCmtElementByText(commentContent);
-        const actualAuthor = await cmtEl.authorLabel.textContent();
+        const actualAuthor = await cmtEl.commentWriter.textContent();
         expect(actualAuthor?.trim()).toBe(authorName);
 
         await cmtEl.deleteCmtBtn.click();
