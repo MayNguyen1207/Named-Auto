@@ -109,7 +109,7 @@ test.describe('[Auth] Login from pages with callback redirect', () => {
 
 });
 
-test.describe.skip('[Auth] Login from pages without callback redirect', () => {
+test.describe('[Auth] Login from pages without callback redirect', () => {
     let homePage: HomePage;
     let loginPage: LoginPage;
 
