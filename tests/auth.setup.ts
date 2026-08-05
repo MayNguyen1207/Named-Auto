@@ -69,13 +69,3 @@ setup('Authenticate as Non-verified user', async ({ page }) => {
   await page.context().storageState({ path: adminStatePath });
 });
 
-setup('Authenticate as Authenticated Email User', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.navigate();
-  await loginPage.login(loginData.authenticatedEmail.email, loginData.authenticatedEmail.password);
-  await page.waitForURL(/.*home/, { timeout: 7000 });
-
-  await injectBannerBypass(page);
-  const authEmailStatePath = path.resolve(__dirname, '../playwright/.auth/authenticated-email.json');
-  await page.context().storageState({ path: authEmailStatePath });
-});

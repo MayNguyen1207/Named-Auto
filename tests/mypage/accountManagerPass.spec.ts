@@ -24,7 +24,7 @@ test.describe('[MyInfor] Account Management Password Tests', () => {
   });
 
   test.describe('Change password dialog', () => {
-    test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/authenticated-email.json') });
+    test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/prisoner.json') });
 
     test.beforeEach(async ({ page }) => {
       await page.goto('/mypage/info?');

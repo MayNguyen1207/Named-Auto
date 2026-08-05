@@ -137,11 +137,11 @@ test.describe('[MyInfor] Account Management Tests', () => {
   });
 
   test.describe('[MyInfo] Authenticated Email User Tests', () => {
-    test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/authenticated-email.json') });
+    test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/prisoner.json') });
     let userVerifiedEmail: any;
 
     test.beforeEach(async ({ page }) => {
-      userVerifiedEmail = loginData.authenticatedEmail;
+      userVerifiedEmail = loginData.prisoner;
       await page.goto('/mypage/info?');
     });
 

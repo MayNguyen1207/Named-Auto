@@ -165,7 +165,22 @@
   "prisoner": {
     "email": "autotest02@yopmail.com",
     "password": "Named@123",
-    "expectedUsername": "회원_6a4f142f0aabd"
+    "expectedUsername": "회원_6a4f142f0aabd",
+    "validation": {
+      "emptyEmailMessage": "새 이메일 주소를 입력해 주세요",
+      "invalidEmail": "test_011@youp",
+      "invalidEmailMessage": "잘못된 이메일 주소입니다",
+      "registeredEmailMessage": "은(는) 이미 다른 회원이 사용 중인 이메일입니다. 다른 이메일을 입력해 주세요.",
+      "newEmail": "test_011@yopmail.com",
+      "otpSentMessage": "입력하신 이메일 주소로 인증번호가 발송 되었습니다",
+      "invalidOtp": "111111",
+      "invalidOtpMessage": "입력하신 인증 코드가 잘못되었습니다. 다시 시도해 주세요.",
+      "incompleteOtp": "123",
+      "incompleteOtpMessage": "인증번호 6자리를 입력해 주세요.",
+      "mockedOtpSendErrorCode": 1030,
+      "mockedOtpSendErrorMessage": "이메일 발송중 오류가 발생하였습니다.",
+      "otpResendSuccessMessage": "입력하신 이메일 주소로 인증번호가 발송 되었습니다"
+    }
   },
   "nonverifiedUser": {
     "email": "ruistpwjd148@yopmail.com",
@@ -208,24 +223,5 @@
         "hasLoginUrlCheck": false
       }
     ]
-  },
-  "authenticatedEmail": {
-    "email": "test_010@yopmail.com",
-    "password": "Named@123",
-    "validation": {
-      "emptyEmailMessage": "새 이메일 주소를 입력해 주세요",
-      "invalidEmail": "test_011@youp",
-      "invalidEmailMessage": "잘못된 이메일 주소입니다",
-      "registeredEmailMessage": "은(는) 이미 다른 회원이 사용 중인 이메일입니다. 다른 이메일을 입력해 주세요.",
-      "newEmail": "test_011@yopmail.com",
-      "otpSentMessage": "입력하신 이메일 주소로 인증번호가 발송 되었습니다",
-      "invalidOtp": "111111",
-      "invalidOtpMessage": "입력하신 인증 코드가 잘못되었습니다. 다시 시도해 주세요.",
-      "incompleteOtp": "123",
-      "incompleteOtpMessage": "인증번호 6자리를 입력해 주세요.",
-      "mockedOtpSendErrorCode": 1030,
-      "mockedOtpSendErrorMessage": "이메일 발송중 오류가 발생하였습니다.",
-      "otpResendSuccessMessage": "입력하신 이메일 주소로 인증번호가 발송 되었습니다"
-    }
   }
 }
