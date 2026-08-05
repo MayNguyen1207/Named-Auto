@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type TestInfo } from '@playwright/test';
 import { MyInfoPage } from '../../pages/MyInfoPage';
 import loginData from '../../data-test/login-data.json';
 import mypageData from '../../data-test/mypage-data.json';
@@ -44,6 +44,7 @@ test.describe('[MyInfor] Account Management Tests', () => {
       });
 
       test('Verify invalid OTP shows error from API', async ({ page }) => {
+        await page.unroute('**/send-code-verify-email**');
         await myInfoPage.requestOtp();
         await myInfoPage.submitOtp(userNotVerifiedEmail.invalidOtp);
         await myInfoPage.verifyInvalidOtpError(
