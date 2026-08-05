@@ -1,8 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { MyInfoPage } from '../../pages/MyInfoPage';
-import loginData from '../../data-test/login-data.json';
 import mypageData from '../../data-test/mypage-data.json';
-import { UNAUTHENTICATED_EMAIL_STATE, AUTHENTICATED_EMAIL_STATE } from './mypage.setup';
+import path from 'path';
 
 test.describe('[MyInfor] Account Management Password Tests', () => {
   let myInfoPage: MyInfoPage;
@@ -12,18 +11,20 @@ test.describe('[MyInfor] Account Management Password Tests', () => {
   });
 
   test.describe('Password Change Reminder', () => {
-    test.use({ storageState: UNAUTHENTICATED_EMAIL_STATE });
+    test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/user.json') });
+
+    test.beforeEach(async ({ page }) => {
+      await page.goto('/mypage/info?');
+    });
 
     test('Verify password change reminder dialog is visible after login', async ({ page }) => {
-      await page.goto('/mypage/info?');
-
       await expect(page.getByRole('heading', { name: '비밀번호 변경' })).toBeVisible();
       await expect(page.getByText('변경하지 않음')).toBeVisible();
     });
   });
 
   test.describe('Change password dialog', () => {
-    test.use({ storageState: AUTHENTICATED_EMAIL_STATE });
+    test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/authenticated-email.json') });
 
     test.beforeEach(async ({ page }) => {
       await page.goto('/mypage/info?');

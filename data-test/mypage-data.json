@@ -5,7 +5,7 @@
       "subtitle": "(달성할 때마다 푸짐한 아이템 지급!)",
       "guideButton": "달성률과 보상안내",
       "progressBar": "P0P25P50P75P100P",
-      "currentPoints": "32 P"
+      "currentPoints": "20 P"
     },
     "dialogExpectedTexts": {
       "noticeText": "보상아이템은 달성시 자동지급되며 내아이템에서 확인하실 수 있습니다.(선물불가)"

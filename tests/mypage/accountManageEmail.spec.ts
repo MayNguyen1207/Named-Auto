@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { MyInfoPage } from '../../pages/MyInfoPage';
 import loginData from '../../data-test/login-data.json';
-import { UNAUTHENTICATED_EMAIL_STATE, AUTHENTICATED_EMAIL_STATE } from './mypage.setup';
+import mypageData from '../../data-test/mypage-data.json';
+import path from 'path';
 
 test.describe('[MyInfor] Account Management Tests', () => {
   let myInfoPage: MyInfoPage;
@@ -11,12 +12,21 @@ test.describe('[MyInfor] Account Management Tests', () => {
   });
 
   test.describe('[MyInfo] Unauthenticated Email User Tests', () => {
-    test.use({ storageState: UNAUTHENTICATED_EMAIL_STATE });
+    test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/user.json') });
     let userNotVerifiedEmail: any;
 
     test.beforeEach(async ({ page }) => {
-      userNotVerifiedEmail = loginData.unauthenticatedEmail;
+      userNotVerifiedEmail = loginData.valid;
       await page.goto('/mypage/info?');
+    });
+
+    test('Verify reward section is visible for valid account from storage state', async ({ page }) => {
+      await myInfoPage.verifyRewardElementsVisible(mypageData.reward.expectedTexts);
+      await myInfoPage.verifyCurrentPoints(mypageData.reward.expectedTexts.currentPoints);
+      await myInfoPage.openRewardGuideDialog(mypageData.reward.expectedTexts.guideButton);
+      await myInfoPage.verifyRewardGuideDialogVisible(mypageData.reward.dialogExpectedTexts.noticeText);
+      await myInfoPage.closeRewardGuideDialog();
+      await myInfoPage.verifyRewardGuideDialogHidden();
     });
 
     test('Verify unauthenticated email display and dialog', async ({ page }) => {
@@ -126,7 +136,7 @@ test.describe('[MyInfor] Account Management Tests', () => {
   });
 
   test.describe('[MyInfo] Authenticated Email User Tests', () => {
-    test.use({ storageState: AUTHENTICATED_EMAIL_STATE });
+    test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/authenticated-email.json') });
     let userVerifiedEmail: any;
 
     test.beforeEach(async ({ page }) => {

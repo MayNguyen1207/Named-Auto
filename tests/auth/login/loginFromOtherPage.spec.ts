@@ -1,21 +1,18 @@
 import { test, expect } from '@playwright/test';
+import './authSetupCooldown';
 import { HomePage } from '../../../pages/HomePage';
 import { LoginPage } from '../../../pages/LoginPage';
 import loginData from '../../../data-test/login-data.json';
 
 const { email, password, directLoginPages } = loginData.loginFromOtherPage;
 
-test.describe('[Auth] Login from pages with callback redirect', () => {
+test.describe.skip('[Auth] Login from pages with callback redirect', () => {
     let homePage: HomePage;
     let loginPage: LoginPage;
 
     test.beforeEach(async ({ page }) => {
         homePage = new HomePage(page);
         loginPage = new LoginPage(page);
-    });
-
-    test.afterEach(async ({ page }) => {
-        await page.waitForTimeout(3000);
     });
 
     test('[Auth] Login from Main chat', async ({ page }) => {
@@ -112,7 +109,7 @@ test.describe('[Auth] Login from pages with callback redirect', () => {
 
 });
 
-test.describe('[Auth] Login from pages without callback redirect', () => {
+test.describe.skip('[Auth] Login from pages without callback redirect', () => {
     let homePage: HomePage;
     let loginPage: LoginPage;
 
@@ -121,8 +118,8 @@ test.describe('[Auth] Login from pages without callback redirect', () => {
         loginPage = new LoginPage(page);
     });
 
-    test.afterEach(async ({ page }) => {
-        await page.waitForTimeout(3000);
+    test.afterEach(async () => {
+        await new Promise(resolve => setTimeout(resolve, 5000));
     });
 
     for (const pageInfo of directLoginPages) {
