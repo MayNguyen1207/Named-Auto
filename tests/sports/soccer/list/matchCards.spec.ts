@@ -146,7 +146,8 @@ test.describe('Guest Flow', () => {
         }
     });
 
-    test('[Soccer] matchStatus should display correctly', async ({ page, sportsApiBaseURL }) => {
+    test('[Soccer] matchStatus should display correctly', async ({ page }) => {
+        test.fail(true, 'https://vincoholdinglp.atlassian.net/browse/NOS-17668, https://vincoholdinglp.atlassian.net/browse/NOS-17670');
         const { nowMs, toKSTString, baseGame, mkTeam } = soccerListPage.getMockHelpers();
 
         const mockGames: any[] = [
