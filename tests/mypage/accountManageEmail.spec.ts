@@ -77,15 +77,15 @@ test.describe('[MyInfor] Account Management Tests', () => {
 
       test('Verify OTP resend rate limit shows countdown message', async ({ page }) => {
         await myInfoPage.requestOtp();
-        await myInfoPage.verifyOtpResendCountdownMessage();
+        await myInfoPage.verifyOtpResendCountdownMessageEmail();
       });
 
       test('Verify OTP resend countdown persists after reopening verification dialog', async ({ page }) => {
         await myInfoPage.requestOtp();
-        await myInfoPage.verifyOtpResendCountdownMessage();
+        await myInfoPage.verifyOtpResendCountdownMessageEmail();
         await myInfoPage.cancelVerificationDialog();
         await myInfoPage.openVerificationDialog();
-        await myInfoPage.verifyOtpResendCountdownMessage();
+        await myInfoPage.verifyOtpResendCountdownMessageEmail();
       });
 
       test('Verify clicking cancel closes verification dialog and keeps email unchanged', async ({ page }) => {

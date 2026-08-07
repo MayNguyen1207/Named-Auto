@@ -359,6 +359,11 @@ export class MyInfoPage {
         await expect(this.page.locator('button').filter({ hasText: '변경하기' }).nth(2)).toBeVisible();
         await expect(this.otpResendCountdownText).toBeVisible();
     }
+
+    async verifyOtpResendCountdownMessageEmail() {
+        await expect(this.page.locator('button').filter({ hasText: '변경하기' }).first()).toBeVisible();
+        await expect(this.otpResendCountdownText).toBeVisible();
+    }
     async verifyResendButtonHidden() { await this.expectAllHidden(this.resendOtpText, this.resendOtpButton); }
     async verifyResendButtonVisible() { await this.expectAllVisible(this.resendOtpText, this.resendOtpButton); }
     async clickResendOtp() { await this.resendOtpButton.click(); }
