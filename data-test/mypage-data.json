@@ -11,6 +11,74 @@
       "noticeText": "보상아이템은 달성시 자동지급되며 내아이템에서 확인하실 수 있습니다.(선물불가)"
     }
   },
+  "phoneValidation": {
+    "otpCountdownPhoneNumber": "17754388952",
+    "invalidOtp": "135674",
+    "invalidOtpMessage": "입력하신 인증 코드가 잘못되었습니다. 다시 시도해 주세요.",
+    "incompleteOtp": "123",
+    "incompleteOtpMessage": "인증번호 6자리를 입력해 주세요",
+    "emptyOtpMessage": "인증 코드를 입력해 주세요.",
+    "expiredOtp": "123456",
+    "expiredOtpMessage": "인증 시간이 만료 되었습니다. 인증 번호를 다시 요청해 주세요.",
+    "resendOtpSuccessMessage": "입력하신 휴대폰 번호로 코드가 전송되었습니다. 문자 메세지를 확인해 주세요.",
+    "scenarios": [
+      {
+        "phoneNumber": "abcd",
+        "message": "유효하지 않은 전화번호입니다. 다시 확인해 주세요."
+      },
+      {
+        "phoneNumber": "",
+        "message": "유효하지 않은 전화번호입니다. 다시 확인해 주세요."
+      },
+      {
+        "phoneNumber": "+13322568356",
+        "message": "해당 전화번호는 이미 다른 계정에 등록되어 있습니다.",
+        "selectCountryCode": true
+      },
+      {
+        "phoneNumber": "01012345678"
+      },
+      {
+        "phoneNumber": "+13322568357",
+        "message": "오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+        "serverError": true
+      }
+    ]
+  },
+  "unverifiedPhoneValidation": {
+    "otpCountdownPhoneNumber": "17754388952",
+    "invalidOtp": "135674",
+    "invalidOtpMessage": "입력하신 인증 코드가 잘못되었습니다. 다시 시도해 주세요.",
+    "incompleteOtp": "123",
+    "incompleteOtpMessage": "인증번호 6자리를 입력해 주세요",
+    "emptyOtpMessage": "인증 코드를 입력해 주세요.",
+    "expiredOtp": "123456",
+    "expiredOtpMessage": "인증 시간이 만료 되었습니다. 인증 번호를 다시 요청해 주세요.",
+    "resendOtpSuccessMessage": "입력하신 휴대폰 번호로 코드가 전송되었습니다. 문자 메세지를 확인해 주세요.",
+    "scenarios": [
+      {
+        "phoneNumber": "abcd",
+        "message": "유효하지 않은 전화번호입니다. 다시 확인해 주세요."
+      },
+      {
+        "phoneNumber": "",
+        "message": "유효하지 않은 전화번호입니다. 다시 확인해 주세요."
+      },
+      {
+        "phoneNumber": "+13322568356",
+        "message": "다른 계정에서 이미 인증된 휴대폰 번호입니다.",
+        "selectCountryCode": true
+      },
+      {
+        "phoneNumber": "01012345678"
+      },
+      {
+        "phoneNumber": "+13322568357",
+        "message": "오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+        "serverError": true
+      }
+    ]
+  },
   "passwordValidation": {
     "fieldValidation": [
       {
