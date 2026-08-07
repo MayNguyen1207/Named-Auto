@@ -180,28 +180,29 @@
       "mockedOtpSendErrorCode": 1030,
       "mockedOtpSendErrorMessage": "이메일 발송중 오류가 발생하였습니다.",
       "otpResendSuccessMessage": "입력하신 이메일 주소로 인증번호가 발송 되었습니다"
-    },
-    "nonverifiedUser": {
+    }
+  },
+  "nonverifiedUser": {
       "email": "ruistpwjd148@yopmail.com",
       "password": "Named@123"
     },
-    "userB": {
+  "userB": {
       "email": "qavn10@yopmail.com",
       "password": "Named@123"
     },
-    "userC": {
+  "userC": {
       "email": "qavn8@yopmail.com",
       "password": "Named@123"
     },
-    "userD": {
+  "userD": {
       "email": "qavn9@yopmail.com",
       "password": "Named@123"
     },
-    "unverifiedPhone": {
-      "email": "testacc4@yopmail.com",
+  "unverifiedPhone": {
+      "email": "test_acc4@yopmail.com",
       "password": "Named@123"
     },
-    "loginFromOtherPage": {
+  "loginFromOtherPage": {
       "email": "qavn3@yopmail.com",
       "password": "Named@123",
       "directLoginPages": [
@@ -226,6 +227,5 @@
           "hasLoginUrlCheck": false
         }
       ]
-    }
-  }
+   }
 }
