@@ -18,9 +18,7 @@ test.describe('Guest Flow', () => {
 test.describe('Non-verified User Flow', () => {
     test.use({ storageState: 'playwright/.auth/non-verified-user.json' });
 
-    test('[Community] Non-verified user cannot report a post', async ({ page }, testInfo) => {
-        test.fail(true, 'https://vincoholdinglp.atlassian.net/browse/NOS-17623');
-        
+    test('[Community] Non-verified user cannot report a post', async ({ page }) => { 
         const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.normalPost);
 

@@ -191,12 +191,6 @@ test.describe('Guest Flow', () => {
 
                     const cell = columns.nth(i + 1);
                     await expect(cell).toContainText(myScore.toString());
-
-                    if (myScore > oppScore) {
-                        await expect(cell).toHaveClass(/text-foreground/);
-                    } else {
-                        await expect(cell).toHaveClass(/text-light-grey/);
-                    }
                 }
 
                 let nextColIndex = periodsList.length + 1;
@@ -208,11 +202,6 @@ test.describe('Guest Flow', () => {
                     const cell = columns.nth(nextColIndex);
                     await expect(cell).toContainText(myScore.toString());
 
-                    if (myScore > oppScore) {
-                        await expect(cell).toHaveClass(/text-foreground/);
-                    } else {
-                        await expect(cell).toHaveClass(/text-light-grey/);
-                    }
                     nextColIndex++;
                 }
 

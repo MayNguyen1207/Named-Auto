@@ -108,11 +108,12 @@ export class WriteFreePage extends BasePage {
 
     async navigate() {
         await this.page.goto('/community/create?boardType=free');
+        await this.page.locator('.skeleton-loader').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => {});
         await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
     }
 
     async enterTitle(title: string) {
-        await this.titleInput.fill(title);
+        await this.titleInput.pressSequentially(title);
         await this.page.waitForTimeout(2000);
         if ((await this.titleInput.inputValue()) === '') {
             await this.titleInput.fill(title);

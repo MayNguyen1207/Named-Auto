@@ -109,6 +109,7 @@ export class SoccerListPage extends BasePage {
 
     async navigate() {
         await this.page.goto('/scorecenter/soccer');
+        await this.page.locator('.skeleton-loader').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => {});
         await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
     }
 

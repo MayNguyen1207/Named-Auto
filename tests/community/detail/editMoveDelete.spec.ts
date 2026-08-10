@@ -4,18 +4,32 @@ import { WriteFreePage } from '../../../pages/WriteFreePage';
 import loginData from '../../../data-test/login-data.json';
 import freePostData from '../../../data-test/free-post-data.json';
 import postData from '../../../data-test/write-post-data.json';
+import fs from 'fs';
+import path from 'path';
 
 test.describe('Prisoner Flow', () => {
     test.use({ storageState: 'playwright/.auth/prisoner.json' });
 
-    test('[Community] Prisoner cannot edit Free post', async ({ page }) => {
+    test('[Community] Prisoner cannot edit Free post', async ({ page, request, apiBaseURL }) => {
+        const authData = JSON.parse(fs.readFileSync(path.resolve('playwright/.auth/prisoner.json'), 'utf-8'));
+        const sessionId = authData.cookies.find((c: any) => c.name === 'dev_session_id')?.value;
+
+        const response = await request.get(`${apiBaseURL}/me`, {
+            headers: {
+                'NAMED-SESSION': sessionId
+            }
+        });
+        const data = await response.json();
+        const [year, month, day] = data.jail_released_date.split('-');
+
         const detailFreePage = new DetailFreePage(page);
         await detailFreePage.navigate(freePostData.postUrl.prisonerPost);
         await detailFreePage.editPostBtn.click();
         await expect(detailFreePage.jailPoster).toBeVisible();
         await expect(detailFreePage.prisonNotice).toContainText(
-            "서비스 이용 제한 안내" +
-            loginData.prisoner.expectedUsername + "님은 비매너의 죄명으로 영창에 수감되어 네임드의 서비스를 이용하실 수 없습니다.");
+            `${loginData.prisoner.expectedUsername}님은 비매너의 죄명으로 영창에 수감되어 네임드의 서비스를 이용하실 수 없습니다.\n
+            ${year}년 ${month}월 ${day}일 00:00부터 정상 이용이 가능합니다.`
+        );
         await detailFreePage.previousPageBtn.click();
         await expect(detailFreePage.jailPoster).toBeHidden();
 
@@ -78,6 +92,7 @@ test.describe('Normal User Flow', () => {
             await writeFreePage.writePost(data.title, data.content);
             switch (data.id) {
                 case 'spaceTitle':
+                    test.fail(true, 'https://vincoholdinglp.atlassian.net/browse/NOS-17700');
                     await expect(writeFreePage.writeBtn).toBeDisabled();
                     await writeFreePage.titleInput.clear();
                     await expect(writeFreePage.titleErrorMsg).toBeVisible();

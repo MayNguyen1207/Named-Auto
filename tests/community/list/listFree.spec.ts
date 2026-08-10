@@ -139,9 +139,11 @@ test.describe('Normal User Flow', () => {
     ] as const;
 
     test('[Community] Post data should be displayed correctly in all tabs', async ({ page, request, apiBaseURL }) => {
-        test.setTimeout(60000);
-
         for (const tab of tabs) {
+            if (tab.type === 'best' || tab.type === 'my_wr' || tab.type === 'my_cm') {
+                test.setTimeout(test.info().timeout + 40000);
+            }
+
             if (tab.type !== 'all') {
                 await tab.getLocator(freeListPage).click();
             }

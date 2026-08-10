@@ -56,6 +56,7 @@ test.describe('Admin Flow', () => {
     });
 
     test('[Community] Admin can add and remove a post from Suggested Post list', async ({ page, apiBaseURL, browserName }) => {
+        test.fail(true, 'Batch is turned off');
         test.skip(browserName !== 'chromium', 'Avoid conflict in parallel');
         test.setTimeout(150000);
 
@@ -69,10 +70,12 @@ test.describe('Admin Flow', () => {
         await detailFreePage.dialogCancelBtn.click();
         await expect(detailFreePage.noticeDialog).toBeHidden();
         await expect(detailFreePage.suggestBtn).toHaveText('추천 게시물 추가');
+        await page.waitForTimeout(500);
 
         await detailFreePage.suggestBtn.click();
         await detailFreePage.dialogConfirmBtn.click();
         await expect(detailFreePage.suggestBtn).toHaveText('추천 게시물 해제');
+        await page.waitForTimeout(500);
 
         await page.waitForTimeout(60000);
         const suggestedResponse = await page.request.get(`${apiBaseURL}/community/board/feature`);
@@ -87,10 +90,12 @@ test.describe('Admin Flow', () => {
         await detailFreePage.dialogCancelBtn.click();
         await expect(detailFreePage.noticeDialog).toBeHidden();
         await expect(detailFreePage.suggestBtn).toHaveText('추천 게시물 해제');
+        await page.waitForTimeout(500);
 
         await detailFreePage.suggestBtn.click();
         await detailFreePage.dialogConfirmBtn.click();
         await expect(detailFreePage.suggestBtn).toHaveText('추천 게시물 추가');
+        await page.waitForTimeout(500);
 
         await page.waitForTimeout(60000);
         const suggestedResponseAfter = await page.request.get(`${apiBaseURL}/community/board/feature`);
