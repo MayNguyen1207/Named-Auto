@@ -72,12 +72,12 @@ setup('Authenticate as Non-verified user', async ({ page }) => {
 setup('Authenticate as Non phone user', async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.navigate();
-    await loginPage.login(loginData.unverifiedPhone.email, loginData.unverifiedPhone.password);
+    await loginPage.login(loginData.nonPhone.email, loginData.nonPhone.password);
     await page.waitForURL(/.*home/, { timeout: 7000 });
 
     await injectBannerBypass(page);
 
-    const nonVerifiedPhoneStatePath = path.resolve(__dirname, '../playwright/.auth/non-phone-user.json');
-    await page.context().storageState({ path: nonVerifiedPhoneStatePath });
+    const nonPhoneStatePath = path.resolve(__dirname, '../playwright/.auth/non-phone-user.json');
+    await page.context().storageState({ path: nonPhoneStatePath });
 });
 

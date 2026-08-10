@@ -11,7 +11,7 @@ test.describe('[MyInfo] Account Management Phone Tests', () => {
   });
 
   test.describe('[MyInfo] Unverified Phone', () => {
-    test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/non-verified-phone-user.json') });
+    test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/non-phone-user.json') });
 
     test.beforeEach(async ({ page }) => {
       await page.goto('/mypage/info?');

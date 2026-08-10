@@ -183,49 +183,49 @@
     }
   },
   "nonverifiedUser": {
-      "email": "ruistpwjd148@yopmail.com",
-      "password": "Named@123"
-    },
+    "email": "ruistpwjd148@yopmail.com",
+    "password": "Named@123"
+  },
   "userB": {
-      "email": "qavn10@yopmail.com",
-      "password": "Named@123"
-    },
+    "email": "qavn10@yopmail.com",
+    "password": "Named@123"
+  },
   "userC": {
-      "email": "qavn8@yopmail.com",
-      "password": "Named@123"
-    },
+    "email": "qavn8@yopmail.com",
+    "password": "Named@123"
+  },
   "userD": {
-      "email": "qavn9@yopmail.com",
-      "password": "Named@123"
-    },
-  "unverifiedPhone": {
-      "email": "test_acc4@yopmail.com",
-      "password": "Named@123"
-    },
+    "email": "qavn9@yopmail.com",
+    "password": "Named@123"
+  },
+  "nonPhone": {
+    "email": "test_acc4@yopmail.com",
+    "password": "Named@123"
+  },
   "loginFromOtherPage": {
-      "email": "qavn3@yopmail.com",
-      "password": "Named@123",
-      "directLoginPages": [
-        {
-          "name": "Home page",
-          "url": "/home",
-          "hasLoginUrlCheck": true
-        },
-        {
-          "name": "Sport page",
-          "url": "/scorecenter/major",
-          "hasLoginUrlCheck": false
-        },
-        {
-          "name": "PowerBall page",
-          "url": "/minigame/rball/double_dragon",
-          "hasLoginUrlCheck": false
-        },
-        {
-          "name": "Trusted Sites page",
-          "url": "/trustedsites",
-          "hasLoginUrlCheck": false
-        }
-      ]
-   }
+    "email": "qavn3@yopmail.com",
+    "password": "Named@123",
+    "directLoginPages": [
+      {
+        "name": "Home page",
+        "url": "/home",
+        "hasLoginUrlCheck": true
+      },
+      {
+        "name": "Sport page",
+        "url": "/scorecenter/major",
+        "hasLoginUrlCheck": false
+      },
+      {
+        "name": "PowerBall page",
+        "url": "/minigame/rball/double_dragon",
+        "hasLoginUrlCheck": false
+      },
+      {
+        "name": "Trusted Sites page",
+        "url": "/trustedsites",
+        "hasLoginUrlCheck": false
+      }
+    ]
+  }
 }
