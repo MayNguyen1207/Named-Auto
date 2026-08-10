@@ -142,5 +142,26 @@
         "message": "영문, 숫자, 특수문자를 모두 포함해야 합니다.."
       }
     ]
+  },
+  "nickname": {
+    "expectedTexts": {
+      "countText": "(보유: 0개)",
+      "countTextWithItem": "(보유: 1개)",
+      "changeItemText": "닉네임 변경 x1",
+      "dialogNotice1": "닉네임을 변경하지 않고 팝업을 닫으실 경우, 해당 아이템은 사용되지 않습니다.",
+      "dialogNotice2": "한글, 영문, 숫자를 혼용하여 사용할 수 있습니다. (한글 2자, 영문/숫자 4자 이상, 8자 이하로 설정 가능)",
+      "dialogNotice3": "욕설이나 미풍양속에 어긋나는 닉네임 사용으로 신고가 접수될 경우, ID 이용이 제한될 수 있습니다."
+    },
+    "marketUrl": "/market/market?purpose_type=NICKNAME&category=community",
+    "validations": [
+      { "input": "Mayy", "message": "사용 중인 닉네임입니다. 다른 닉네임을 사용해 주세요." },
+      { "input": "My Nick", "message": "닉네임은 공백없이 한글, 영문, 숫자만 입력 가능합니다" },
+      { "input": "@user!", "message": "닉네임은 공백없이 한글, 영문, 숫자만 입력 가능합니다" },
+      { "input": "한", "message": "한글2자,영문/숫자4자 이상, 8자 이하 입력 가능합니다." },
+      { "input": "supercalifragilistic", "message": "한글2자,영문/숫자4자 이상, 8자 이하 입력 가능합니다." },
+      { "input": "회원6124", "message": "현재 닉네임과 동일합니다." },
+      { "input": "admin", "message": "닉네임의 admin는 사용할수 없는 단어 입니다." },
+      { "input": "허니픽", "message": "닉네임의 허니픽는 사용할수 없는 단어 입니다." }
+    ]
   }
 }

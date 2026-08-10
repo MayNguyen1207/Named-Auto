@@ -79,6 +79,21 @@ export class MyInfoPage {
     readonly cancelChangePasswordButton: Locator;
     readonly changePasswordCloseIcon: Locator;
 
+    // Nickname
+    readonly nicknameChangeIcon: Locator;
+    readonly nicknameChangeImage: Locator;
+    readonly purchaseButton: Locator;
+    readonly purchaseLink: Locator;
+    readonly changeNicknameButton: Locator;
+    readonly nicknameInput: Locator;
+    readonly changeNicknameDialog: Locator;
+    readonly levelIconImage: Locator;
+    readonly changeNicknameDialogHeading: Locator;
+    readonly changeNicknameInput: Locator;
+    readonly changeNicknameLabel: Locator;
+    readonly changeNicknameCancelButton: Locator;
+    readonly changeNicknameSubmitButton: Locator;
+
     constructor(page: Page) {
         this.page = page;
 
@@ -157,6 +172,21 @@ export class MyInfoPage {
         this.submitChangePasswordButton = page.getByRole('button', { name: '변경하기' });
         this.cancelChangePasswordButton = page.getByRole('button', { name: '취소' });
         this.changePasswordCloseIcon = page.getByTestId('dialog-header').getByRole('img');
+
+        // Nickname
+        this.nicknameChangeIcon = page.locator('.absolute > .shrink-0');
+        this.nicknameChangeImage = page.getByRole('img', { name: '닉네임 변경' });
+        this.purchaseButton = page.locator('button').filter({ hasText: '구매하기' }).first();
+        this.purchaseLink = page.locator('a').filter({ hasText: '구매하기' }).first();
+        this.changeNicknameButton = page.locator('button').filter({ hasText: '변경하기' }).nth(1);
+        this.nicknameInput = page.getByRole('textbox', { name: '닉네임' });
+        this.changeNicknameDialog = page.getByRole('dialog');
+        this.levelIconImage = page.locator('img[alt="level-icon"]').first();
+        this.changeNicknameDialogHeading = page.getByRole('heading', { name: '닉네임 변경하기 (본인인증이 완료되어 닉네임 변경이 가능합니다.)' });
+        this.changeNicknameInput = page.locator('input[name="nick"]');
+        this.changeNicknameLabel = page.locator('label').filter({ hasText: '닉네임' }).first();
+        this.changeNicknameCancelButton = page.getByRole('button', { name: '취소' });
+        this.changeNicknameSubmitButton = page.locator('button').filter({ hasText: '변경하기' }).first();
     }
 
     // Private Helpers 
@@ -481,5 +511,62 @@ export class MyInfoPage {
     async verifyChangePasswordDialogHidden() { await expect(this.changePasswordDialog).toBeHidden(); }
     async verifyPasswordValidationMessage(message: string) {
         await expect(this.page.getByText(message, { exact: true })).toBeVisible();
+    }
+
+    // Nickname
+    async verifyNicknameManagementUI(countText: string, changeItemText: string) {
+        await this.expectAllVisible(
+            this.page.locator('span').filter({ hasText: countText }).first(),
+            this.nicknameChangeIcon,
+            this.page.locator('p').filter({ hasText: changeItemText }).first(),
+            this.nicknameChangeImage,
+            this.purchaseButton,
+            this.nicknameInput
+        );
+    }
+
+    async verifyNicknameManagementUIWithItem(countText: string, changeItemText: string) {
+        await this.expectAllVisible(
+            this.page.locator('p').filter({ hasText: changeItemText }).first(),
+            this.nicknameChangeImage,
+            this.page.locator('span').filter({ hasText: countText }).first(),
+            this.purchaseLink,
+            this.changeNicknameButton,
+            this.nicknameChangeIcon,
+            this.nicknameInput
+        );
+        await this.changeNicknameButton.click();
+        await expect(this.changeNicknameDialog).toBeVisible();
+    }
+
+    async compareLevelIconWithNicknameIcon() {
+        const levelIconSrc = await this.levelIconImage.getAttribute('src');
+        const nicknameIconSrc = await this.nicknameChangeIcon.getAttribute('src');
+        expect(levelIconSrc).toBe(nicknameIconSrc);
+    }
+
+    async verifyChangeNicknameDialogUI(texts: { notice1: string; notice2: string; notice3: string; changeItemText: string }) {
+        await this.expectAllVisible(
+            this.changeNicknameDialogHeading,
+            this.changeNicknameInput,
+            this.changeNicknameLabel,
+            this.page.getByText(texts.notice1, { exact: true }),
+            this.page.getByText(texts.notice2, { exact: true }),
+            this.page.getByText(texts.notice3, { exact: true }),
+            this.page.locator('div').filter({ hasText: texts.changeItemText }).first(),
+            this.changeNicknameCancelButton,
+            this.changeNicknameSubmitButton
+        );
+    }
+
+    async fillAndVerifyNicknameValidation(nickname: string, message: string) {
+        await this.changeNicknameInput.click();
+        await this.changeNicknameInput.clear();
+        await this.changeNicknameInput.fill(nickname);
+        await expect(this.page.getByText(message, { exact: true })).toBeVisible();
+    }
+
+    async clickPurchaseButton() {
+        await this.purchaseButton.click();
     }
 }
