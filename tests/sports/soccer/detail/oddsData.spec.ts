@@ -4,7 +4,7 @@ import matchData from '../../../../data-test/match-detail-data.json';
 
 test.describe('No Data', () => {
     test('[Soccer] Table title and no data text should be displayed correctly', async ({ page }) => {
-        const matchId = matchData.matchLink.noDividendData;
+        const matchId = matchData.matchLink.noOddsData;
         const soccerDetailPage = new SoccerDetailPage(page);
         await soccerDetailPage.navigateOdds(matchId);
 

@@ -5,7 +5,7 @@ import matchData from '../../../../data-test/match-detail-data.json';
 test.describe('Have Data', () => {
 
     let soccerDetailPage: SoccerDetailPage;
-    const matchId = matchData.matchLink.teamAchivements;
+    const matchId = matchData.matchLink.stat;
 
     test.beforeEach(async ({ page }) => {
         soccerDetailPage = new SoccerDetailPage(page);

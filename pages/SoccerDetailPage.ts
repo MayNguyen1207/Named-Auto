@@ -33,7 +33,7 @@ export class SoccerDetailPage extends BasePage {
     readonly broadcastTab: Locator;
     readonly recordTab: Locator;
 
-    //Dividend Tab
+    //Odds Tab
     readonly oddsTableTitle: Locator;
     readonly normalBtn: Locator;
     readonly handicapBtn: Locator;
@@ -43,7 +43,7 @@ export class SoccerDetailPage extends BasePage {
     readonly oddsTableRows: Locator;
     readonly oddsTableContentCells: Locator;
 
-    //Team Achivements Tab
+    //Stat Tab
     readonly expandBtn: Locator;
     readonly vsRecordTable: Locator;
     readonly vsRecordTableTitle: Locator;
