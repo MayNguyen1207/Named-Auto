@@ -33,7 +33,7 @@ test.describe('[MyInfo] Account Management Nickname Tests', () => {
     });
 
     test.describe('[MyInfo] User with Nickname item', () => {
-        test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/non-verified-phone-user.json') });
+        test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/non-phone-user.json') });
 
         test.beforeEach(async ({ page }) => {
             await page.goto('/mypage/info?');
