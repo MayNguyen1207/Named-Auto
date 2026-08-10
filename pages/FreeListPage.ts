@@ -47,6 +47,7 @@ export class FreeListPage extends BasePage {
 
     async navigate() {
         await this.page.goto('/community/free');
+        await this.page.locator('.skeleton-loader').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => {});
         await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
     }
 

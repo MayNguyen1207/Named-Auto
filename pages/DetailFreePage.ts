@@ -132,6 +132,7 @@ export class DetailFreePage extends BasePage {
 
     async navigate(url: string) {
         await this.page.goto(url);
+        await this.page.locator('.skeleton-loader').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => {});
         await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
     }
 
@@ -284,6 +285,7 @@ export class DetailFreePage extends BasePage {
     async selectFirstCmtAuthor(): Promise<string> {
         await this.cmtAuthorPicker.first().click();
         await expect(this.authorCommandRoot).toBeVisible();
+        await this.page.waitForTimeout(1000);
         const firstItem = this.authorFirstItem;
         const fullText = (await firstItem.textContent())?.trim() ?? '';
         const authorName = fullText.split('(')[0].trim();

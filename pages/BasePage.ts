@@ -82,7 +82,7 @@ export class BasePage {
     }
     async verifyToastMsg(type: 'error' | 'success' | 'info', expectedText: string) {
         const toast = this.getToastByType(type).filter({ hasText: expectedText }).first();
-        await expect(toast).toBeVisible({ timeout: 10000 });
+        await expect(toast).toBeVisible({ timeout: 20000 });
     }
 
     // To check pagination

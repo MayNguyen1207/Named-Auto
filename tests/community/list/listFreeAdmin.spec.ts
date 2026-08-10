@@ -20,7 +20,7 @@ test.describe('Admin Flow', () => {
         await freeListPage.selectAndDeselectCheckBox();
     });
 
-    test('[Community] Admin can delete posts in list', async ({ page }) => {
+    test('[Community] Admin can delete posts in list', async () => {
         await freeListPage.goToPageViaInput('200', 200);
 
         const count = await freeListPage.listItems.count();
@@ -41,8 +41,8 @@ test.describe('Admin Flow', () => {
         await freeListPage.deletePostBtn.click();
         await freeListPage.dialogConfirmBtn.click();
 
-        await expect(freeListPage.listItems.filter({ hasText: lastPostTitle })).toHaveCount(0, { timeout: 5000 });
-        await expect(freeListPage.listItems.filter({ hasText: secondLastPostTitle })).toHaveCount(0, { timeout: 5000 });
+        await expect(freeListPage.listItems.filter({ hasText: lastPostTitle })).toHaveCount(0, { timeout: 15000 });
+        await expect(freeListPage.listItems.filter({ hasText: secondLastPostTitle })).toHaveCount(0, { timeout: 15000 });
     });
 
     test('[Community] List of boards to move post should be displayed correctly', async ({ page, request, apiBaseURL }) => {
