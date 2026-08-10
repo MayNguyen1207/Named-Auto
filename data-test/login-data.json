@@ -198,6 +198,10 @@
     "email": "qavn9@yopmail.com",
     "password": "Named@123"
   },
+  "nonPhone": {
+    "email": "test_acc4@yopmail.com",
+    "password": "Named@123"
+  },
   "loginFromOtherPage": {
     "email": "qavn3@yopmail.com",
     "password": "Named@123",
