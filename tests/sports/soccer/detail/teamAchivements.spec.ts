@@ -97,8 +97,8 @@ test.describe('Have Data', () => {
 
         const expectedRows = [
             ['', '전반', '후반', '연장', '합계', '기준', '배당'], // Row 1: header labels
-            [home.name, fmt(homeP1), fmt(homeP2), fmt(homeExtra), String(homeTotal), '-', '-'], // Row 2: home team
-            [away.name, fmt(awayP1), fmt(awayP2), fmt(awayExtra), String(awayTotal), '-', '-'], // Row 3: away team
+            [away.name, fmt(awayP1), fmt(awayP2), fmt(awayExtra), String(awayTotal), '-', '-'], // Row 2: away team
+            [home.name, fmt(homeP1), fmt(homeP2), fmt(homeExtra), String(homeTotal), '-', '-'], // Row 3: home team
             ['', fmt((homeP1 ?? 0) + (awayP1 ?? 0) || null), fmt((homeP2 ?? 0) + (awayP2 ?? 0) || null), fmt(totalExtra), String(homeTotal + awayTotal), '-', '-'], // Row 4: totals
         ];
 
@@ -108,5 +108,8 @@ test.describe('Have Data', () => {
                 await expect(row.nth(j)).toHaveText(expectedRows[i][j]);
             }
         }
+
+        await soccerDetailPage.vsRecordTableRows.first().click();
+        await expect(soccerDetailPage.comparisonGrid).toBeHidden();
     });
 })
