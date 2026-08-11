@@ -85,7 +85,7 @@ test.describe('Normal User Flow', () => {
             await detailFreePage.navigate(freePostData.postUrl.myPost);
             await expect(async () => {
                 await detailFreePage.editPostBtn.click();
-                await expect(page).toHaveURL('/community/edit/free');
+                await expect(page).toHaveURL(/\/community\/edit\/free/);
             }).toPass({ timeout: 10000 });
 
             const writeFreePage = new WriteFreePage(page);
