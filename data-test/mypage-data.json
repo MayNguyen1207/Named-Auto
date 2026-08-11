@@ -163,5 +163,37 @@
       { "input": "admin", "message": "닉네임의 admin는 사용할수 없는 단어 입니다." },
       { "input": "허니픽", "message": "닉네임의 허니픽는 사용할수 없는 단어 입니다." }
     ]
+  },
+  "todayWord": {
+    "expectedTexts": {
+      "changeItemText": "오늘의 한마디 x1",
+      "countText": "(보유: 0개)",
+      "countTextWithItem": "(보유: 1개)",
+      "todayWordValue": "HelloWorld12345678901234567890",
+      "dialogHeading": "오늘의 한마디 변경하기",
+      "dialogNotice1": "사이트 규정에 어긋나는 용도로 사용 시, 제재의 대상이 됩니다.",
+      "dialogNotice2": "한글 20자, 영문 40자까지 입력 가능합니다.",
+      "dialogNotice3": "(한글, 숫자, 영문, 띄어쓰기, 마침표, 쉼표만 입력 가능)",
+      "deleteConfirmMessage": "기존 설정된 오늘의 한마디가 삭제 됩니다. 진행하시겠습니까?"
+    },
+    "validations": [
+      {
+        "input": "",
+        "message": "오늘의 한마디를 입력해 주세요"
+      },
+      {
+        "input": "이 문장은 이십 글자를 초과하는 문장입니다.",
+        "message": "오늘의 한마디는 한글 20글자, 영문 40글자 까지 입력가능합니다."
+      },
+      {
+        "input": "This is a long sentence that contains over forty characters.",
+        "message": "오늘의 한마디는 한글 20글자, 영문 40글자 까지 입력가능합니다."
+      },
+      {
+        "input": "Good luck!@#",
+        "message": "오늘의 한마디는 한글,숫자,영문,띄어쓰기( ),마침표(.),쉼표(,)만 가능합니다."
+      }
+    ],
+    "marketUrl": "/market/market?purpose_type=TODAY_WORD&category=community"
   }
-}
+}

@@ -1,4 +1,4 @@
-﻿import { Locator, Page, expect } from '@playwright/test';
+import { Locator, Page, expect } from '@playwright/test';
 
 export class MyInfoPage {
     readonly page: Page;
@@ -94,6 +94,20 @@ export class MyInfoPage {
     readonly changeNicknameCancelButton: Locator;
     readonly changeNicknameSubmitButton: Locator;
 
+    // Today Word
+    readonly todayWordInput: Locator;
+    readonly todayWordPurchaseButton: Locator;
+    readonly todayWordPurchaseLink: Locator;
+    readonly todayWordChangeButton: Locator;
+    readonly todayWordDialogInput: Locator;
+    readonly todayWordDialogLabel: Locator;
+    readonly todayWordDialogSubmitButton: Locator;
+    readonly todayWordDialogCancelButton: Locator;
+    readonly todayWordDialogDeleteButton: Locator;
+    readonly todayWordDialogCloseIcon: Locator;
+    readonly todayWordConfirmDeleteCancelButton: Locator;
+    readonly todayWordConfirmDeleteSubmitButton: Locator;
+
     constructor(page: Page) {
         this.page = page;
 
@@ -187,6 +201,20 @@ export class MyInfoPage {
         this.changeNicknameLabel = page.locator('label').filter({ hasText: '닉네임' }).first();
         this.changeNicknameCancelButton = page.getByRole('button', { name: '취소' });
         this.changeNicknameSubmitButton = page.locator('button').filter({ hasText: '변경하기' }).first();
+
+        // Today Word
+        this.todayWordInput = page.getByRole('textbox', { name: '오늘의 한마디' });
+        this.todayWordPurchaseButton = page.getByRole('button', { name: '구매하기' }).nth(1);
+        this.todayWordPurchaseLink = page.locator('a').filter({ hasText: '구매하기' }).nth(2);
+        this.todayWordChangeButton = page.locator('button').filter({ hasText: '변경하기' }).nth(2);
+        this.todayWordDialogInput = page.getByRole('textbox', { name: '오늘의 한마디를 입력해 주세요.' });
+        this.todayWordDialogLabel = page.getByLabel('오늘의 한마디를 입력해 주세요.');
+        this.todayWordDialogSubmitButton = page.locator('button').filter({ hasText: '변경 완료' });
+        this.todayWordDialogCancelButton = page.getByRole('button', { name: '취소' });
+        this.todayWordDialogDeleteButton = page.getByRole('button', { name: '삭제' });
+        this.todayWordDialogCloseIcon = page.getByRole('img').first();
+        this.todayWordConfirmDeleteCancelButton = page.locator('button').filter({ hasText: '취소' }).nth(1);
+        this.todayWordConfirmDeleteSubmitButton = page.getByRole('button', { name: '확인' });
     }
 
     // Private Helpers 
@@ -566,7 +594,77 @@ export class MyInfoPage {
         await expect(this.page.getByText(message, { exact: true })).toBeVisible();
     }
 
+    async cancelChangeNicknameDialog(countText: string) {
+        await this.changeNicknameCancelButton.click();
+        await expect(this.page.locator('span').filter({ hasText: countText }).first()).toBeVisible();
+    }
+
     async clickPurchaseButton() {
         await this.purchaseButton.click();
+    }
+
+    // Today Word
+    async verifyTodayWordUI(changeItemText: string, countText: string) {
+        await this.expectAllVisible(
+            this.todayWordInput,
+            this.page.locator('p').filter({ hasText: changeItemText }).first(),
+            this.page.getByRole('img', { name: '오늘의 한마디' }),
+            this.page.getByText(countText).nth(2),
+            this.todayWordPurchaseButton
+        );
+    }
+
+    async verifyTodayWordUIWithItem(countTextWithItem: string, todayWordValue: string, changeItemText: string, dialogTexts?: { heading: string; notice1: string; notice2: string; notice3: string }) {
+        await expect(this.todayWordInput).toBeVisible();
+        await expect(this.todayWordInput).toHaveValue(todayWordValue);
+        await expect(this.page.locator('p').filter({ hasText: changeItemText }).first()).toBeVisible();
+        await expect(this.page.getByRole('img', { name: '오늘의 한마디' })).toBeVisible();
+        await expect(this.page.getByText(countTextWithItem).nth(2)).toBeVisible();
+        await expect(this.todayWordPurchaseLink).toBeVisible();
+        await expect(this.todayWordChangeButton).toBeVisible();
+        await this.todayWordChangeButton.click();
+        await expect(this.page.getByTestId('dialog-content')).toBeVisible();
+        if (dialogTexts) {
+            await expect(this.page.getByRole('heading', { name: dialogTexts.heading })).toBeVisible();
+            await expect(this.todayWordDialogInput).toBeVisible();
+            await expect(this.todayWordDialogInput).toHaveValue(todayWordValue);
+            await expect(this.todayWordDialogLabel).toBeVisible();
+            await expect(this.page.getByText(dialogTexts.notice1, { exact: true })).toBeVisible();
+            await expect(this.page.getByText(dialogTexts.notice2, { exact: true })).toBeVisible();
+            await expect(this.page.getByText(dialogTexts.notice3, { exact: true })).toBeVisible();
+            await expect(this.page.locator('p').filter({ hasText: changeItemText }).first()).toBeVisible();
+            await expect(this.todayWordDialogCancelButton).toBeVisible();
+            await expect(this.todayWordDialogDeleteButton).toBeVisible();
+            await expect(this.todayWordDialogSubmitButton).toBeVisible();
+            await expect(this.todayWordDialogCloseIcon).toBeVisible();
+        }
+    }
+
+    async fillAndVerifyTodayWordValidation(input: string, message: string) {
+        await this.todayWordDialogInput.click();
+        await this.todayWordDialogInput.clear();
+        if (input !== '') {
+            await this.todayWordDialogInput.fill(input);
+        }
+        await this.todayWordDialogSubmitButton.click();
+        await expect(this.page.getByText(message, { exact: true })).toBeVisible();
+    }
+
+    async clickDeleteAndVerifyCancel(confirmMessage: string) {
+        await this.todayWordDialogDeleteButton.click();
+        await expect(this.page.getByText(confirmMessage, { exact: true })).toBeVisible();
+        await expect(this.todayWordConfirmDeleteCancelButton).toBeVisible();
+        await expect(this.todayWordConfirmDeleteSubmitButton).toBeVisible();
+        await this.todayWordConfirmDeleteCancelButton.click();
+        await expect(this.page.getByTestId('dialog-content')).toBeVisible();
+    }
+
+    async cancelTodayWordDialog(countTextWithItem: string) {
+        await this.todayWordDialogCancelButton.click();
+        await expect(this.page.locator('span').filter({ hasText: countTextWithItem }).first()).toBeVisible();
+    }
+
+    async clickTodayWordPurchaseButton() {
+        await this.todayWordPurchaseButton.click();
     }
 }

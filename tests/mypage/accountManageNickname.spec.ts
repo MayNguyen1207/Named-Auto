@@ -65,6 +65,10 @@ test.describe('[MyInfo] Account Management Nickname Tests', () => {
                     await myInfoPage.fillAndVerifyNicknameValidation(scenario.input, scenario.message);
                 }
             });
+
+            await test.step('Verify dialog closes with cancel button', async () => {
+                await myInfoPage.cancelChangeNicknameDialog(mypageData.nickname.expectedTexts.countTextWithItem);
+            });
         });
     });
 });
