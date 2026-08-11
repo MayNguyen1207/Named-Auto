@@ -1,12 +1,10 @@
 import { Locator, Page, expect } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class MyInfoPage {
-    readonly page: Page;
-
+export class MyInfoPage extends BasePage {
     // Common
     readonly otpInput: Locator;
     readonly otpSendButton: Locator;
-    readonly cancelButton: Locator;
     readonly confirmButton: Locator;
     readonly rewardCloseIcon: Locator;
 
@@ -21,7 +19,6 @@ export class MyInfoPage {
     readonly unverifiedIcon: Locator;
     readonly unverifiedBadge: Locator;
     readonly verifyNowLink: Locator;
-    readonly verificationDialog: Locator;
     readonly verificationDialogHeading: Locator;
     readonly verificationEmailLabel: Locator;
     readonly verificationEmailInput: Locator;
@@ -39,15 +36,12 @@ export class MyInfoPage {
     readonly unverifiedPhoneIcon: Locator;
     readonly unverifiedPhoneButton: Locator;
     readonly unverifiedPhoneInput: Locator;
-    readonly unverifiedPhoneDialog: Locator;
-    readonly closeUnverifiedPhonePopup: Locator;
     readonly unverifiedPhoneDialogHeading: Locator;
     readonly unverifiedPhonePlaceholderInput: Locator;
     readonly unverifiedPhoneCountryIcon: Locator;
     readonly unverifiedPhoneCountryCodeButton: Locator;
     readonly unverifiedPhoneOtpLabel: Locator;
     readonly unverifiedPhoneOtpTextbox: Locator;
-    readonly unverifiedPhoneCancelButton: Locator;
     readonly unverifiedPhoneOtpSendButton: Locator;
 
     // Phone – Verified / Change 
@@ -71,12 +65,10 @@ export class MyInfoPage {
     // Password 
     readonly passwordChangedHeading: Locator;
     readonly changePasswordButton: Locator;
-    readonly changePasswordDialog: Locator;
     readonly currentPasswordInput: Locator;
     readonly newPasswordInput: Locator;
     readonly confirmNewPasswordInput: Locator;
     readonly submitChangePasswordButton: Locator;
-    readonly cancelChangePasswordButton: Locator;
     readonly changePasswordCloseIcon: Locator;
 
     // Nickname
@@ -86,12 +78,10 @@ export class MyInfoPage {
     readonly purchaseLink: Locator;
     readonly changeNicknameButton: Locator;
     readonly nicknameInput: Locator;
-    readonly changeNicknameDialog: Locator;
     readonly levelIconImage: Locator;
     readonly changeNicknameDialogHeading: Locator;
     readonly changeNicknameInput: Locator;
     readonly changeNicknameLabel: Locator;
-    readonly changeNicknameCancelButton: Locator;
     readonly changeNicknameSubmitButton: Locator;
 
     // Today Word
@@ -105,16 +95,13 @@ export class MyInfoPage {
     readonly todayWordDialogCancelButton: Locator;
     readonly todayWordDialogDeleteButton: Locator;
     readonly todayWordDialogCloseIcon: Locator;
-    readonly todayWordConfirmDeleteCancelButton: Locator;
-    readonly todayWordConfirmDeleteSubmitButton: Locator;
 
     constructor(page: Page) {
-        this.page = page;
+        super(page);
 
         // Common
         this.otpInput = page.getByTestId('input-otp-root');
         this.otpSendButton = page.getByRole('button', { name: 'OTP 받기' });
-        this.cancelButton = page.getByRole('button', { name: '취소' });
         this.confirmButton = page.getByRole('button', { name: '인증 완료' });
         this.rewardCloseIcon = page.locator('.tabler-icon.tabler-icon-x');
 
@@ -129,7 +116,6 @@ export class MyInfoPage {
         this.unverifiedIcon = page.locator('.tabler-icon.tabler-icon-circle-x-filled > path');
         this.unverifiedBadge = page.locator('span:has-text("미인증 – 지금 인증하기")');
         this.verifyNowLink = page.getByText('미인증 – 지금 인증하기');
-        this.verificationDialog = page.getByRole('dialog');
         this.verificationDialogHeading = page.getByRole('heading', { name: '이메일 인증받기' });
         this.verificationEmailLabel = page.locator('label').filter({ hasText: '이메일' }).first();
         this.verificationEmailInput = page.locator('input[name="email"]');
@@ -147,15 +133,12 @@ export class MyInfoPage {
         this.unverifiedPhoneIcon = page.locator('.absolute.right-3 svg.tabler-icon-circle-x-filled').nth(1);
         this.unverifiedPhoneButton = page.getByRole('button', { name: '미인증 – 지금 인증하기' });
         this.unverifiedPhoneInput = page.getByRole('textbox', { name: '핸드폰 번호' });
-        this.unverifiedPhoneDialog = page.getByRole('dialog');
-        this.closeUnverifiedPhonePopup = page.getByRole('button', { name: '취소' });
         this.unverifiedPhoneDialogHeading = page.getByRole('heading', { name: '핸드폰 인증받기' });
         this.unverifiedPhonePlaceholderInput = page.getByPlaceholder('핸드폰 번호 입력');
         this.unverifiedPhoneCountryIcon = page.locator('svg').filter({ hasText: 'KR' }).first();
         this.unverifiedPhoneCountryCodeButton = page.getByTestId('dialog-content').getByTestId('popover-trigger');
         this.unverifiedPhoneOtpLabel = page.getByLabel('OTP 입력');
         this.unverifiedPhoneOtpTextbox = page.getByRole('textbox', { name: 'OTP 입력' });
-        this.unverifiedPhoneCancelButton = page.getByRole('button', { name: '취소' });
         this.unverifiedPhoneOtpSendButton = page.getByRole('button', { name: 'OTP 받기' });
 
         // Phone – Verified / Change
@@ -179,12 +162,10 @@ export class MyInfoPage {
         // Password
         this.passwordChangedHeading = page.getByRole('heading', { name: '변경됨' });
         this.changePasswordButton = page.getByTestId('dialog-trigger').nth(1);
-        this.changePasswordDialog = page.getByRole('dialog');
         this.currentPasswordInput = page.getByLabel('현재 비밀번호');
         this.newPasswordInput = page.getByLabel('새 비밀번호', { exact: true });
         this.confirmNewPasswordInput = page.getByLabel('새 비밀번호 확인');
         this.submitChangePasswordButton = page.getByRole('button', { name: '변경하기' });
-        this.cancelChangePasswordButton = page.getByRole('button', { name: '취소' });
         this.changePasswordCloseIcon = page.getByTestId('dialog-header').getByRole('img');
 
         // Nickname
@@ -194,12 +175,10 @@ export class MyInfoPage {
         this.purchaseLink = page.locator('a').filter({ hasText: '구매하기' }).first();
         this.changeNicknameButton = page.locator('button').filter({ hasText: '변경하기' }).nth(1);
         this.nicknameInput = page.getByRole('textbox', { name: '닉네임' });
-        this.changeNicknameDialog = page.getByRole('dialog');
         this.levelIconImage = page.locator('img[alt="level-icon"]').first();
         this.changeNicknameDialogHeading = page.getByRole('heading', { name: '닉네임 변경하기 (본인인증이 완료되어 닉네임 변경이 가능합니다.)' });
         this.changeNicknameInput = page.locator('input[name="nick"]');
         this.changeNicknameLabel = page.locator('label').filter({ hasText: '닉네임' }).first();
-        this.changeNicknameCancelButton = page.getByRole('button', { name: '취소' });
         this.changeNicknameSubmitButton = page.locator('button').filter({ hasText: '변경하기' }).first();
 
         // Today Word
@@ -213,8 +192,6 @@ export class MyInfoPage {
         this.todayWordDialogCancelButton = page.getByRole('button', { name: '취소' });
         this.todayWordDialogDeleteButton = page.getByRole('button', { name: '삭제' });
         this.todayWordDialogCloseIcon = page.getByRole('img').first();
-        this.todayWordConfirmDeleteCancelButton = page.locator('button').filter({ hasText: '취소' }).nth(1);
-        this.todayWordConfirmDeleteSubmitButton = page.getByRole('button', { name: '확인' });
     }
 
     // Private Helpers 
@@ -292,11 +269,11 @@ export class MyInfoPage {
         await expect(this.emailInput).toHaveValue(emailAddress);
     }
     async openVerificationDialog() { await this.verifyNowLink.click(); }
-    async verifyVerificationDialogVisible() { await expect(this.verificationDialog).toBeVisible(); }
+    async verifyVerificationDialogVisible() { await expect(this.dialog).toBeVisible(); }
     async verifyVerificationDialogUI(emailAddress: string) {
         await this.expectAllVisible(
             this.verificationDialogHeading, this.verificationEmailLabel, this.verificationOtpLabel,
-            this.otpInput, this.otpSendButton, this.cancelButton, this.verificationCloseIcon,
+            this.otpInput, this.otpSendButton, this.dialogCancelBtn, this.verificationCloseIcon,
         );
         await expect(this.verificationEmailInput).toHaveValue(emailAddress);
     }
@@ -305,7 +282,7 @@ export class MyInfoPage {
         await this.verificationCloseIcon.click();
     }
     async verifyVerificationDialogClosedAndEmailUnchanged(emailAddress: string) {
-        await expect(this.verificationDialog).toBeHidden();
+        await expect(this.dialog).toBeHidden();
         await this.verifyUnauthenticatedEmailUI(emailAddress);
     }
 
@@ -314,14 +291,14 @@ export class MyInfoPage {
         await this.expectAllVisible(this.unverifiedPhoneIcon, this.unverifiedPhoneButton);
         await expect(this.unverifiedPhoneInput).toBeDisabled();
         await this.unverifiedPhoneButton.click();
-        await expect(this.unverifiedPhoneDialog).toBeVisible();
+        await expect(this.dialog).toBeVisible();
     }
     async verifyUnverifiedPhoneDialogUI() {
         await this.expectAllVisible(
             this.unverifiedPhoneDialogHeading, this.unverifiedPhonePlaceholderInput,
             this.unverifiedPhoneCountryIcon, this.unverifiedPhoneCountryCodeButton,
             this.unverifiedPhoneOtpLabel, this.unverifiedPhoneOtpTextbox,
-            this.unverifiedPhoneCancelButton, this.unverifiedPhoneOtpSendButton,
+            this.dialogCancelBtn, this.unverifiedPhoneOtpSendButton,
         );
     }
     async enterUnverifiedPhoneNumberAndRequestOtp(phoneNumber: string) {
@@ -329,12 +306,8 @@ export class MyInfoPage {
         await this.unverifiedPhoneOtpSendButton.click();
     }
     async enterUnverifiedPhoneOtp(otpCode: string) { await this.unverifiedPhoneOtpTextbox.fill(otpCode); }
-    async verifyUnverifiedOtpResendCountdownMessage() {
-        await this.expectAllVisible(this.confirmButton, this.otpResendCountdownText);
-    }
-    async verifyUnverifiedPhoneNumberScenario(phoneNumber: string, message?: string) {
-        await this.verifyPhoneScenario(this.unverifiedPhonePlaceholderInput, this.unverifiedPhoneOtpSendButton, phoneNumber, message);
-    }
+    async verifyUnverifiedOtpResendCountdownMessage() { await this.expectAllVisible(this.confirmButton, this.otpResendCountdownText); }
+    async verifyUnverifiedPhoneNumberScenario(phoneNumber: string, message?: string) { await this.verifyPhoneScenario(this.unverifiedPhonePlaceholderInput, this.unverifiedPhoneOtpSendButton, phoneNumber, message); }
 
     // Phone – Verified / Change 
     async verifiedPhoneManagerScreen() {
@@ -368,16 +341,11 @@ export class MyInfoPage {
         await this.phoneChangeOtpSendButton.click();
     }
     async enterPhoneChangeOtp(otpCode: string) { await this.phoneChangeOtpInput.fill(otpCode); }
-    async submitPhoneChange() {
-        await this.changePhoneDialog.getByRole('button', { name: '변경하기' }).first().click();
-    }
-    async verifyPhoneNumberScenario(phoneNumber: string, message?: string) {
-        await this.verifyPhoneScenario(this.phoneChangePhoneInput, this.phoneChangeOtpSendButton, phoneNumber, message);
-    }
+    async submitPhoneChange() { await this.changePhoneDialog.getByRole('button', { name: '변경하기' }).first().click(); }
+    async verifyPhoneNumberScenario(phoneNumber: string, message?: string) { await this.verifyPhoneScenario(this.phoneChangePhoneInput, this.phoneChangeOtpSendButton, phoneNumber, message); }
 
     // OTP Actions
     async requestOtp() { await this.otpSendButton.click(); }
-    async cancelVerificationDialog() { await this.cancelButton.click(); }
     async submitOtp(otpCode: string) {
         await this.otpInput.click();
         await this.otpInput.fill(otpCode);
@@ -410,9 +378,7 @@ export class MyInfoPage {
     }
 
     // OTP Resend
-    async verifyIncompleteOtpValidation(validationErrorMessage: string) {
-        await expect(this.page.getByText(validationErrorMessage)).toBeVisible();
-    }
+    async verifyIncompleteOtpValidation(validationErrorMessage: string) { await expect(this.page.getByText(validationErrorMessage)).toBeVisible(); }
     async verifyOtpResendCountdownMessage() {
         await expect(this.page.locator('button').filter({ hasText: '변경하기' }).nth(2)).toBeVisible();
         await expect(this.otpResendCountdownText).toBeVisible();
@@ -425,19 +391,13 @@ export class MyInfoPage {
     async verifyResendButtonHidden() { await this.expectAllHidden(this.resendOtpText, this.resendOtpButton); }
     async verifyResendButtonVisible() { await this.expectAllVisible(this.resendOtpText, this.resendOtpButton); }
     async clickResendOtp() { await this.resendOtpButton.click(); }
-    async verifyResendOtpSuccess(successMessage: string) {
-        await expect(this.page.getByText(successMessage, { exact: true })).toBeVisible();
-    }
+    async verifyResendOtpSuccess(successMessage: string) { await expect(this.page.getByText(successMessage, { exact: true })).toBeVisible(); }
 
     // Mock – Email 
     async mockOtpSendError(errorMessage: string) { await this.mockRoute('**/send-code-verify-email**', 500, { code: 500, message: errorMessage }); }
     async mockOtpSendSuccess() { await this.mockRoute('**/send-code-verify-email**', 200, { code: 200, message: 'OK', data: {} }); }
-    async mockOtpEmailError(errorCode: number, errorMessage: string) {
-        await this.mockRoute('**/send-code-verify-email**', 400, { code: errorCode, message: errorMessage });
-    }
-    async mockOtpChangeEmailError(errorCode: number, errorMessage: string) {
-        await this.mockRoute('**/send-code-change-email**', 400, { code: errorCode, message: errorMessage });
-    }
+    async mockOtpEmailError(errorCode: number, errorMessage: string) { await this.mockRoute('**/send-code-verify-email**', 400, { code: errorCode, message: errorMessage }); }
+    async mockOtpChangeEmailError(errorCode: number, errorMessage: string) { await this.mockRoute('**/send-code-change-email**', 400, { code: errorCode, message: errorMessage }); }
     async mockOtpChangeEmailSuccess() { await this.mockRoute('**/send-code-change-email**', 200, { code: 200, message: 'OK', data: {} }); }
     async mockExpiredOtpChangeEmailError() { await this.mockExpiredRoute('confirm-change-email'); }
     async mockExpiredOtpError() { await this.mockExpiredRoute('confirm-verify-email'); }
@@ -461,17 +421,13 @@ export class MyInfoPage {
     async mockOtpChangePhoneError(errorMessage: string) { await this.mockPhoneRoute('send-code-change-phone', false, errorMessage); }
     async mockOtpChangePhoneSuccess() { await this.mockPhoneRoute('send-code-change-phone', true); }
     async mockExpiredOtpChangePhoneError() { await this.mockExpiredRoute('confirm-change-phone'); }
-    async verifyExpiredPhoneChangeOtpError(expectedErrorMessage: string) {
-        await this.verifyExpiredOtpResponse('confirm-change-phone', () => this.submitPhoneChange(), expectedErrorMessage);
-    }
+    async verifyExpiredPhoneChangeOtpError(expectedErrorMessage: string) { await this.verifyExpiredOtpResponse('confirm-change-phone', () => this.submitPhoneChange(), expectedErrorMessage); }
 
     // Mock – Phone Verify 
     async mockOtpVerifyPhoneError(errorMessage: string) { await this.mockPhoneRoute('send-code-verify-phone', false, errorMessage); }
     async mockOtpVerifyPhoneSuccess() { await this.mockPhoneRoute('send-code-verify-phone', true); }
     async mockExpiredOtpVerifyPhoneError() { await this.mockExpiredRoute('confirm-verify-phone'); }
-    async verifyExpiredPhoneVerifyOtpError(expectedErrorMessage: string) {
-        await this.verifyExpiredOtpResponse('confirm-verify-phone', () => this.confirmButton.click(), expectedErrorMessage);
-    }
+    async verifyExpiredPhoneVerifyOtpError(expectedErrorMessage: string) { await this.verifyExpiredOtpResponse('confirm-verify-phone', () => this.confirmButton.click(), expectedErrorMessage); }
 
     // Email – Authenticated 
     async verifyAuthenticatedEmailUI(emailAddress: string) {
@@ -479,8 +435,6 @@ export class MyInfoPage {
         await this.expectAllVisible(this.authenticatedIcon, this.authenticatedBadge, this.changeEmailButton);
     }
     async openChangeEmailDialog() { await this.changeEmailButton.click(); }
-    async verifyChangeEmailDialogVisible() { await expect(this.changeEmailDialog).toBeVisible(); }
-    async verifyChangeEmailButtonVisible() { await expect(this.changeEmailButton).toBeVisible(); }
     async fillNewEmail(email: string) {
         await this.newEmailInput.click();
         if (email === '') {
@@ -491,28 +445,19 @@ export class MyInfoPage {
         }
         await this.newEmailInput.press('Tab');
     }
-    async clickSubmitChangeEmail() {
-        await this.changeEmailDialog.locator('button').filter({ hasText: '변경하기' }).click();
-    }
-    async verifyNewEmailValidationMessage(message: string, exact = false) {
-        await expect(this.page.getByText(message, { exact })).toBeVisible();
-    }
-    async verifyChangeEmailDialogClosed() { await expect(this.changeEmailDialog).toBeHidden(); }
+    async clickSubmitChangeEmail() { await this.changeEmailDialog.locator('button').filter({ hasText: '변경하기' }).click(); }
+    async verifyNewEmailValidationMessage(message: string, exact = false) { await expect(this.page.getByText(message, { exact })).toBeVisible(); }
     async verifyChangeEmailDialogClosedAndEmailUnchanged(emailAddress: string) {
         await expect(this.changeEmailDialog).toBeHidden();
         await this.verifyAuthenticatedEmailUI(emailAddress);
     }
 
     // Password
-    async verifyPasswordChangedStatusVisible() {
-        await this.expectAllVisible(this.passwordChangedHeading, this.page.getByText(/변경됨/).last());
-    }
-    async openChangePasswordDialog() { await this.changePasswordButton.click(); }
     async verifyChangePasswordDialogVisible() {
         await this.expectAllVisible(
-            this.changePasswordDialog, this.currentPasswordInput,
+            this.dialog, this.currentPasswordInput,
             this.newPasswordInput, this.confirmNewPasswordInput,
-            this.submitChangePasswordButton, this.cancelChangePasswordButton,
+            this.submitChangePasswordButton, this.dialogCancelBtn,
             this.changePasswordCloseIcon,
         );
     }
@@ -533,14 +478,6 @@ export class MyInfoPage {
         for (const [value, locator] of fields)
             if (value !== undefined) await this.fillInput(locator, value);
     }
-    async submitChangePassword() { await this.submitChangePasswordButton.click(); }
-    async cancelChangePassword() { await this.cancelChangePasswordButton.click(); }
-    async closeChangePasswordDialog() { await this.changePasswordCloseIcon.click(); }
-    async verifyChangePasswordDialogHidden() { await expect(this.changePasswordDialog).toBeHidden(); }
-    async verifyPasswordValidationMessage(message: string) {
-        await expect(this.page.getByText(message, { exact: true })).toBeVisible();
-    }
-
     // Nickname
     async verifyNicknameManagementUI(countText: string, changeItemText: string) {
         await this.expectAllVisible(
@@ -564,13 +501,7 @@ export class MyInfoPage {
             this.nicknameInput
         );
         await this.changeNicknameButton.click();
-        await expect(this.changeNicknameDialog).toBeVisible();
-    }
-
-    async compareLevelIconWithNicknameIcon() {
-        const levelIconSrc = await this.levelIconImage.getAttribute('src');
-        const nicknameIconSrc = await this.nicknameChangeIcon.getAttribute('src');
-        expect(levelIconSrc).toBe(nicknameIconSrc);
+        await expect(this.dialog).toBeVisible();
     }
 
     async verifyChangeNicknameDialogUI(texts: { notice1: string; notice2: string; notice3: string; changeItemText: string }) {
@@ -582,7 +513,7 @@ export class MyInfoPage {
             this.page.getByText(texts.notice2, { exact: true }),
             this.page.getByText(texts.notice3, { exact: true }),
             this.page.locator('div').filter({ hasText: texts.changeItemText }).first(),
-            this.changeNicknameCancelButton,
+            this.dialogCancelBtn,
             this.changeNicknameSubmitButton
         );
     }
@@ -591,16 +522,6 @@ export class MyInfoPage {
         await this.changeNicknameInput.click();
         await this.changeNicknameInput.clear();
         await this.changeNicknameInput.fill(nickname);
-        await expect(this.page.getByText(message, { exact: true })).toBeVisible();
-    }
-
-    async cancelChangeNicknameDialog(countText: string) {
-        await this.changeNicknameCancelButton.click();
-        await expect(this.page.locator('span').filter({ hasText: countText }).first()).toBeVisible();
-    }
-
-    async clickPurchaseButton() {
-        await this.purchaseButton.click();
     }
 
     // Today Word
@@ -614,57 +535,21 @@ export class MyInfoPage {
         );
     }
 
-    async verifyTodayWordUIWithItem(countTextWithItem: string, todayWordValue: string, changeItemText: string, dialogTexts?: { heading: string; notice1: string; notice2: string; notice3: string }) {
-        await expect(this.todayWordInput).toBeVisible();
+    async openTodayWordChangeDialog(countTextWithItem: string, todayWordValue: string, changeItemText: string) {
         await expect(this.todayWordInput).toHaveValue(todayWordValue);
         await expect(this.page.locator('p').filter({ hasText: changeItemText }).first()).toBeVisible();
-        await expect(this.page.getByRole('img', { name: '오늘의 한마디' })).toBeVisible();
         await expect(this.page.getByText(countTextWithItem).nth(2)).toBeVisible();
-        await expect(this.todayWordPurchaseLink).toBeVisible();
-        await expect(this.todayWordChangeButton).toBeVisible();
         await this.todayWordChangeButton.click();
         await expect(this.page.getByTestId('dialog-content')).toBeVisible();
-        if (dialogTexts) {
-            await expect(this.page.getByRole('heading', { name: dialogTexts.heading })).toBeVisible();
-            await expect(this.todayWordDialogInput).toBeVisible();
-            await expect(this.todayWordDialogInput).toHaveValue(todayWordValue);
-            await expect(this.todayWordDialogLabel).toBeVisible();
-            await expect(this.page.getByText(dialogTexts.notice1, { exact: true })).toBeVisible();
-            await expect(this.page.getByText(dialogTexts.notice2, { exact: true })).toBeVisible();
-            await expect(this.page.getByText(dialogTexts.notice3, { exact: true })).toBeVisible();
-            await expect(this.page.locator('p').filter({ hasText: changeItemText }).first()).toBeVisible();
-            await expect(this.todayWordDialogCancelButton).toBeVisible();
-            await expect(this.todayWordDialogDeleteButton).toBeVisible();
-            await expect(this.todayWordDialogSubmitButton).toBeVisible();
-            await expect(this.todayWordDialogCloseIcon).toBeVisible();
-        }
     }
 
-    async fillAndVerifyTodayWordValidation(input: string, message: string) {
+    async fillTodayWordInput(input: string) {
         await this.todayWordDialogInput.click();
         await this.todayWordDialogInput.clear();
         if (input !== '') {
             await this.todayWordDialogInput.fill(input);
         }
         await this.todayWordDialogSubmitButton.click();
-        await expect(this.page.getByText(message, { exact: true })).toBeVisible();
     }
 
-    async clickDeleteAndVerifyCancel(confirmMessage: string) {
-        await this.todayWordDialogDeleteButton.click();
-        await expect(this.page.getByText(confirmMessage, { exact: true })).toBeVisible();
-        await expect(this.todayWordConfirmDeleteCancelButton).toBeVisible();
-        await expect(this.todayWordConfirmDeleteSubmitButton).toBeVisible();
-        await this.todayWordConfirmDeleteCancelButton.click();
-        await expect(this.page.getByTestId('dialog-content')).toBeVisible();
-    }
-
-    async cancelTodayWordDialog(countTextWithItem: string) {
-        await this.todayWordDialogCancelButton.click();
-        await expect(this.page.locator('span').filter({ hasText: countTextWithItem }).first()).toBeVisible();
-    }
-
-    async clickTodayWordPurchaseButton() {
-        await this.todayWordPurchaseButton.click();
-    }
 }

@@ -83,13 +83,13 @@ test.describe('[MyInfor] Account Management Tests', () => {
       test('Verify OTP resend countdown persists after reopening verification dialog', async ({ page }) => {
         await myInfoPage.requestOtp();
         await myInfoPage.verifyOtpResendCountdownMessageEmail();
-        await myInfoPage.cancelVerificationDialog();
+        await myInfoPage.dialogCancelBtn.click();
         await myInfoPage.openVerificationDialog();
         await myInfoPage.verifyOtpResendCountdownMessageEmail();
       });
 
       test('Verify clicking cancel closes verification dialog and keeps email unchanged', async ({ page }) => {
-        await myInfoPage.cancelVerificationDialog();
+        await myInfoPage.dialogCancelBtn.click();
         await myInfoPage.verifyVerificationDialogClosedAndEmailUnchanged(userNotVerifiedEmail.email);
       });
 
@@ -222,9 +222,8 @@ test.describe('[MyInfor] Account Management Tests', () => {
       });
 
       test('Verify "취소" (Cancel) and "X" button both close the email change dialog without saving', async ({ page }) => {
-        await myInfoPage.cancelVerificationDialog();
-        await myInfoPage.verifyChangeEmailDialogClosed();
-        await myInfoPage.verifyAuthenticatedEmailUI(userVerifiedEmail.email);
+        await myInfoPage.dialogCancelBtn.click();
+        await myInfoPage.verifyChangeEmailDialogClosedAndEmailUnchanged(userVerifiedEmail.email);
 
         await page.reload();
         await myInfoPage.openChangeEmailDialog();

@@ -26,7 +26,7 @@ test.describe('[MyInfo] Account Management Today Word Tests', () => {
             });
 
             await test.step('Click purchase button and verify navigation to market', async () => {
-                await myInfoPage.clickTodayWordPurchaseButton();
+                await myInfoPage.todayWordPurchaseButton.click();
                 await expect(page).toHaveURL(mypageData.todayWord.marketUrl);
             });
         });
@@ -41,32 +41,42 @@ test.describe('[MyInfo] Account Management Today Word Tests', () => {
 
         test('Verify Today Word UI with item', async ({ page }) => {
             await test.step('Verify Today Word UI elements are visible when user has item', async () => {
-                await myInfoPage.verifyTodayWordUIWithItem(
+                await expect(myInfoPage.todayWordInput).toBeVisible();
+                await expect(myInfoPage.todayWordPurchaseLink).toBeVisible();
+                await expect(myInfoPage.todayWordChangeButton).toBeVisible();
+                await expect(page.getByRole('img', { name: '오늘의 한마디' })).toBeVisible();
+                await myInfoPage.openTodayWordChangeDialog(
                     mypageData.todayWord.expectedTexts.countTextWithItem,
                     mypageData.todayWord.expectedTexts.todayWordValue,
-                    mypageData.todayWord.expectedTexts.changeItemText,
-                    {
-                        heading: mypageData.todayWord.expectedTexts.dialogHeading,
-                        notice1: mypageData.todayWord.expectedTexts.dialogNotice1,
-                        notice2: mypageData.todayWord.expectedTexts.dialogNotice2,
-                        notice3: mypageData.todayWord.expectedTexts.dialogNotice3,
-                    }
+                    mypageData.todayWord.expectedTexts.changeItemText
                 );
+                await expect(page.getByRole('heading', { name: mypageData.todayWord.expectedTexts.dialogHeading })).toBeVisible();
+                await expect(myInfoPage.todayWordDialogInput).toBeVisible();
+                await expect(myInfoPage.todayWordDialogInput).toHaveValue(mypageData.todayWord.expectedTexts.todayWordValue);
+                await expect(myInfoPage.todayWordDialogLabel).toBeVisible();
+                await expect(page.getByText(mypageData.todayWord.expectedTexts.dialogNotice1, { exact: true })).toBeVisible();
+                await expect(page.getByText(mypageData.todayWord.expectedTexts.dialogNotice2, { exact: true })).toBeVisible();
+                await expect(page.getByText(mypageData.todayWord.expectedTexts.dialogNotice3, { exact: true })).toBeVisible();
+                await expect(myInfoPage.todayWordDialogCancelButton).toBeVisible();
+                await expect(myInfoPage.todayWordDialogDeleteButton).toBeVisible();
+                await expect(myInfoPage.todayWordDialogSubmitButton).toBeVisible();
+                await expect(myInfoPage.todayWordDialogCloseIcon).toBeVisible();
             });
 
             await test.step('Verify Today Word dialog input validation messages', async () => {
                 for (const scenario of mypageData.todayWord.validations) {
-                    await myInfoPage.fillAndVerifyTodayWordValidation(scenario.input, scenario.message);
+                    await myInfoPage.fillTodayWordInput(scenario.input);
+                    await expect(page.getByText(scenario.message, { exact: true })).toBeVisible();
                 }
             });
 
             await test.step('Verify delete confirmation and cancel flow', async () => {
-                await myInfoPage.clickDeleteAndVerifyCancel(
-                    mypageData.todayWord.expectedTexts.deleteConfirmMessage
-                );
-                await myInfoPage.cancelTodayWordDialog(
-                    mypageData.todayWord.expectedTexts.countTextWithItem
-                );
+                await myInfoPage.todayWordDialogDeleteButton.click();
+                await expect(page.getByText(mypageData.todayWord.expectedTexts.deleteConfirmMessage, { exact: true })).toBeVisible();
+                await myInfoPage.dialogCancelBtn.click();
+                await expect(page.getByTestId('dialog-content')).toBeVisible();
+                await myInfoPage.todayWordDialogCancelButton.click();
+                await expect(page.locator('span').filter({ hasText: mypageData.todayWord.expectedTexts.countTextWithItem }).first()).toBeVisible();
             });
         });
     });

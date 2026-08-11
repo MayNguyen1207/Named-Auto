@@ -30,7 +30,7 @@ test.describe('[MyInfo] Account Management Phone Tests', () => {
       });
 
       await test.step('Close dialog via cancel button and reopen to check countdown persists', async () => {
-        await myInfoPage.closeUnverifiedPhonePopup.click();
+        await myInfoPage.dialogCancelBtn.click();
         await myInfoPage.unverifyPhoneManagerScreen();
         await myInfoPage.verifyUnverifiedOtpResendCountdownMessage();
       });
@@ -134,7 +134,7 @@ test.describe('[MyInfo] Account Management Phone Tests', () => {
       });
 
       await test.step('Close dialog via icon and reopen to check countdown persists', async () => {
-        await myInfoPage.closeChangePasswordDialog();
+        await myInfoPage.changePasswordCloseIcon.click();;
         await myInfoPage.verifiedPhoneManagerScreen();
         await myInfoPage.verifyOtpResendCountdownMessage();
       });
