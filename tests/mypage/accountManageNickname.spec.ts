@@ -26,7 +26,7 @@ test.describe('[MyInfo] Account Management Nickname Tests', () => {
             });
 
             await test.step('Click purchase button and verify navigation to market', async () => {
-                await myInfoPage.clickPurchaseButton();
+                await myInfoPage.purchaseButton.click();
                 await expect(page).toHaveURL(mypageData.nickname.marketUrl);
             });
         });
@@ -48,7 +48,9 @@ test.describe('[MyInfo] Account Management Nickname Tests', () => {
             });
 
             await test.step('Compare level icon src with nickname icon src', async () => {
-                await myInfoPage.compareLevelIconWithNicknameIcon();
+                const levelIconSrc = await myInfoPage.levelIconImage.getAttribute('src');
+                const nicknameIconSrc = await myInfoPage.nicknameChangeIcon.getAttribute('src');
+                expect(levelIconSrc).toBe(nicknameIconSrc);
             });
 
             await test.step('Open change nickname dialog and verify UI', async () => {
@@ -63,7 +65,13 @@ test.describe('[MyInfo] Account Management Nickname Tests', () => {
             await test.step('Verify nickname validation messages', async () => {
                 for (const scenario of mypageData.nickname.validations) {
                     await myInfoPage.fillAndVerifyNicknameValidation(scenario.input, scenario.message);
+                    await expect(page.getByText(scenario.message, { exact: true })).toBeVisible();
                 }
+            });
+
+            await test.step('Verify dialog closes with cancel button', async () => {
+                await myInfoPage.dialogCancelBtn.click();
+                await expect(page.locator('span').filter({ hasText: mypageData.nickname.expectedTexts.countTextWithItem }).first()).toBeVisible();
             });
         });
     });

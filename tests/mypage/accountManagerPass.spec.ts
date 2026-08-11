@@ -28,10 +28,10 @@ test.describe('[MyInfor] Account Management Password Tests', () => {
 
     test.beforeEach(async ({ page }) => {
       await page.goto('/mypage/info?');
-      await myInfoPage.openChangePasswordDialog();
+      await myInfoPage.changePasswordButton.click();
     });
 
-    test('Verify change password dialog UI and placeholder behavior', async () => {
+    test('Verify change password dialog UI and placeholder behavior', async ({ page }) => {
       await test.step('Dialog UI elements are visible', async () => {
         await myInfoPage.verifyChangePasswordDialogVisible();
       });
@@ -41,7 +41,7 @@ test.describe('[MyInfor] Account Management Password Tests', () => {
       });
     });
 
-    test('Verify password field validation messages', async () => {
+    test('Verify password field validation messages', async ({ page }) => {
       for (const { step, currentPass, newPass, confirmPass, messages } of mypageData.passwordValidation.fieldValidation) {
         await test.step(step, async () => {
           await myInfoPage.fillChangePasswordForm({
@@ -49,37 +49,38 @@ test.describe('[MyInfor] Account Management Password Tests', () => {
             newPass: newPass ?? undefined,
             confirmPass: confirmPass ?? undefined,
           });
-          await myInfoPage.submitChangePassword();
+          await myInfoPage.submitChangePasswordButton.click();
           for (const message of messages) {
-            await myInfoPage.verifyPasswordValidationMessage(message);
+            await expect(page.getByText(message, { exact: true })).toBeVisible();
+
           }
         });
       }
     });
 
-    test('Verify password length and complexity validation', async () => {
+    test('Verify password length and complexity validation', async ({ page }) => {
       for (const { step, newPass, message } of mypageData.passwordValidation.lengthComplexity) {
         await test.step(step, async () => {
           await myInfoPage.fillChangePasswordForm({ newPass });
-          await myInfoPage.submitChangePassword();
-          await myInfoPage.verifyPasswordValidationMessage(message);
+          await myInfoPage.submitChangePasswordButton.click();
+          await expect(page.getByText(message, { exact: true })).toBeVisible();
         });
       }
     });
 
     test('Verify dialog closes via 취소 button and close icon', async () => {
       await test.step('취소 button closes the dialog', async () => {
-        await myInfoPage.cancelChangePassword();
-        await myInfoPage.verifyChangePasswordDialogHidden();
+        await myInfoPage.dialogCancelBtn.click();;
+        await expect(myInfoPage.dialog).toBeHidden();
       });
 
       await test.step('Reopen dialog', async () => {
-        await myInfoPage.openChangePasswordDialog();
+        await myInfoPage.changePasswordButton.click();
       });
 
       await test.step('Close icon closes the dialog', async () => {
-        await myInfoPage.closeChangePasswordDialog();
-        await myInfoPage.verifyChangePasswordDialogHidden();
+        await myInfoPage.changePasswordCloseIcon.click();;
+        await expect(myInfoPage.dialog).toBeHidden();;
       });
     });
   });

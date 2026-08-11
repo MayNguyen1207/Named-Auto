@@ -83,13 +83,13 @@ test.describe('[MyInfor] Account Management Tests', () => {
       test('Verify OTP resend countdown persists after reopening verification dialog', async ({ page }) => {
         await myInfoPage.requestOtp();
         await myInfoPage.verifyOtpResendCountdownMessageEmail();
-        await myInfoPage.cancelVerificationDialog();
+        await myInfoPage.dialogCancelBtn.click();
         await myInfoPage.openVerificationDialog();
         await myInfoPage.verifyOtpResendCountdownMessageEmail();
       });
 
       test('Verify clicking cancel closes verification dialog and keeps email unchanged', async ({ page }) => {
-        await myInfoPage.cancelVerificationDialog();
+        await myInfoPage.dialogCancelBtn.click();
         await myInfoPage.verifyVerificationDialogClosedAndEmailUnchanged(userNotVerifiedEmail.email);
       });
 
@@ -148,12 +148,12 @@ test.describe('[MyInfor] Account Management Tests', () => {
     test('Verify authenticated email display and change dialog', async ({ page }) => {
       await myInfoPage.verifyAuthenticatedEmailUI(userVerifiedEmail.email);
       await myInfoPage.openChangeEmailDialog();
-      await myInfoPage.verifyChangeEmailDialogVisible();
+      await expect(myInfoPage.changeEmailDialog).toBeVisible();
     });
 
     test('Verify new email validation messages', async ({ page }) => {
       await myInfoPage.openChangeEmailDialog();
-      await myInfoPage.verifyChangeEmailDialogVisible();
+      await expect(myInfoPage.changeEmailDialog).toBeVisible();
 
       const validationScenarios = [
         { email: '', expectedMsg: userVerifiedEmail.validation.emptyEmailMessage },
@@ -171,13 +171,13 @@ test.describe('[MyInfor] Account Management Tests', () => {
 
     test('Verify successful OTP request for new email', async ({ page }) => {
       await myInfoPage.openChangeEmailDialog();
-      await myInfoPage.verifyChangeEmailDialogVisible();
+      await expect(myInfoPage.changeEmailDialog).toBeVisible();
 
       await myInfoPage.fillNewEmail(userVerifiedEmail.validation.newEmail);
       await myInfoPage.mockOtpChangeEmailSuccess();
       await myInfoPage.requestOtp();
       await myInfoPage.verifyNewEmailValidationMessage(userVerifiedEmail.validation.otpSentMessage, true);
-      await myInfoPage.verifyChangeEmailButtonVisible();
+      await expect(myInfoPage.changeEmailButton).toBeVisible();
       await myInfoPage.verifyOtpResendCountdownMessage();
     });
 
@@ -222,9 +222,8 @@ test.describe('[MyInfor] Account Management Tests', () => {
       });
 
       test('Verify "취소" (Cancel) and "X" button both close the email change dialog without saving', async ({ page }) => {
-        await myInfoPage.cancelVerificationDialog();
-        await myInfoPage.verifyChangeEmailDialogClosed();
-        await myInfoPage.verifyAuthenticatedEmailUI(userVerifiedEmail.email);
+        await myInfoPage.dialogCancelBtn.click();
+        await myInfoPage.verifyChangeEmailDialogClosedAndEmailUnchanged(userVerifiedEmail.email);
 
         await page.reload();
         await myInfoPage.openChangeEmailDialog();

@@ -25,8 +25,9 @@ test.describe('[Auth] Login from pages with callback redirect', () => {
 
     test('[Auth] Login from Match page when action is restricted (Chat)', async ({ page }) => {
         await page.goto('/match/soccer/11737634/odds');
+        await page.getByRole('textbox', { name: '메세지를 입력하세요' }).click();
         await page.getByRole('textbox', { name: '메세지를 입력하세요' }).fill('a');
-        await page.getByTestId('button-root').nth(4).click();
+        await page.getByTestId('send-message-button').click();
 
         await loginPage.handleLoginRequiredDialog(email, password, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fodds/, /\/match\/soccer\/11737634\/odds/);
     });
