@@ -42,7 +42,7 @@ test.describe('Have Data', () => {
 
     test('[Soccer] User can click image to open odd site in new tab', async ({ context }) => {
         const pagePromise = context.waitForEvent('page');
-        await soccerDetailPage.oddsTableContentCells.first().click();
+        await soccerDetailPage.oddsTableContentCells.locator('img').first().click();
         const newPage = await pagePromise;
 
         await newPage.waitForLoadState();
@@ -52,18 +52,18 @@ test.describe('Have Data', () => {
     test('[Soccer] Data table should be displayed correctly in 일반 tab', async ({ request, sportsApiBaseURL }) => {
         test.fail(true, 'Investigating why YSB 88 is hidden');
         await soccerDetailPage.normalBtn.click();
-        await soccerDetailPage.verifyDividendTableRows(request, sportsApiBaseURL, matchId, '1X2');
+        await soccerDetailPage.verifyOddsTableRows(request, sportsApiBaseURL, matchId, '1X2');
     });
 
     test('[Soccer] Data table should be displayed correctly in 핸디캡 tab', async ({ request, sportsApiBaseURL }) => {
         test.fail(true, 'Investigating why YSB 88 is hidden');
         await soccerDetailPage.handicapBtn.click();
-        await soccerDetailPage.verifyDividendTableRows(request, sportsApiBaseURL, matchId, 'HANDICAP');
+        await soccerDetailPage.verifyOddsTableRows(request, sportsApiBaseURL, matchId, 'HANDICAP');
     });
 
     test('[Soccer] Data table should be displayed correctly in 언더/오버 tab', async ({ request, sportsApiBaseURL }) => {
         test.fail(true, 'Investigating why YSB 88 is hidden');
         await soccerDetailPage.underOverBtn.click();
-        await soccerDetailPage.verifyDividendTableRows(request, sportsApiBaseURL, matchId, 'OVERUNDER');
+        await soccerDetailPage.verifyOddsTableRows(request, sportsApiBaseURL, matchId, 'OVERUNDER');
     });
 })

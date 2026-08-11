@@ -2,7 +2,18 @@ import { test, expect } from '../../../../utils/fixtures';
 import { SoccerDetailPage } from '../../../../pages/SoccerDetailPage';
 import matchData from '../../../../data-test/match-detail-data.json';
 
-test.describe('Have Data', () => {
+test.describe('No Head-To-Head Data', () => {
+    test('[Soccer] Heade-To-Head Data Table should be hidden', async ({ page }) => {
+        const matchId = matchData.matchLink.normal;
+        const soccerDetailPage = new SoccerDetailPage(page);
+        await soccerDetailPage.navigateOdds(matchId);
+
+        await expect(soccerDetailPage.vsRecordTableTitle).toBeHidden();
+        await expect(soccerDetailPage.vsRecordTableHeaderCells).toBeHidden();
+    });
+});
+
+test.describe('Have Head-To-Head Data', () => {
 
     let soccerDetailPage: SoccerDetailPage;
     const matchId = matchData.matchLink.statHeadToHead;
@@ -59,7 +70,7 @@ test.describe('Have Data', () => {
         }
     });
 
-    test('[Soccer] User can click 상대전적 row to view detail record', async ({ request, sportsApiBaseURL }) => {
+    test('[Soccer] User can click a row to view detail record', async ({ request, sportsApiBaseURL }) => {
         const response = await request.get(`${sportsApiBaseURL}/v1.0/sports/soccer/games/${matchId}/record`);
         const json = await response.json();
         const firstRecord = json.vsRecord[0];

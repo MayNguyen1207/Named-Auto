@@ -67,6 +67,7 @@ test.describe('Guest Flow', () => {
             const loginPage = new LoginPage(page);
             await loginPage.navigate();
             await loginPage.login(loginData.userB.email, loginData.userB.password);
+            await expect(page).toHaveURL('/home');
             await soccerListPage.navigate();
         });
 

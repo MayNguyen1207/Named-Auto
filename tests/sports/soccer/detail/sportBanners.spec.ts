@@ -10,7 +10,7 @@ test.describe('Guest Flow', () => {
 
     test.beforeEach(async ({ page }) => {
         soccerDetailPage = new SoccerDetailPage(page);
-        await soccerDetailPage.navigate(matchId);
+        await soccerDetailPage.navigateOdds(matchId);
     });
 
     test('[Soccer] Sport banners should be random displayed', async ({ page }) => {

@@ -56,7 +56,6 @@ test.describe('Admin Flow', () => {
     });
 
     test('[Community] Admin can add and remove a post from Suggested Post list', async ({ page, apiBaseURL, browserName }) => {
-        test.fail(true, 'Batch is turned off');
         test.skip(browserName !== 'chromium', 'Avoid conflict in parallel');
         test.setTimeout(150000);
 

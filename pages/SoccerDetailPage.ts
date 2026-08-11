@@ -45,10 +45,16 @@ export class SoccerDetailPage extends BasePage {
 
     //Stat Tab
     readonly expandBtn: Locator;
+
     readonly vsRecordTable: Locator;
     readonly vsRecordTableTitle: Locator;
     readonly vsRecordTableHeaderCells: Locator;
     readonly vsRecordTableRows: Locator;
+
+    readonly recentFiveTable: Locator;
+    readonly recentFiveTableTitle: Locator;
+    readonly recentHomeTeamBtn: Locator;
+    readonly recentAwayTeamBtn: Locator;
 
     readonly comparisonGrid: Locator;
     readonly comparisonGridRows: Locator;
@@ -96,10 +102,16 @@ export class SoccerDetailPage extends BasePage {
         this.oddsTableContentCells = page.locator('td:visible');
 
         this.expandBtn = page.getByLabel('Expand', { exact: true });
+
         this.vsRecordTable = page.getByTestId('stats-vs-record-table');
         this.vsRecordTableTitle = this.vsRecordTable.getByText('상대전적', { exact: true });
         this.vsRecordTableHeaderCells = this.vsRecordTable.locator('thead th');
         this.vsRecordTableRows = this.vsRecordTable.locator('tr[data-testid^="stats-vs-record-table-row-"]');
+
+        this.recentFiveTable = page.getByTestId('stats-recent5-table');
+        this.recentFiveTableTitle = this.recentFiveTable.getByText('최근 5경기', { exact: true });
+        this.recentHomeTeamBtn = this.recentFiveTable.locator('button').first();
+        this.recentAwayTeamBtn = this.recentFiveTable.locator('button').nth(1);
 
         this.comparisonGrid = page.getByTestId('team-comparison-grid');
         this.comparisonGridRows = this.comparisonGrid.locator('> div');
@@ -117,7 +129,7 @@ export class SoccerDetailPage extends BasePage {
         await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
     }
 
-    async verifyDividendTableRows(request: any, sportsApiBaseURL: string, matchId: number, marketType: string) {
+    async verifyOddsTableRows(request: any, sportsApiBaseURL: string, matchId: number, marketType: string) {
         const response = await request.get(`${sportsApiBaseURL}/v1.0/sports/games/${matchId}/odds/sitesV2`);
         const json = await response.json();
         const dataList = json.international_basic.filter((d: any) => d.marketType === marketType);

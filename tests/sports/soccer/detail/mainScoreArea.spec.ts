@@ -9,7 +9,7 @@ test.describe('Guest Flow', () => {
 
     test.beforeEach(async ({ page }) => {
         soccerDetailPage = new SoccerDetailPage(page);
-        await soccerDetailPage.navigate(matchId);
+        await soccerDetailPage.navigateOdds(matchId);
     });
 
     test('[Soccer] User can click the leagueName and leagueName is correct', async ({ request, page, sportsApiBaseURL }) => {

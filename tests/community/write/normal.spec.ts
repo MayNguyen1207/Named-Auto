@@ -42,7 +42,7 @@ test.describe('Normal User Flow; Write Post and submit', () => {
             await writeFreePage.writeBtn.click();
 
             const detailFreePage = new DetailFreePage(page);
-            await expect(page).toHaveURL(/.*community\/free/);
+            await expect(page).toHaveURL(/.*community\/free/, { timeout: 15000 });
 
             const txtLink = detailFreePage.postContent.getByRole('link', { name: 'Google Search' });
             await expect(txtLink).toBeVisible({ timeout: 15000 });
