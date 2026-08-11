@@ -83,7 +83,10 @@ test.describe('Normal User Flow', () => {
             test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
 
             await detailFreePage.navigate(freePostData.postUrl.myPost);
-            await detailFreePage.editPostBtn.click();
+            await expect(async () => {
+                await detailFreePage.editPostBtn.click();
+                await expect(page).toHaveURL(/\/community\/edit\/free/);
+            }).toPass({ timeout: 10000 });
 
             const writeFreePage = new WriteFreePage(page);
             await writeFreePage.titleInput.clear();

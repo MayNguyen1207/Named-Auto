@@ -100,7 +100,7 @@ export class SoccerListPage extends BasePage {
         this.matchCards = page.locator('div[data-item-group-index]');
         this.broadCastContainer = page.getByTestId('broadcast-content');
 
-        this.adminOpenMatchBtn = page.getByTestId('open-new-tab-button');
+        this.adminOpenMatchBtn = page.getByTestId('admin-open-new-tab-button');
         this.adminCasterBtn = page.getByRole('button', { name: 'Caster' });
 
         this.likedMatchArea = page.locator(".mb-1[data-testid='accordion-root']");

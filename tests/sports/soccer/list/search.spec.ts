@@ -23,7 +23,7 @@ test.describe('Guest Flow', () => {
 
         for (const game of games) {
             const league = game.league;
-            if (league && league.shortName?.includes(KEYWORD) && !leagueMap.has(league.id)) {
+            if (league && league.shortName?.toLowerCase().includes(KEYWORD.toLowerCase()) && !leagueMap.has(league.id)) {
                 leagueMap.set(league.id, {
                     shortName: league.shortName,
                     imgPath: league.nation?.imgPath ?? '',
@@ -31,7 +31,7 @@ test.describe('Guest Flow', () => {
             }
             for (const side of ['home', 'away'] as const) {
                 const team = game.teams?.[side];
-                if (team && team.name?.includes(KEYWORD) && !teamMap.has(team.id)) {
+                if (team && team.name?.toLowerCase().includes(KEYWORD.toLowerCase()) && !teamMap.has(team.id)) {
                     teamMap.set(team.id, {
                         name: team.name,
                         imgPath: team.imgPath ?? '',
