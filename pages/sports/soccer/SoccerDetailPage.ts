@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { BasePage } from '../../BasePage';
 
 export class SoccerDetailPage extends BasePage {
     readonly page: Page;
@@ -43,22 +43,6 @@ export class SoccerDetailPage extends BasePage {
     readonly oddsTableRows: Locator;
     readonly oddsTableContentCells: Locator;
 
-    //Stat Tab
-    readonly expandBtn: Locator;
-
-    readonly vsRecordTable: Locator;
-    readonly vsRecordTableTitle: Locator;
-    readonly vsRecordTableHeaderCells: Locator;
-    readonly vsRecordTableRows: Locator;
-
-    readonly recentFiveTable: Locator;
-    readonly recentFiveTableTitle: Locator;
-    readonly recentHomeTeamBtn: Locator;
-    readonly recentAwayTeamBtn: Locator;
-
-    readonly comparisonGrid: Locator;
-    readonly comparisonGridRows: Locator;
-
     constructor(page: Page) {
         super(page);
         this.page = page;
@@ -100,21 +84,6 @@ export class SoccerDetailPage extends BasePage {
         this.oddsTableHeaderCells = page.locator('th:visible');
         this.oddsTableRows = page.locator('tr[data-testid^="odds-table-row-"]');
         this.oddsTableContentCells = page.locator('td:visible');
-
-        this.expandBtn = page.getByLabel('Expand', { exact: true });
-
-        this.vsRecordTable = page.getByTestId('stats-vs-record-table');
-        this.vsRecordTableTitle = this.vsRecordTable.getByText('상대전적', { exact: true });
-        this.vsRecordTableHeaderCells = this.vsRecordTable.locator('thead th');
-        this.vsRecordTableRows = this.vsRecordTable.locator('tr[data-testid^="stats-vs-record-table-row-"]');
-
-        this.recentFiveTable = page.getByTestId('stats-recent5-table');
-        this.recentFiveTableTitle = this.recentFiveTable.getByText('최근 5경기', { exact: true });
-        this.recentHomeTeamBtn = this.recentFiveTable.locator('button').first();
-        this.recentAwayTeamBtn = this.recentFiveTable.locator('button').nth(1);
-
-        this.comparisonGrid = page.getByTestId('team-comparison-grid');
-        this.comparisonGridRows = this.comparisonGrid.locator('> div');
     }
 
     async navigateOdds(id: number) {
@@ -123,17 +92,7 @@ export class SoccerDetailPage extends BasePage {
         await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
     }
 
-    async navigateStat(id: number) {
-        await this.page.goto(`/match/soccer/${id}/stat`);
-        await this.page.locator('.skeleton-loader').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => { });
-        await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
-    }
-
-    async verifyOddsTableRows(request: any, sportsApiBaseURL: string, matchId: number, marketType: string) {
-        const response = await request.get(`${sportsApiBaseURL}/v1.0/sports/games/${matchId}/odds/sitesV2`);
-        const json = await response.json();
-        const dataList = json.international_basic.filter((d: any) => d.marketType === marketType);
-
+    async verifyOddsTableRows(dataList: any[]) {
         const rows = this.oddsTableRows;
         const rowCount = await rows.count();
         expect.soft(rowCount).toBe(dataList.length);
@@ -154,21 +113,20 @@ export class SoccerDetailPage extends BasePage {
             await expect(cells.nth(3)).toContainText(expectedData.draw ?? '');
             await expect(cells.nth(4)).toContainText(expectedData.loss ?? '');
 
-            const checkStatusArrow = async (cellIndex: number, status: string) => {
-                const cell = cells.nth(cellIndex);
-                if (status === 'UP') {
-                    await expect(cell.locator('svg.tabler-icon-triangle-filled')).toBeVisible();
-                } else if (status === 'DOWN') {
-                    await expect(cell.locator('svg.tabler-icon-triangle-inverted-filled')).toBeVisible();
-                } else if (status === 'STAY') {
-                    await expect(cell.locator('svg.tabler-icon-triangle-filled')).toBeHidden();
-                    await expect(cell.locator('svg.tabler-icon-triangle-inverted-filled')).toBeHidden();
-                }
-            };
+            await this.checkOddsStatusArrow(cells.nth(2), expectedData.winStatus);
+            await this.checkOddsStatusArrow(cells.nth(3), expectedData.drawStatus);
+            await this.checkOddsStatusArrow(cells.nth(4), expectedData.lossStatus);
+        }
+    }
 
-            await checkStatusArrow(2, expectedData.winStatus);
-            await checkStatusArrow(3, expectedData.drawStatus);
-            await checkStatusArrow(4, expectedData.lossStatus);
+    async checkOddsStatusArrow(cell: Locator, status: string) {
+        if (status === 'UP') {
+            await expect(cell.locator('svg.tabler-icon-triangle-filled')).toBeVisible();
+        } else if (status === 'DOWN') {
+            await expect(cell.locator('svg.tabler-icon-triangle-inverted-filled')).toBeVisible();
+        } else if (status === 'STAY') {
+            await expect(cell.locator('svg.tabler-icon-triangle-filled')).toBeHidden();
+            await expect(cell.locator('svg.tabler-icon-triangle-inverted-filled')).toBeHidden();
         }
     }
 }

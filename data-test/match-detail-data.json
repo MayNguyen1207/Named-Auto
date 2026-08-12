@@ -2,6 +2,12 @@
     "matchLink": {
         "normal": 11746280,
         "noOddsData": 11707415,
-        "statHeadToHead": 11734911
+        "statHeadToHead": 11734911,
+        "noStatHeadToHead": 11746280,
+        "statRecentFive": 11746280,
+        "statNextMatches": 11746280,
+        "noStatNextMatches": 11734885,
+        "statTeamRanking": 11746280,
+        "noStatTeamRanking": 11734885
     }
 }

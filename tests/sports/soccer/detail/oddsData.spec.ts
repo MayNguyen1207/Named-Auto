@@ -1,8 +1,8 @@
 import { test, expect } from '../../../../utils/fixtures';
-import { SoccerDetailPage } from '../../../../pages/SoccerDetailPage';
+import { SoccerDetailPage } from '../../../../pages/sports/soccer/SoccerDetailPage';
 import matchData from '../../../../data-test/match-detail-data.json';
 
-test.describe('No Data', () => {
+test.describe('No Odds Data', () => {
     test('[Soccer] Table title and no data text should be displayed correctly', async ({ page }) => {
         const matchId = matchData.matchLink.noOddsData;
         const soccerDetailPage = new SoccerDetailPage(page);
@@ -17,7 +17,7 @@ test.describe('No Data', () => {
     });
 });
 
-test.describe('Have Data', () => {
+test.describe('Have Odds Data', () => {
 
     let soccerDetailPage: SoccerDetailPage;
     const matchId = matchData.matchLink.normal;
@@ -49,21 +49,20 @@ test.describe('Have Data', () => {
         expect(newPage.url()).not.toBe('about:blank');
     });
 
-    test('[Soccer] Data table should be displayed correctly in 일반 tab', async ({ request, sportsApiBaseURL }) => {
-        test.fail(true, 'Investigating why YSB 88 is hidden');
-        await soccerDetailPage.normalBtn.click();
-        await soccerDetailPage.verifyOddsTableRows(request, sportsApiBaseURL, matchId, '1X2');
-    });
+    const oddsTabs = [
+        { name: '일반', btn: () => soccerDetailPage.normalBtn, marketType: '1X2' },
+        { name: '핸디캡', btn: () => soccerDetailPage.handicapBtn, marketType: 'HANDICAP' },
+        { name: '언더/오버', btn: () => soccerDetailPage.underOverBtn, marketType: 'OVERUNDER' },
+    ];
 
-    test('[Soccer] Data table should be displayed correctly in 핸디캡 tab', async ({ request, sportsApiBaseURL }) => {
-        test.fail(true, 'Investigating why YSB 88 is hidden');
-        await soccerDetailPage.handicapBtn.click();
-        await soccerDetailPage.verifyOddsTableRows(request, sportsApiBaseURL, matchId, 'HANDICAP');
-    });
-
-    test('[Soccer] Data table should be displayed correctly in 언더/오버 tab', async ({ request, sportsApiBaseURL }) => {
-        test.fail(true, 'Investigating why YSB 88 is hidden');
-        await soccerDetailPage.underOverBtn.click();
-        await soccerDetailPage.verifyOddsTableRows(request, sportsApiBaseURL, matchId, 'OVERUNDER');
-    });
+    for (const { name, btn, marketType } of oddsTabs) {
+        test(`[Soccer] Data table should be displayed correctly in ${name} tab`, async ({ request, sportsApiBaseURL }) => {
+            test.fail(true, 'Investigating why YSB 88 is hidden');
+            await btn().click();
+            const response = await request.get(`${sportsApiBaseURL}/v1.0/sports/games/${matchId}/odds/sitesV2`);
+            const json = await response.json();
+            const dataList = json.international_basic.filter((d: any) => d.marketType === marketType);
+            await soccerDetailPage.verifyOddsTableRows(dataList);
+        });
+    }
 })

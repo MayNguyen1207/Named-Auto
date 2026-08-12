@@ -1,6 +1,6 @@
 import { test, expect } from '../../../../utils/fixtures';
 import { Locator } from '@playwright/test';
-import { SoccerDetailPage } from '../../../../pages/SoccerDetailPage';
+import { SoccerDetailPage } from '../../../../pages/sports/soccer/SoccerDetailPage';
 import matchData from '../../../../data-test/match-detail-data.json';
 
 test.describe('Guest Flow', () => {
