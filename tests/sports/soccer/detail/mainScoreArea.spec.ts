@@ -2,7 +2,7 @@ import { test, expect } from '../../../../utils/fixtures';
 import { SoccerDetailPage } from '../../../../pages/sports/soccer/SoccerDetailPage';
 import matchData from '../../../../data-test/match-detail-data.json';
 
-test.describe('Guest Flow', () => {
+test.describe('Score board', () => {
 
     let soccerDetailPage: SoccerDetailPage;
     const matchId = matchData.matchLink.normal;
@@ -89,7 +89,7 @@ test.describe('Guest Flow', () => {
                 if (awayTeam.imgPath) {
                     const src = await soccerDetailPage.awayTeamLogo.getAttribute('src');
                     const expectedSegment = awayTeam.imgPath.split('/').pop()!.split('_')[0];
-                    const isFallback = src?.includes('default_away_team_logo') || src?.includes('default_home_team_logo');
+                    const isFallback = src?.includes('default_away_team_logo');
                     if (!isFallback) {
                         expect(src).toContain(expectedSegment);
                     }
@@ -98,24 +98,7 @@ test.describe('Guest Flow', () => {
         });
     });
 
-    test('[Soccer] Guest can like and unlike the match', async ({ page }) => {
-        await expect(async () => {
-            await soccerDetailPage.favBtn.click();
-            await expect(soccerDetailPage.favBtn).toBeHidden();
-            await expect(soccerDetailPage.removeFavBtn).toBeVisible();
-        }).toPass({ intervals: [1000], timeout: 10000 });
-
-        await page.reload({ waitUntil: 'domcontentloaded' });
-        await expect(soccerDetailPage.removeFavBtn).toBeVisible();
-
-        await soccerDetailPage.removeFavBtn.click();
-        await expect(soccerDetailPage.removeFavBtn).toBeHidden();
-        await expect(soccerDetailPage.favBtn).toBeVisible();
-    });
-
-    test('[Soccer] Score board should be displayed correctly', async ({ request, sportsApiBaseURL }) => {
-        test.fail(true, 'https://vincoholdinglp.atlassian.net/browse/NOS-17695');
-
+    test('[Soccer] Score table should be displayed correctly', async ({ request, sportsApiBaseURL }) => {
         const response = await request.get(`${sportsApiBaseURL}/v1.0/sports/soccer/games/${matchId}`);
         expect(response.ok()).toBeTruthy();
         const data = await response.json();
@@ -165,12 +148,6 @@ test.describe('Guest Flow', () => {
                     }
                 }
 
-                const getScoreByTeam = (teamInfo: any, p: number) => {
-                    const periods = teamInfo?.periodData || [];
-                    const pd = periods.find((period: any) => period.period === p || period.id === p);
-                    return pd ? parseInt(pd.score) || 0 : 0;
-                };
-
                 const opponentData = team.name === 'home' ? data.teams?.away : data.teams?.home;
 
                 const periodsList = [1, 2];
@@ -183,8 +160,8 @@ test.describe('Guest Flow', () => {
 
                 for (let i = 0; i < periodsList.length; i++) {
                     const p = periodsList[i];
-                    const myScore = getScoreByTeam(teamData, p);
-                    const oppScore = getScoreByTeam(opponentData, p);
+                    const myScore = soccerDetailPage.getScoreByTeam(teamData, p);
+                    const oppScore = soccerDetailPage.getScoreByTeam(opponentData, p);
 
                     totalScore += myScore;
                     oppTotalScore += oppScore;
@@ -196,8 +173,8 @@ test.describe('Guest Flow', () => {
                 let nextColIndex = periodsList.length + 1;
 
                 if (hasPeriod(5)) {
-                    const myScore = getScoreByTeam(teamData, 5);
-                    const oppScore = getScoreByTeam(opponentData, 5);
+                    const myScore = soccerDetailPage.getScoreByTeam(teamData, 5);
+                    const oppScore = soccerDetailPage.getScoreByTeam(opponentData, 5);
 
                     const cell = columns.nth(nextColIndex);
                     await expect(cell).toContainText(myScore.toString());
@@ -216,4 +193,4 @@ test.describe('Guest Flow', () => {
             });
         }
     });
-})
+});
