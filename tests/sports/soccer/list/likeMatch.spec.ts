@@ -1,5 +1,5 @@
 import { test, expect } from '../../../../utils/fixtures';
-import { SoccerListPage } from '../../../../pages/SoccerListPage';
+import { SoccerListPage } from '../../../../pages/sports/soccer/SoccerListPage';
 import { LoginPage } from '../../../../pages/LoginPage';
 import loginData from '../../../../data-test/login-data.json';
 
