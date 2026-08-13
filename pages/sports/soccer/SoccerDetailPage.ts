@@ -43,6 +43,23 @@ export class SoccerDetailPage extends BasePage {
     readonly oddsTableRows: Locator;
     readonly oddsTableContentCells: Locator;
 
+    //Line up
+    readonly noLineUpTxt: Locator;
+
+    //Broadcast
+    readonly broadcastTable: Locator;
+
+    //Record
+    readonly recordTable: Locator;
+    readonly recordTableTitle: Locator;
+    readonly recordHomeTeamLogo: Locator;
+    readonly recordHomeTeamName: Locator;
+    readonly vsTxt: Locator;
+    readonly recordAwayTeamLogo: Locator;
+    readonly recordAwayTeamName: Locator;
+    readonly noRecordTxt: Locator;
+    readonly waitForRecordTxt: Locator;
+
     constructor(page: Page) {
         super(page);
         this.page = page;
@@ -84,6 +101,20 @@ export class SoccerDetailPage extends BasePage {
         this.oddsTableHeaderCells = page.locator('th:visible');
         this.oddsTableRows = page.locator('tr[data-testid^="odds-table-row-"]');
         this.oddsTableContentCells = page.locator('td:visible');
+
+        this.noLineUpTxt = page.getByText('준비 중인 기능입니다.', { exact: true });
+
+        this.broadcastTable = page.getByTestId('broadcast-tab-table');
+
+        this.recordTable = page.getByTestId('record-table')
+        this.recordTableTitle = this.recordTable.getByText('경기 기록', { exact: true });
+        this.recordHomeTeamLogo = this.recordTable.locator('div.col-span-5.text-center').first().locator('img');
+        this.recordHomeTeamName = page.getByTestId('home-team-name-record');
+        this.vsTxt = this.recordTable.locator('span').filter({ hasText: 'VS' });
+        this.recordAwayTeamLogo = this.recordTable.locator('div.col-span-5.text-center').last().locator('img');
+        this.recordAwayTeamName = page.getByTestId('away-team-name-record');
+        this.noRecordTxt = page.getByText('데이터가 없습니다.', { exact: true });
+        this.waitForRecordTxt = page.getByText('경기 데이터가 준비되는 대로 확인하실 수 있습니다.', { exact: true });
     }
 
     async navigateOdds(id: number) {
@@ -91,6 +122,30 @@ export class SoccerDetailPage extends BasePage {
         await this.page.locator('.skeleton-loader').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => { });
         await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
     }
+
+    async navigateLineUp(id: number) {
+        await this.page.goto(`/match/soccer/${id}/lineup`);
+        await this.page.locator('.skeleton-loader').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => { });
+        await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
+    }
+
+    async navigateBroadcast(id: number) {
+        await this.page.goto(`/match/soccer/${id}/broadcast`);
+        await this.page.locator('.skeleton-loader').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => { });
+        await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
+    }
+
+    async navigateRecord(id: number) {
+        await this.page.goto(`/match/soccer/${id}/record`);
+        await this.page.locator('.skeleton-loader').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => { });
+        await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
+    }
+
+    getScoreByTeam = (teamInfo: any, p: number) => {
+        const periods = teamInfo?.periodData || [];
+        const pd = periods.find((period: any) => period.period === p || period.id === p);
+        return pd ? parseInt(pd.score) || 0 : 0;
+    };
 
     async verifyOddsTableRows(dataList: any[]) {
         const rows = this.oddsTableRows;
