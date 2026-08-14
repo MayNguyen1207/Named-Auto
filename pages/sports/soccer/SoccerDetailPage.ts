@@ -60,6 +60,15 @@ export class SoccerDetailPage extends BasePage {
     readonly noRecordTxt: Locator;
     readonly waitForRecordTxt: Locator;
 
+    //Analysis post list
+    readonly noPostTxt: Locator;
+    readonly tabTitle: Locator;
+    readonly writeBtn: Locator;
+    readonly tableHeaderCells: Locator;
+    readonly analysisTableRows: Locator;
+    readonly analysisPostPopup: Locator;
+    readonly createAnalysisPostPopup: Locator;
+
     constructor(page: Page) {
         super(page);
         this.page = page;
@@ -115,6 +124,14 @@ export class SoccerDetailPage extends BasePage {
         this.recordAwayTeamName = page.getByTestId('away-team-name-record');
         this.noRecordTxt = page.getByText('데이터가 없습니다.', { exact: true });
         this.waitForRecordTxt = page.getByText('경기 데이터가 준비되는 대로 확인하실 수 있습니다.', { exact: true });
+
+        this.noPostTxt = page.getByText('작성된 분석글이 없습니다.', { exact: true });
+        this.tabTitle = page.locator('div.w-full.space-y-4').locator('div').first();
+        this.writeBtn = page.getByText('글쓰기', { exact: true });
+        this.tableHeaderCells = page.locator('th:visible');
+        this.analysisTableRows = page.locator('tr[data-testid^="analysis-table-row-"]');
+        this.analysisPostPopup = page.locator('[aria-labelledby="analysis-modal-title"]');
+        this.createAnalysisPostPopup = page.locator('[aria-labelledby="analysis-create-new-post-title"]');
     }
 
     async navigateOdds(id: number) {
@@ -137,6 +154,12 @@ export class SoccerDetailPage extends BasePage {
 
     async navigateRecord(id: number) {
         await this.page.goto(`/match/soccer/${id}/record`);
+        await this.page.locator('.skeleton-loader').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => { });
+        await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
+    }
+
+    async navigateAnalysis(id: number) {
+        await this.page.goto(`/match/soccer/${id}/analysis`);
         await this.page.locator('.skeleton-loader').first().waitFor({ state: 'attached', timeout: 1000 }).catch(() => { });
         await expect(this.page.locator('.skeleton-loader')).toHaveCount(0, { timeout: 10000 });
     }
@@ -183,5 +206,9 @@ export class SoccerDetailPage extends BasePage {
             await expect(cell.locator('svg.tabler-icon-triangle-filled')).toBeHidden();
             await expect(cell.locator('svg.tabler-icon-triangle-inverted-filled')).toBeHidden();
         }
+    }
+
+    getAnalysisTableRow(wrId: number): Locator {
+        return this.page.getByTestId(`analysis-table-row-${wrId}`);
     }
 }
