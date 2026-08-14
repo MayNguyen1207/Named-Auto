@@ -115,7 +115,7 @@ test.describe('Score board', () => {
             }
 
             if (hasPeriod(5)) {
-                expectedHeaders.push('슛아웃');
+                expectedHeaders.push('승부차기');
             }
 
             const headerLocators = soccerDetailPage.scoreTableHeader.locator('p');

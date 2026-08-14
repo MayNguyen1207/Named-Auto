@@ -11,6 +11,8 @@
         "statTeamRanking": 11746280,
         "noStatTeamRanking": 11734885,
         "noBroadcast": 11735114,
-        "noRecord": 11748919
+        "noRecord": 11748919,
+        "noAnalysisPost": 11742899,
+        "haveAnalysisPost": 11094741
     }
 }
