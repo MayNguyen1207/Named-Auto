@@ -112,7 +112,7 @@ test.describe('Normal User Flow', () => {
         await expect(detailFreePage.noCommentTxt).toBeHidden();
         await expect(detailFreePage.cmtCount).toHaveText("1");
 
-        await detailFreePage.deletePostViaAPI(request, apiBaseURL, postId);
+        await detailFreePage.deletePostViaAPI(request, apiBaseURL, postId, 'free');
     });
 
     for (const data of freePostData.invalidCmt) {

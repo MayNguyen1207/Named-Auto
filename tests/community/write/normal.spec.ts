@@ -175,11 +175,11 @@ test.describe('Normal User Flow', () => {
         const currentUrl = page.url();
         await writeFreePage.cancelBtn.click();
         await expect(page).not.toHaveURL(currentUrl, { timeout: 10000 });
-    })
+    });
 
     //Invalid titles and contents
     for (const data of postData.invalid) {
-        test(`[Community] ${data.name}`, async ({ page, browserName }) => {
+        test(`[Community] ${data.name}`, async ({ browserName }) => {
             test.skip(browserName === 'webkit', 'Specific error in initializing the Editor on the WebKit emulator');
 
             await writeFreePage.writePost(data.title, data.content);

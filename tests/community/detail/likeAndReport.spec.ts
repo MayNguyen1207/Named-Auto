@@ -110,7 +110,7 @@ test.describe('Normal User Flow', () => {
         });
 
         await test.step('Clean up: delete post via API', async () => {
-            await detailFreePage.deletePostViaAPI(request, apiBaseURL, sharedPostId);
+            await detailFreePage.deletePostViaAPI(request, apiBaseURL, sharedPostId, 'free');
         });
     });
 

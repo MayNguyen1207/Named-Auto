@@ -133,6 +133,6 @@ test.describe('Admin Flow', () => {
         await expect(detailFreePage.readBtn).toBeDisabled();
         await expect(detailFreePage.adminRead).toBeVisible();
 
-        await detailFreePage.deletePostViaAPI(request, apiBaseURL, newPostId);
+        await detailFreePage.deletePostViaAPI(request, apiBaseURL, newPostId, 'free');
     });
 })

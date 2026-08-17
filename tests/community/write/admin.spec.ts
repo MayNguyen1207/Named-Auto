@@ -116,7 +116,7 @@ test.describe('Admin Flow', () => {
                 }
             });
 
-            await detailFreePage.deletePostViaAPI(request, apiBaseURL, postId!);
+            await detailFreePage.deletePostViaAPI(request, apiBaseURL, postId!, 'free');
         });
     }
 });
