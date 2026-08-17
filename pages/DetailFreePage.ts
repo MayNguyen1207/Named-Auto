@@ -294,7 +294,7 @@ export class DetailFreePage extends BasePage {
     }
 
     // Delete post via API
-    async deletePostViaAPI(request: import('@playwright/test').APIRequestContext, apiBaseURL: string, postId: string) {
+    async deletePostViaAPI(request: import('@playwright/test').APIRequestContext, apiBaseURL: string, postId: string, boardType: string) {
         const fs = require('fs');
         const adminStorageState = JSON.parse(fs.readFileSync('playwright/.auth/admin.json', 'utf8'));
         const sessionCookie = adminStorageState.cookies.find((c: any) => c.name.includes('session_id'));
@@ -304,7 +304,7 @@ export class DetailFreePage extends BasePage {
             headers: { 'NAMED-SESSION': `${adminToken}` },
             form: {
                 wr_id: postId,
-                board_type: 'free',
+                board_type: boardType,
             }
         });
         expect(deleteRes.ok()).toBeTruthy();

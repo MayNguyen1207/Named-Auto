@@ -20,6 +20,7 @@ export class WriteFreePage extends BasePage {
     readonly dialogCloseBtn: Locator;
     readonly dialogCancelBtn: Locator;
 
+    readonly seeMoreBtn: Locator;
     //Insert Link related locator
     readonly insertLnkBtn: Locator;
     readonly txtLnkInput: Locator;
@@ -53,7 +54,8 @@ export class WriteFreePage extends BasePage {
     //Admin - Author picker
     readonly authorPickerTrigger: Locator;
     readonly authorCommandRoot: Locator;
-    readonly authorFirstItem: Locator;
+    readonly authorSearchInput: Locator;
+    readonly authorItem: Locator;
 
     constructor(page: Page) {
         super(page);
@@ -74,6 +76,7 @@ export class WriteFreePage extends BasePage {
         this.dialogCloseBtn = page.getByRole('button', { name: '닫기' });
         this.dialogCancelBtn = page.locator('button').filter({ hasText: '취소' }).last();
 
+        this.seeMoreBtn = page.locator('[data-cke-tooltip-text="더보기"]');
         this.insertLnkBtn = page.getByRole('button', { name: '링크' });
         this.txtLnkInput = page.getByRole('textbox', { name: '표시 텍스트' });
         this.lnkInput = page.getByRole('textbox', { name: '링크 주소' });
@@ -102,8 +105,9 @@ export class WriteFreePage extends BasePage {
         this.uploadVideoBtn = page.locator('button.ck-file-dialog-button[data-cke-tooltip-text="동영상 업로드"]');
 
         this.authorPickerTrigger = page.getByTestId('community-comment-author-selection');
-        this.authorCommandRoot = page.locator('[data-testid="command-root"]');
-        this.authorFirstItem = this.authorCommandRoot.locator('[data-testid="command-item"]').first();
+        this.authorCommandRoot = page.getByTestId('command-root');
+        this.authorSearchInput = this.authorCommandRoot.getByTestId('command-input-wrapper');
+        this.authorItem = this.authorCommandRoot.getByTestId('command-item');
     }
 
     async navigate() {
@@ -230,10 +234,15 @@ export class WriteFreePage extends BasePage {
     async selectFirstAuthor(): Promise<string> {
         await this.authorPickerTrigger.click();
         await expect(this.authorCommandRoot).toBeVisible();
-        const firstItem = this.authorFirstItem;
+        const firstItem = this.authorItem.first();
         const fullText = (await firstItem.textContent())?.trim() ?? '';
         const authorName = fullText.split('(')[0].trim();
         await firstItem.click();
         return authorName;
+    }
+
+    async searchAuthor(keyword: string) {
+        await this.authorPickerTrigger.click();
+        await this.authorSearchInput.fill(keyword);
     }
 }
