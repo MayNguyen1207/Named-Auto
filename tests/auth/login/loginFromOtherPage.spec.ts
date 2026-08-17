@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import './authSetupCooldown';
+import '../../../utils/authSetupCooldown';
 import { HomePage } from '../../../pages/HomePage';
 import { LoginPage } from '../../../pages/LoginPage';
 import loginData from '../../../data-test/login-data.json';
@@ -34,9 +34,8 @@ test.describe('[Auth] Login from pages with callback redirect', () => {
 
     test('[Auth] Login from Match page when action is restricted (Write Post)', async ({ page }) => {
         await page.goto('/match/soccer/11737634/odds');
-        await page.getByRole('button', { name: '분석글' }).click();
-        await page.getByText('글쓰기', { exact: true }).click();
-
+        await page.getByTestId('tab-analysis').click();
+        await page.getByRole('button', { name: '글쓰기' }).click();
         await loginPage.handleLoginRequiredDialog(email, password, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fanalysis/, /\/match\/soccer\/11737634\/analysis/);
     });
 

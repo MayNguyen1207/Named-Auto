@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import './authSetupCooldown';
+import '../../../utils/authSetupCooldown';
 import { LoginPage } from '../../../pages/LoginPage';
 import loginData from '../../../data-test/login-data.json';
 

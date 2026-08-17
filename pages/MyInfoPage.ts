@@ -96,6 +96,33 @@ export class MyInfoPage extends BasePage {
     readonly todayWordDialogDeleteButton: Locator;
     readonly todayWordDialogCloseIcon: Locator;
 
+    // Profile Image
+    readonly profileImage: Locator;
+    readonly profileImageEditIcon: Locator;
+    readonly profileImageHeading: Locator;
+    readonly profileImageChangeItemText: Locator;
+    readonly profileImageItemIcon: Locator;
+    readonly profileImageCountText: Locator;
+    readonly profileImagePurchaseButton: Locator;
+    readonly ImageUploadOption: Locator;
+    readonly ImageDeleteOption: Locator;
+    readonly pfImageFileInput: Locator;
+    readonly cropContainer: Locator;
+    readonly cropSliderTrack: Locator;
+    readonly cropSliderThumb: Locator;
+    readonly cropSliderRange: Locator;
+    readonly cropImage: Locator;
+
+    // Background Image
+    readonly bgImage: Locator;
+    readonly bgImageEditIcon: Locator;
+    readonly bgImageHeading: Locator;
+    readonly bgImageChangeItemText: Locator;
+    readonly bgImageItemIcon: Locator;
+    readonly bgImageCountText: Locator;
+    readonly bgImagePurchaseButton: Locator;
+    readonly bgImageFileInput: Locator;
+
     constructor(page: Page) {
         super(page);
 
@@ -192,6 +219,39 @@ export class MyInfoPage extends BasePage {
         this.todayWordDialogCancelButton = page.getByRole('button', { name: '취소' });
         this.todayWordDialogDeleteButton = page.getByRole('button', { name: '삭제' });
         this.todayWordDialogCloseIcon = page.getByRole('img').first();
+
+        // Profile Image
+        this.profileImage = page.locator('img.object-cover.rounded-full').first();
+        this.profileImageEditIcon = page.locator('.tabler-icon.tabler-icon-edit').first();
+        this.profileImageHeading = page.getByRole('heading', { name: '프로필 이미지' });
+        this.profileImageChangeItemText = page.getByText('프로필 이미지 변경권 x1', { exact: true });
+        this.profileImageItemIcon = page.getByRole('img', { name: '프로필 이미지 변경권' });
+        this.profileImageCountText = page.locator('span').filter({ hasText: /\(보유: \d+개\)/ }).first();
+        this.profileImagePurchaseButton = page.locator('button').filter({ hasText: '구매하기' }).nth(2);
+        this.pfImageFileInput = page.getByRole('button', { name: 'Choose File' }).nth(2);
+        
+
+        // Background Image
+        this.bgImage = page.locator('img.object-cover.rounded-full').nth(1);
+        this.bgImageEditIcon = page.locator('.tabler-icon.tabler-icon-edit').nth(2);
+        this.bgImageHeading = page.getByRole('heading', { name: '프로필 배경 이미지' });
+        this.bgImageChangeItemText = page.getByText('프로필 배경 이미지 변경권 x1', { exact: true });
+        this.bgImageItemIcon = page.getByRole('img', { name: '프로필 배경 이미지 변경권' });
+        this.bgImageCountText = page.getByText(/\(보유: \d+개\)/).nth(5);
+        this.bgImagePurchaseButton = page.locator('button').filter({ hasText: '구매하기' }).nth(3);
+
+        // Image Upload Options
+        this.ImageUploadOption = page.getByText('업로드하기');
+        this.ImageDeleteOption = page.getByText('설정된 프로필 이미지 삭제');
+        this.cropContainer = page.getByTestId('container');
+        this.cropSliderTrack = page.getByTestId('slider-track');
+        this.cropSliderThumb = page.getByTestId('slider-thumb');
+        this.cropSliderRange = page.getByTestId('slider-range');
+        this.cropImage = page.locator('img.reactEasyCrop_Image');
+        this.pfImageFileInput = page.getByRole('button', { name: 'Choose File' }).nth(2);
+        this.bgImageFileInput = page.getByRole('button', { name: 'Choose File' }).nth(3);
+        
+
     }
 
     // Private Helpers 
@@ -524,6 +584,21 @@ export class MyInfoPage extends BasePage {
         await this.changeNicknameInput.fill(nickname);
     }
 
+    // Profile Image
+    async verifyProfileImageUI(texts: { heading: string; sizeNotice: string; contentNotice: string; changeItemText: string; countText: string }) {
+        await this.expectAllVisible(
+            this.profileImage,
+            this.profileImageEditIcon,
+            this.profileImageHeading,
+            this.page.getByText(texts.sizeNotice),
+            this.page.getByText(texts.contentNotice).first(),
+            this.profileImageChangeItemText,
+            this.profileImageItemIcon,
+            this.page.locator('span').filter({ hasText: texts.countText }).first(),
+            this.profileImagePurchaseButton
+        );
+    }
+
     // Today Word
     async verifyTodayWordUI(changeItemText: string, countText: string) {
         await this.expectAllVisible(
@@ -550,6 +625,21 @@ export class MyInfoPage extends BasePage {
             await this.todayWordDialogInput.fill(input);
         }
         await this.todayWordDialogSubmitButton.click();
+    }
+
+    // Background Image
+    async verifyBgImageUI(texts: { heading: string; sizeNotice: string; contentNotice: string; changeItemText: string; countText: string }) {
+        await this.expectAllVisible(
+            this.bgImage,
+            this.bgImageEditIcon,
+            this.bgImageHeading,
+            this.page.getByText(texts.sizeNotice, { exact: true }),
+            this.page.locator('p').filter({ hasText: texts.contentNotice }).first(),
+            this.bgImageChangeItemText,
+            this.bgImageItemIcon,
+            this.bgImageCountText,
+            this.bgImagePurchaseButton
+        );
     }
 
 }

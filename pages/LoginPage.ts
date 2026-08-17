@@ -12,8 +12,6 @@ export class LoginPage {
 
   // Keep-login toggle
   readonly keepLoginToggle: Locator;
-  readonly keepLoginCheckedIcon: Locator;
-  readonly keepLoginUncheckedIcon: Locator;
 
   // Password visibility
   readonly passwordVisibilityToggleBtn: Locator;
@@ -59,26 +57,23 @@ export class LoginPage {
     this.page = page;
 
     // Login form
-    this.emailInput = page.getByRole('textbox', { name: '이메일 또는 휴대폰 번호' });
-    this.passwordInput = page.getByRole('textbox', { name: '비밀번호' });
+    this.emailInput = page.getByRole('textbox', { name: '이메일' });
+    this.passwordInput = page.getByLabel('비밀번호');
     this.loginButton = page.getByRole('button', { name: '로그인', exact: true });
     this.loginErrorForm = page.locator('form');
 
     // Keep-login toggle
-    this.keepLoginToggle = page.locator('button:has-text("로그인 상태 유지")');
-    this.keepLoginCheckedIcon = page.locator('svg.tabler-icon-square-rounded-check.w-6.h-6');
-    this.keepLoginUncheckedIcon = page.locator('svg.tabler-icon-square-rounded.w-6.h-6');
+    this.keepLoginToggle = page.getByRole('checkbox', { name: '로그인 상태 유지' });
 
     // Password visibility
-    this.passwordVisibilityToggleBtn = page.locator('div:has(> #password) > button');
+    this.passwordVisibilityToggleBtn = page.getByTestId('password-visibility-toggle');
     this.eyeOpenIcon = this.passwordVisibilityToggleBtn.locator('svg.tabler-icon-eye');
     this.eyeOffIcon = this.passwordVisibilityToggleBtn.locator('svg.tabler-icon-eye-off');
 
     // Navigation links
     this.findIdLink = page.getByRole('link', { name: '아이디 찾기' });
     this.resetPasswordLink = page.getByRole('link', { name: '비밀번호 재설정' });
-    this.registerLink = page.getByRole('link', { name: '회원 가입' });
-
+    this.registerLink = page.getByRole('tab', { name: '회원가입' })
     // Inline validation messages
     this.emailValidationMsg = page.getByText('유효한 이메일 주소를 입력해 주세요.', { exact: true });
     this.resetPasswordButton = page.getByRole('button', { name: '비밀번호 재설정' });
@@ -95,10 +90,10 @@ export class LoginPage {
     // Email/Phone verification dialog
     this.emailVerificationDialog = page.getByRole('dialog', { name: 'Phone or Email verification' });
     this.emailVerificationDialogContent = page.getByLabel('Phone or Email verification');
-    this.verificationEmailInput = this.emailVerificationDialogContent.getByRole('textbox');
-    this.verificationPhoneInput = this.emailVerificationDialogContent.locator('input[type="tel"]');
+    this.verificationEmailInput = this.emailVerificationDialog.getByRole('textbox');
+    this.verificationPhoneInput = this.emailVerificationDialog.locator('input[type="tel"]');
     this.phoneCountryCode = page.locator('div').filter({ hasText: /^US\+1$/ }).first();
-    this.sendOtpButton = this.emailVerificationDialogContent.getByTestId('button-root').first();
+    this.sendOtpButton = this.emailVerificationDialog.getByTestId('button-root').first();
     this.confirmButton = page.getByRole('button', { name: '확인' });
 
     // OTP input screen
@@ -117,7 +112,6 @@ export class LoginPage {
   }
 
   // Login actions
-  // Fill credentials and click login — no options.
   async login(email: string, pass: string) {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(pass);
@@ -126,8 +120,11 @@ export class LoginPage {
     try {
       await expect(this.loginButton).toBeEnabled({ timeout: 2000 });
     } catch {
+      await this.emailInput.clear();
       await this.emailInput.fill(email);
+      await this.passwordInput.clear();
       await this.passwordInput.fill(pass);
+      await this.passwordInput.press('Tab'); // Trigger blur event for validation
     }
 
     await this.loginButton.click();
@@ -165,16 +162,21 @@ export class LoginPage {
 
   // Keep-login
   async toggleKeepLogin(checked: boolean) {
-    const isChecked = await this.keepLoginCheckedIcon.isVisible();
+    const isChecked = await this.keepLoginToggle.isChecked();
     if (checked !== isChecked) {
       await this.keepLoginToggle.click();
-      await expect(checked ? this.keepLoginCheckedIcon : this.keepLoginUncheckedIcon).toBeVisible();
+    }
+
+    await expect(this.keepLoginToggle).toHaveAttribute('aria-checked', checked ? 'true' : 'false');
+    if (checked) {
+      await expect(this.keepLoginToggle).toBeChecked();
+    } else {
+      await expect(this.keepLoginToggle).not.toBeChecked();
     }
   }
 
   async expectKeepLoginDefaultChecked() {
-    await expect(this.keepLoginCheckedIcon).toBeVisible();
-    await expect(this.keepLoginUncheckedIcon).not.toBeVisible();
+    await expect(this.keepLoginToggle).toBeChecked();
   }
 
   // Password visibility
@@ -225,7 +227,7 @@ export class LoginPage {
     await expect(this.emailVerificationDialog).toBeVisible();
 
     const expectedTitle = type === 'email' ? '이메일 인증' : '휴대폰 인증';
-    await expect(this.emailVerificationDialogContent).toContainText(expectedTitle);
+    await expect(this.emailVerificationDialog).toContainText(expectedTitle);
   }
 
   // Email/Phone verification dialog
@@ -234,7 +236,7 @@ export class LoginPage {
       await expect(this.verificationEmailInput).toHaveValue(email!);
       await expect(this.verificationEmailInput).toBeDisabled();
     } else {
-      await expect(this.emailVerificationDialogContent).toContainText(
+      await expect(this.emailVerificationDialog).toContainText(
         '본인 명의의 휴대폰으로 본인 인증을 완료한 회원의 경우'
       );
       await expect(this.phoneCountryCode).toBeVisible();
@@ -261,11 +263,11 @@ export class LoginPage {
   // OTP input screen
   async verifyOtpScreenDefaultUI() {
     await expect(this.otpInput).toBeVisible();
-    await expect(this.emailVerificationDialogContent).toContainText('인증번호 입력');
-    await expect(this.emailVerificationDialogContent).toContainText('인증번호 6자리 입력');
+    await expect(this.emailVerificationDialog).toContainText('인증번호 입력');
+    await expect(this.emailVerificationDialog).toContainText('인증번호 6자리 입력');
     await expect(this.goBackButton).toBeVisible();
     await expect(this.verifyCompleteButton).toBeVisible();
-    await expect(this.emailVerificationDialogContent).toContainText(/OTP 재전송은 \d+분 \d+초 후에 가능합니다/);
+    await expect(this.emailVerificationDialog).toContainText(/OTP 재전송은 \d+분 \d+초 후에 가능합니다/);
     await expect(this.verifyCompleteButton).toBeDisabled();
   }
 
@@ -295,7 +297,7 @@ export class LoginPage {
       await expect(errorDialog).toContainText('입력하신 인증 코드가 잘못되었습니다. 다시 시도해 주세요.');
       await errorDialog.getByRole('button', { name: '확인' }).click();
     } catch {
-      await expect(this.emailVerificationDialogContent.locator('form')).toContainText(
+      await expect(this.emailVerificationDialog.locator('form')).toContainText(
         '입력하신 인증 코드가 잘못되었습니다. 다시 시도해 주세요.'
       );
     }
@@ -329,16 +331,16 @@ export class LoginPage {
     await expect(this.otpForm).toContainText('인증번호 재발송');
   }
   async verifyCountdownIsDecrementing() {
-    await expect(this.emailVerificationDialogContent).toContainText(/OTP 재전송은 \d+분 \d+초 후에 가능합니다/);
-    const before = await this.emailVerificationDialogContent.textContent();
+    await expect(this.emailVerificationDialog).toContainText(/OTP 재전송은 \d+분 \d+초 후에 가능합니다/);
+    const before = await this.emailVerificationDialog.textContent();
     await this.page.waitForTimeout(2000);
-    const after = await this.emailVerificationDialogContent.textContent();
+    const after = await this.emailVerificationDialog.textContent();
     expect(before).not.toEqual(after);
   }
   async resendOtp() {
-    await this.emailVerificationDialogContent.getByText('인증번호 재발송').click({ force: true });
+    await this.emailVerificationDialog.getByText('인증번호 재전송').click({ force: true });
     await this.page.getByRole('button', { name: '확인' }).click();
-    await expect(this.emailVerificationDialogContent).toContainText(/OTP 재전송은 \d+분 \d+초 후에 가능합니다/);
+    await expect(this.emailVerificationDialog).toContainText(/OTP 재전송은 \d+분 \d+초 후에 가능합니다/);
   }
 
   // Reactivation success
@@ -348,21 +350,36 @@ export class LoginPage {
     await successDialog.getByRole('button', { name: '확인' }).click();
   }
   // Unauthorized-IP dialog
-  async verifyUnauthorizedIpDialog() {
+  async verifyUnauthorizedIpDialog(type?: 'email' | 'phone') {
     const dialog = this.page.getByTestId('dialog-content').first();
     await expect(dialog).toBeVisible();
     await expect(dialog).toContainText('지정한 IP 이외의 IP에서 로그인하셨습니다.');
     await expect(dialog.getByRole('paragraph')).toContainText(
       '지정한 IP 이외의 IP에서 로그인하는 경우, 인증 완료 후 로그인이 가능합니다.'
     );
-    await expect(this.verifyIpDialog.getByTestId('button-root').first()).toBeVisible();
+
+    if (type === 'email') {
+      await expect(this.verifyIpDialog.getByRole('button', { name: '이메일 인증', exact: true })).toBeVisible();
+    } else if (type === 'phone') {
+      await expect(this.verifyIpDialog.getByRole('button', { name: '휴대폰 인증', exact: true })).toBeVisible();
+    } else {
+      await expect(this.verifyIpDialog.getByRole('button', { name: '휴대폰 인증', exact: true })).toBeVisible();
+      await expect(this.verifyIpDialog.getByRole('button', { name: '이메일 인증', exact: true })).toBeVisible();
+    }
+
     await expect(this.goToMainPageButton).toBeVisible();
   }
 
   async proceedToVerificationFromIpDialog(type: 'email' | 'phone') {
-    await this.verifyIpDialog.getByTestId('button-root').first().click();
+    const selectedOption = type === 'email'
+      ? this.verifyIpDialog.getByRole('button', { name: '이메일 인증', exact: true })
+      : this.verifyIpDialog.getByRole('button', { name: '휴대폰 인증', exact: true });
+
+    await expect(selectedOption).toBeVisible();
+    await selectedOption.click();
+
     const expectedTitle = type === 'email' ? '이메일 인증' : '휴대폰 인증';
-    await expect(this.emailVerificationDialogContent).toContainText(expectedTitle);
+    await expect(this.emailVerificationDialog).toContainText(expectedTitle);
   }
 
   async handleLoginRequiredDialog(email: string, password: string, expectedLoginUrl: string | RegExp, finalExpectedUrl: string | RegExp) {
