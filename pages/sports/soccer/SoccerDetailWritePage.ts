@@ -17,7 +17,7 @@ export class SoccerDetailWritePage extends BasePage {
 
         this.createAnalysisPostPopup = page.locator('[aria-labelledby="analysis-create-new-post-title"]');
         this.popupHeader = page.getByTestId('dialog-title');
-        this.closeBtn = page.getByTestId('dialog-title').locator('svg').nth(1);
+        this.closeBtn = page.getByTestId('dialog-title').locator('svg.tabler-icon-square-x-filled');
 
         this.sportCombo = page.locator('[role="combobox"]').first();
         this.matchCombo = page.locator('[role="combobox"]').last();
