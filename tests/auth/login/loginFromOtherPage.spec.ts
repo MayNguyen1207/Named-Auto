@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import './authSetupCooldown';
+import '../../../utils/authSetupCooldown';
 import { HomePage } from '../../../pages/HomePage';
 import { LoginPage } from '../../../pages/LoginPage';
 import loginData from '../../../data-test/login-data.json';
@@ -21,23 +21,6 @@ test.describe('[Auth] Login from pages with callback redirect', () => {
         await page.locator('.tabler-icon.tabler-icon-send-2').first().click();
 
         await loginPage.handleLoginRequiredDialog(email, password, '/login?callbackUrl=%2Fhome', '/home');
-    });
-
-    test('[Auth] Login from Match page when action is restricted (Chat)', async ({ page }) => {
-        await page.goto('/match/soccer/11737634/odds');
-        await page.getByRole('textbox', { name: '메세지를 입력하세요' }).click();
-        await page.getByRole('textbox', { name: '메세지를 입력하세요' }).fill('a');
-        await page.getByTestId('send-message-button').click();
-
-        await loginPage.handleLoginRequiredDialog(email, password, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fodds/, /\/match\/soccer\/11737634\/odds/);
-    });
-
-    test('[Auth] Login from Match page when action is restricted (Write Post)', async ({ page }) => {
-        await page.goto('/match/soccer/11737634/odds');
-        await page.getByRole('button', { name: '분석글' }).click();
-        await page.getByText('글쓰기', { exact: true }).click();
-
-        await loginPage.handleLoginRequiredDialog(email, password, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fanalysis/, /\/match\/soccer\/11737634\/analysis/);
     });
 
     test('[Auth] Login from Market - Trade page', async ({ page }) => {

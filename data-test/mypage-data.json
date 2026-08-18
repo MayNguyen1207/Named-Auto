@@ -195,5 +195,35 @@
       }
     ],
     "marketUrl": "/market/market?purpose_type=TODAY_WORD&category=community"
+  },
+  "profileImage": {
+    "expectedTexts": {
+      "heading": "프로필 이미지",
+      "sizeNotice": "사이즈 150x150 이상, 최대 용량 1MB입니다",
+      "contentNotice": "선정적이거나 사회적으로 이슈가 되는 이미지 등록은 금지됩니다",
+      "changeItemText": "프로필 이미지 변경권 x1",
+      "countText": "(보유: 0개)",
+      "noItemMessage": "현재 보유하신 프로필 이미지 변경 아이템이 없습니다",
+      "deleteConfirmMessage": "한 번 삭제한 이미지는 복구되지 않습니다. 삭제하시겠습니까?",
+      "invalidFormatMessage": "GIF, JP(E)G, PNG 확장자의 이미지만 업로드 가능합니다.",
+      "smallSizeMessage": "이미지 크기가 너무 작습니다. 150x150 픽셀 이상으로 업로드해 주세요.",
+      "tooLargeMessage": "파일 크기가 너무 큽니다. 1MB 이하로 업로드해 주세요."
+    },
+    "marketUrl": "/market/market?purpose_type=PROFILE&category=community"
+  },
+  "bgImage": {
+    "expectedTexts": {
+      "heading": "프로필 배경 이미지",
+      "sizeNotice": "사이즈 460x300, 최대 용량 1MB입니다.",
+      "contentNotice": "선정적이거나 사회적으로 이슈가 되는 이미지 등록은 금지됩니다.",
+      "changeItemText": "프로필 배경 이미지 변경권 x1",
+      "noItemMessage": "현재 보유하신 프로필 배경 이미지 변경 아이템이 없습니다.",
+      "smallSizeMessage": "이미지 크기가 너무 작습니다. 460x300 픽셀 이상으로 업로드해 주세요.",
+      "tooLargeMessage": "파일 크기가 너무 큽니다. 1MB 이하로 업로드해 주세요.",
+      "invalidFormatMessage": "GIF, JP(E)G, PNG 확장자의 이미지만 업로드 가능합니다.",
+      "countText": "(보유: 0개)",
+      "deleteConfirmMessage": "한 번 삭제한 이미지는 복구되지 않습니다. 삭제하시겠습니까?"
+    },
+    "marketUrl": "/market/market?purpose_type=BACKGROUND&category=community"
   }
-}
+}

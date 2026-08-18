@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import './authSetupCooldown';
+import '../../../utils/authSetupCooldown';
 import { LoginPage } from '../../../pages/LoginPage';
 import loginData from '../../../data-test/login-data.json';
 
@@ -17,9 +17,9 @@ test.describe('[Auth] Normal User Login Feature Tests - Verify IP', () => {
   ] as const;
 
   for (const { method, data } of unauthorizedIpData) {
-    test(`[Auth] Verify IP shows dialog and allows verification flow - ${method.toUpperCase()}`, async ({ page }) => {      
+    test(`[Auth] Verify IP shows dialog and allows verification flow - ${method.toUpperCase()}`, async ({ page }) => {
       await loginPage.login(data.email, data.password);
-      await loginPage.verifyUnauthorizedIpDialog();
+      await loginPage.verifyUnauthorizedIpDialog(method);
 
       await loginPage.proceedToVerificationFromIpDialog(method);
       await loginPage.verifyVerificationDefaultUI(method, data.email);
@@ -43,7 +43,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Verify IP', () => {
       await expect(page).toHaveURL('/home');
     });
   }
-  
+
   test('[Auth] Login with same allowed IP shows success', async ({ page }) => {
     const { email, password } = loginData.sameallowedIpAccount;
     await loginPage.navigate();

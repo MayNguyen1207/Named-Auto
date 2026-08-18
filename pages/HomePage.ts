@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
-export class HomePage{
+export class HomePage {
   readonly page: Page;
   readonly loginLink: Locator;
 
@@ -26,7 +26,7 @@ export class HomePage{
 
   async expectKeepLoginIndicatorVisible(expectedName: string) {
     const userProfile = this.page.getByText(expectedName, { exact: false });
-    
+
     await expect(userProfile).toBeVisible();
     await expect(this.loginLink).toBeHidden();
   }
