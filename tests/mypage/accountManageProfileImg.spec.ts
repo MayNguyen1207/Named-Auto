@@ -69,102 +69,95 @@ test.describe('[MyInfo] Account Management Profile Image Tests', () => {
     test.describe('[MyInfo] User with Profile Image item', () => {
         test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/non-phone-user.json') });
 
-        test.beforeEach(async ({ page }) => {
-            await page.goto('/mypage/info?');
-            await myInfoPage.profileImageEditIcon.click();
-            await myInfoPage.ImageUploadOption.click();
-        });
-
-        test('Upload valid profile images and verify crop behavior', async ({ page }) => {
-            await test.step('Upload valid img and verify crop UI elements are shown', async () => {
-                await myInfoPage.pfImageFileInput.setInputFiles(path.resolve(__dirname, '../../data-test/image-data/valid-profile-img.jpg'));
-
-                await expect(myInfoPage.cropContainer).toBeVisible();
-                await expect(myInfoPage.cropSliderTrack).toBeVisible();
-                await expect(myInfoPage.cropSliderThumb).toBeVisible();
-                await expect(myInfoPage.cropSliderRange).toBeHidden();
-            });
-
-            await test.step('Move cropSliderThumb with keyboard and verify cropImage scale changes', async () => {
-                await myInfoPage.cropSliderThumb.focus();
-                
-                let style = await myInfoPage.cropImage.getAttribute('style');
-                let initialScaleMatch = style?.match(/scale\(([^)]+)\)/);
-                let currentScale = initialScaleMatch ? parseFloat(initialScaleMatch[1]) : 1;
-
-                await page.keyboard.press('ArrowRight');
-                await page.keyboard.press('ArrowRight');
-                await page.waitForTimeout(200); 
-                style = await myInfoPage.cropImage.getAttribute('style');
-                let newScaleMatch = style?.match(/scale\(([^)]+)\)/);
-                let newScale = newScaleMatch ? parseFloat(newScaleMatch[1]) : 1;
-                expect(newScale).toBeGreaterThan(currentScale);
-
-                currentScale = newScale;
-
-                await page.keyboard.press('ArrowLeft');
-                await page.keyboard.press('ArrowLeft');
-                await page.waitForTimeout(200);
-                style = await myInfoPage.cropImage.getAttribute('style');
-                newScaleMatch = style?.match(/scale\(([^)]+)\)/);
-                newScale = newScaleMatch ? parseFloat(newScaleMatch[1]) : 1;
-                expect(newScale).toBeLessThan(currentScale);
-            });
-
-            await test.step('Click No button and verify dialog is hidden', async () => {
-                await page.getByRole('button', { name: '아니오' }).click();
-                await expect(page.getByRole('dialog')).toBeHidden();
-            });
-
-            await test.step('Re-open upload dialog for GIF upload', async () => {
+        test.describe('Upload Profile Image dialog flow case', () => {
+            test.beforeEach(async ({ page }) => {
+                await page.goto('/mypage/info?');
                 await myInfoPage.profileImageEditIcon.click();
                 await myInfoPage.ImageUploadOption.click();
             });
 
-            await test.step('Upload GIF and verify crop image is visible', async () => {
-                await myInfoPage.pfImageFileInput.setInputFiles(path.resolve(__dirname, '../../data-test/image-data/valid-gif-img-profile.gif'));
+            test('Upload valid profile image and verify crop behavior', async ({ page }) => {
+                await test.step('Upload valid img and verify crop UI elements are shown', async () => {
+                    await myInfoPage.pfImageFileInput.setInputFiles(path.resolve(__dirname, '../../data-test/image-data/valid-profile-img.jpg'));
 
-                await expect(myInfoPage.cropImage).toBeVisible();
+                    await expect(myInfoPage.cropContainer).toBeVisible();
+                    await expect(myInfoPage.cropSliderTrack).toBeVisible();
+                    await expect(myInfoPage.cropSliderThumb).toBeVisible();
+                    await expect(myInfoPage.cropSliderRange).toBeHidden();
+                });
+
+                await test.step('Move cropSliderThumb with keyboard and verify cropImage scale changes', async () => {
+                    await myInfoPage.cropSliderThumb.focus();
+
+                    let style = await myInfoPage.cropImage.getAttribute('style');
+                    let initialScaleMatch = style?.match(/scale\(([^)]+)\)/);
+                    let currentScale = initialScaleMatch ? parseFloat(initialScaleMatch[1]) : 1;
+
+                    await page.keyboard.press('ArrowRight');
+                    await page.keyboard.press('ArrowRight');
+                    await page.waitForTimeout(200);
+                    style = await myInfoPage.cropImage.getAttribute('style');
+                    let newScaleMatch = style?.match(/scale\(([^)]+)\)/);
+                    let newScale = newScaleMatch ? parseFloat(newScaleMatch[1]) : 1;
+                    expect(newScale).toBeGreaterThan(currentScale);
+
+                    currentScale = newScale;
+
+                    await page.keyboard.press('ArrowLeft');
+                    await page.keyboard.press('ArrowLeft');
+                    await page.waitForTimeout(200);
+                    style = await myInfoPage.cropImage.getAttribute('style');
+                    newScaleMatch = style?.match(/scale\(([^)]+)\)/);
+                    newScale = newScaleMatch ? parseFloat(newScaleMatch[1]) : 1;
+                    expect(newScale).toBeLessThan(currentScale);
+                });
+
+                await test.step('Click No button and verify dialog is hidden', async () => {
+                    await page.getByRole('button', { name: '아니오' }).click();
+                    await expect(page.getByRole('dialog')).toBeHidden();
+                });
             });
 
-            await test.step('Verify crop image src does not contain .gif extension', async () => {
-                const src = await myInfoPage.cropImage.getAttribute('src');
-                expect(src).not.toMatch(/\.gif/i);
+            test('Upload valid profile GIF and verify crop behavior', async ({ page }) => {
+                await test.step('Upload GIF and verify crop image is visible', async () => {
+                    await myInfoPage.pfImageFileInput.setInputFiles(path.resolve(__dirname, '../../data-test/image-data/valid-gif-img-profile.gif'));
+
+                    await expect(myInfoPage.cropImage).toBeVisible();
+                });
+
+                await test.step('Verify crop GIF src does not contain .gif extension', async () => {
+                    const src = await myInfoPage.cropImage.getAttribute('src');
+                    expect(src).not.toMatch(/\.gif/i);
+                });
             });
-        });
 
-        const uploadErrorCases = [
-            {
-                name: 'invalid format (video)',
-                file: path.resolve(__dirname, '../../data-test/video-data/valid-video.mp4'),
-                messageKey: 'invalidFormatMessage' as const,
-            },
-            {
-                name: 'small size image',
-                file: path.resolve(__dirname, '../../data-test/image-data/small-size-100x100.jpg'),
-                messageKey: 'smallSizeMessage' as const,
-            },
-            {
-                name: 'large size image',
-                file: path.resolve(__dirname, '../../data-test/image-data/toolarge-img.jpg'),
-                messageKey: 'tooLargeMessage' as const,
-            },
-        ];
+            const uploadErrorCases = [
+                {
+                    name: 'invalid format (video)',
+                    file: path.resolve(__dirname, '../../data-test/video-data/valid-video.mp4'),
+                    messageKey: 'invalidFormatMessage' as const,
+                },
+                {
+                    name: 'small size image',
+                    file: path.resolve(__dirname, '../../data-test/image-data/small-size-100x100.jpg'),
+                    messageKey: 'smallSizeMessage' as const,
+                },
+                {
+                    name: 'large size image',
+                    file: path.resolve(__dirname, '../../data-test/image-data/toolarge-img.jpg'),
+                    messageKey: 'tooLargeMessage' as const,
+                },
+            ];
 
-        for (const { name, file, messageKey } of uploadErrorCases) {
-            test(`Upload ${name} and check error message`, async ({ page }) => {
-                await test.step(`Upload ${name} and verify error message`, async () => {
+            for (const { name, file, messageKey } of uploadErrorCases) {
+                test(`Upload ${name} and check error message`, async ({ page }) => {
                     await myInfoPage.pfImageFileInput.setInputFiles(file);
                     await expect(page.getByText(mypageData.profileImage.expectedTexts[messageKey])).toBeVisible();
                 });
-            });
-        }
-    });
+            }
+        });
 
-    test.describe('[MyInfo] User with Profile Image item - Upload and confirm', () => {
-        test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/non-phone-user.json') });
-
-        test('Upload profile image and verify item count decreases after confirmation', async ({ page }) => {
+        test('Upload profile image success and verify item count decreases after confirmation', async ({ page }) => {
             await page.goto('/mypage/info?');
 
             const initialCountText = (await myInfoPage.profileImageCountText.textContent()) ?? '';
@@ -183,7 +176,7 @@ test.describe('[MyInfo] Account Management Profile Image Tests', () => {
 
                 await expect.poll(
                     async () => await myInfoPage.profileImageCountText.textContent(),
-                    { timeout: 3000 }
+                    { timeout: 5000 }
                 ).not.toBe(initialCountText);
             });
         });

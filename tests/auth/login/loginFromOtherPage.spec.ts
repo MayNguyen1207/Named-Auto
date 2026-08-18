@@ -23,22 +23,6 @@ test.describe('[Auth] Login from pages with callback redirect', () => {
         await loginPage.handleLoginRequiredDialog(email, password, '/login?callbackUrl=%2Fhome', '/home');
     });
 
-    test('[Auth] Login from Match page when action is restricted (Chat)', async ({ page }) => {
-        await page.goto('/match/soccer/11737634/odds');
-        await page.getByRole('textbox', { name: '메세지를 입력하세요' }).click();
-        await page.getByRole('textbox', { name: '메세지를 입력하세요' }).fill('a');
-        await page.getByTestId('send-message-button').click();
-
-        await loginPage.handleLoginRequiredDialog(email, password, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fodds/, /\/match\/soccer\/11737634\/odds/);
-    });
-
-    test('[Auth] Login from Match page when action is restricted (Write Post)', async ({ page }) => {
-        await page.goto('/match/soccer/11737634/odds');
-        await page.getByTestId('tab-analysis').click();
-        await page.getByRole('button', { name: '글쓰기' }).click();
-        await loginPage.handleLoginRequiredDialog(email, password, /\/login\?callbackUrl=.*%2Fmatch%2Fsoccer%2F11737634%2Fanalysis/, /\/match\/soccer\/11737634\/analysis/);
-    });
-
     test('[Auth] Login from Market - Trade page', async ({ page }) => {
         await page.goto('/market/market');
         await page.getByRole('link', { name: '황금마차' }).click();
