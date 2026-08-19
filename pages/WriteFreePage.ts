@@ -56,6 +56,8 @@ export class WriteFreePage extends BasePage {
     readonly authorCommandRoot: Locator;
     readonly authorSearchInput: Locator;
     readonly authorItem: Locator;
+    readonly noAuthorResult: Locator;
+    readonly resetSelectionBtn: Locator;
 
     constructor(page: Page) {
         super(page);
@@ -106,8 +108,10 @@ export class WriteFreePage extends BasePage {
 
         this.authorPickerTrigger = page.getByTestId('community-comment-author-selection');
         this.authorCommandRoot = page.getByTestId('command-root');
-        this.authorSearchInput = this.authorCommandRoot.getByTestId('command-input-wrapper');
+        this.authorSearchInput = this.authorCommandRoot.getByTestId('command-input');
         this.authorItem = this.authorCommandRoot.getByTestId('command-item');
+        this.noAuthorResult = this.authorCommandRoot.getByTestId('command-empty');
+        this.resetSelectionBtn = this.authorPickerTrigger.locator('svg.tabler-icon-square-x-filled');
     }
 
     async navigate() {
@@ -243,6 +247,9 @@ export class WriteFreePage extends BasePage {
 
     async searchAuthor(keyword: string) {
         await this.authorPickerTrigger.click();
+        await expect(this.authorItem.first()).toBeVisible();
+        await expect(this.authorSearchInput).toHaveAttribute('placeholder', 'ID 또는 닉네임을 입력하세요.')
         await this.authorSearchInput.fill(keyword);
+        await expect(this.authorSearchInput).toHaveValue(keyword);
     }
 }

@@ -159,6 +159,7 @@
     "email": "manager_turnover@named.com",
     "password": "geH2A_tf7hDg2xK",
     "expectedUsername": "[NM]Turnover",
+    "expectedLevel": "슈퍼관리자",
     "fakeIp": "203.119.34.12",
     "expectedErrorMessage": "관리자 로그인이 허용되지 않은 IP입니다."
   },

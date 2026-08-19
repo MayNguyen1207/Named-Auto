@@ -227,7 +227,7 @@ test.describe('Guest Flow', () => {
     });
 
     test('[Soccer] Team scores should display correctly for various match states with mocked API', async ({ page }) => {
-        const { nowMs, toKSTString, baseGame, mkTeam } = soccerListPage.getMockHelpers();
+        const { baseGame, mkTeam } = soccerListPage.getMockHelpers();
         const mockGames: any[] = [
             { id: 7, ...baseGame, gameStatus: 'BREAK_TIME', teams: { home: mkTeam('T13', 113, [{ period: 1, score: 2 }]), away: mkTeam('T14', 114, [{ period: 1, score: 0 }]) } },
             { id: 2, ...baseGame, gameStatus: 'IN_PROGRESS', period: 1, teams: { home: mkTeam('T3', 103, [{ period: 1, score: 1 }]), away: mkTeam('T4', 104, [{ period: 1, score: 0 }]) } },
