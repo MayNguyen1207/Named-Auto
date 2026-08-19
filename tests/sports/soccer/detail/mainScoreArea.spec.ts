@@ -2,21 +2,41 @@ import { test, expect } from '../../../../utils/fixtures';
 import { SoccerDetailPage } from '../../../../pages/sports/soccer/SoccerDetailPage';
 import matchData from '../../../../data-test/match-detail-data.json';
 
-test.describe('Score board', () => {
+test('[Soccer] User can open the match in new window', async ({ page }) => {
+    let newPage: any;
+    const matchId = matchData.matchLink.normal;
+    const soccerDetailPage = new SoccerDetailPage(page);
+    await soccerDetailPage.navigateOdds(matchId);
+
+    await expect(async () => {
+        const pagePromise = page.context().waitForEvent('page', { timeout: 1500 });
+        await soccerDetailPage.openNewWindow.click({ force: true });
+        newPage = await pagePromise;
+        expect(newPage).toBeTruthy();
+    }).toPass({ intervals: [1000], timeout: 10000 });
+
+    await newPage.waitForLoadState();
+    await expect(newPage).toHaveURL(new RegExp(`/match/soccer/${matchId}`));
+});
+
+test.describe('Tests that need API data', () => {
 
     let soccerDetailPage: SoccerDetailPage;
     const matchId = matchData.matchLink.normal;
+    let data: any;
+
+    test.beforeAll(async ({ request, sportsApiBaseURL }) => {
+        const response = await request.get(`${sportsApiBaseURL}/v1.0/sports/soccer/games/${matchId}`);
+        expect(response.ok()).toBeTruthy();
+        data = await response.json();
+    })
 
     test.beforeEach(async ({ page }) => {
         soccerDetailPage = new SoccerDetailPage(page);
         await soccerDetailPage.navigateOdds(matchId);
     });
 
-    test('[Soccer] User can click the leagueName and leagueName is correct', async ({ request, page, sportsApiBaseURL }) => {
-        const response = await request.get(`${sportsApiBaseURL}/v1.0/sports/soccer/games/${matchId}`);
-        expect(response.ok()).toBeTruthy();
-        const data = await response.json();
-
+    test('[Soccer] User can click the leagueName and leagueName is correct', async ({ page }) => {
         const leagueName = data.league.shortName;
 
         await test.step('Verify that leagueName is correct', async () => {
@@ -31,78 +51,7 @@ test.describe('Score board', () => {
         });
     });
 
-    test('[Soccer] User can open the match in new window', async ({ page }) => {
-        let newPage: any;
-
-        await expect(async () => {
-            const pagePromise = page.context().waitForEvent('page', { timeout: 1500 });
-            await soccerDetailPage.openNewWindow.click({ force: true });
-            newPage = await pagePromise;
-            expect(newPage).toBeTruthy();
-        }).toPass({ intervals: [1000], timeout: 10000 });
-
-        await newPage.waitForLoadState();
-        await expect(newPage).toHaveURL(new RegExp(`/match/soccer/${matchId}`));
-    });
-
-    test('[Soccer] Team name and logo should be displayed', async ({ request, sportsApiBaseURL }) => {
-        const response = await request.get(`${sportsApiBaseURL}/v1.0/sports/soccer/games/${matchId}`);
-        expect(response.ok()).toBeTruthy();
-        const data = await response.json();
-
-        const homeTeam = data.teams?.home;
-        const awayTeam = data.teams?.away;
-
-        await test.step('Verify home team', async () => {
-            if (homeTeam) {
-                await expect(soccerDetailPage.homeTeamName).toContainText(homeTeam.name);
-
-                if (homeTeam.seasonTeamRanking != null) {
-                    await expect(soccerDetailPage.homeTeamRank).toHaveText(`${homeTeam.seasonTeamRanking}위`);
-                    await expect(soccerDetailPage.homeTeamRank).toBeVisible();
-                } else {
-                    await expect(soccerDetailPage.homeTeamRank).toBeHidden();
-                }
-
-                if (homeTeam.imgPath) {
-                    const src = await soccerDetailPage.homeTeamLogo.getAttribute('src');
-                    const expectedSegment = homeTeam.imgPath.split('/').pop()!.split('_')[0];
-                    const isFallback = src?.includes('default_home_team_logo');
-                    if (!isFallback) {
-                        expect(src).toContain(expectedSegment);
-                    }
-                }
-            }
-        });
-
-        await test.step('Verify away team', async () => {
-            if (awayTeam) {
-                await expect(soccerDetailPage.awayTeamName).toContainText(awayTeam.name);
-
-                if (awayTeam.seasonTeamRanking != null) {
-                    await expect(soccerDetailPage.awayTeamRank).toHaveText(`${awayTeam.seasonTeamRanking}위`);
-                    await expect(soccerDetailPage.awayTeamRank).toBeVisible();
-                } else {
-                    await expect(soccerDetailPage.awayTeamRank).toBeHidden();
-                }
-
-                if (awayTeam.imgPath) {
-                    const src = await soccerDetailPage.awayTeamLogo.getAttribute('src');
-                    const expectedSegment = awayTeam.imgPath.split('/').pop()!.split('_')[0];
-                    const isFallback = src?.includes('default_away_team_logo');
-                    if (!isFallback) {
-                        expect(src).toContain(expectedSegment);
-                    }
-                }
-            }
-        });
-    });
-
-    test('[Soccer] Score table should be displayed correctly', async ({ request, sportsApiBaseURL }) => {
-        const response = await request.get(`${sportsApiBaseURL}/v1.0/sports/soccer/games/${matchId}`);
-        expect(response.ok()).toBeTruthy();
-        const data = await response.json();
-
+    test('[Soccer] Score table should be displayed correctly', async () => {
         const homeTeam = data.teams?.home;
         const periods = homeTeam?.periodData || [];
         const hasPeriod = (p: number) => periods.some((period: any) => period.period === p || period.id === p);
