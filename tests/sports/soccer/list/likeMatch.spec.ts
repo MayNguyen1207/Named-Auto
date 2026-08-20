@@ -28,8 +28,7 @@ test.describe('Guest Flow', () => {
     });
 
     test('[Soccer] Guest can like and unlike matches', async ({ page }) => {
-        test.fail(true, 'https://vincoholdinglp.atlassian.net/browse/NOS-17681');
-        
+        test.fail(true, 'https://vincoholdinglp.atlassian.net/browse/NOS-17815');
         await test.step('Verify that favTab shows the count of liked matches', async () => {
             await expect(soccerListPage.favTab).toHaveText(`관심 경기 (${likedHrefs.length})`);
         });

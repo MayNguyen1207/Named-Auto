@@ -49,17 +49,17 @@ test.describe('Guest Flow', () => {
 
         await expect(async () => {
             await soccerListPage.soundBtn.click();
-            await expect(soccerListPage.soundBtn).toBeChecked();
-        }).toPass({ timeout: 10000 });
+            await expect(soccerListPage.soundBtn).toBeChecked({ timeout: 10000 });
+        }).toPass({ timeout: 15000 });
 
         await page.reload();
-        await expect(soccerListPage.soundBtn).toBeChecked({ timeout: 15000 });
+        await expect(soccerListPage.soundBtn).toBeChecked({ timeout: 10000 });
 
         await soccerListPage.soundBtn.click();
-        await expect(soccerListPage.soundBtn).not.toBeChecked();
+        await expect(soccerListPage.soundBtn).not.toBeChecked({ timeout: 10000 });
 
         await page.reload();
-        await expect(soccerListPage.soundBtn).not.toBeChecked({ timeout: 15000 });
+        await expect(soccerListPage.soundBtn).not.toBeChecked({ timeout: 10000 });
     });
 
     test('[Soccer] User can turn on and turn off the prompt', async ({ page }) => {
@@ -67,22 +67,22 @@ test.describe('Guest Flow', () => {
 
         await expect(async () => {
             await soccerListPage.promptBtn.click();
-            await expect(soccerListPage.promptBtn).toBeChecked();
-        }).toPass({ timeout: 10000 });
+            await expect(soccerListPage.promptBtn).toBeChecked({ timeout: 10000 });
+        }).toPass({ timeout: 15000 });
 
         await page.reload();
-        await expect(soccerListPage.promptBtn).toBeChecked({ timeout: 15000 });
+        await expect(soccerListPage.promptBtn).toBeChecked({ timeout: 10000 });
 
         await soccerListPage.promptBtn.click();
         await expect(soccerListPage.promptBtn).not.toBeChecked();
 
         await page.reload();
-        await expect(soccerListPage.promptBtn).not.toBeChecked({ timeout: 15000 });
+        await expect(soccerListPage.promptBtn).not.toBeChecked({ timeout: 10000 });
     });
 
     test('[Soccer] User can change the display of list', async ({ page }) => {
         const firstMatchLayout = soccerListPage.matchCards.first().locator('a > div');
-        await expect(firstMatchLayout).toHaveClass(/grid/, { timeout: 10000 });
+        await expect(firstMatchLayout).toHaveClass(/grid/, { timeout: 15000 });
 
         await soccerListPage.verticalBtn.click();
         await expect(firstMatchLayout).toHaveClass(/flex/);

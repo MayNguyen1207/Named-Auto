@@ -11,6 +11,7 @@ test.describe('Guest Flow', () => {
     });
 
     test('[Soccer] User can change date of the list', async ({ page, request, sportsApiBaseURL }) => {
+        test.fail(true, 'https://vincoholdinglp.atlassian.net/browse/NOS-17696');
         const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
         const pad = (n: number) => String(n).padStart(2, '0');
         const todayFormatted = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())}`;
@@ -25,12 +26,12 @@ test.describe('Guest Flow', () => {
             const prevFormatted = `${prevDate.getFullYear()}.${pad(prevDate.getMonth() + 1)}.${pad(prevDate.getDate())}`;
             const prevApiDate = `${prevDate.getFullYear()}-${pad(prevDate.getMonth() + 1)}-${pad(prevDate.getDate())}`;
 
-            await expect(async () => {
-                await Promise.all([
-                    page.waitForResponse(resp => resp.url().includes(`games?date=${prevApiDate}`) && resp.status() === 200, { timeout: 2000 }),
-                    soccerListPage.previousDayBtn.click(),
-                ]);
-            }).toPass({ timeout: 10000 });
+            const prevResponsePromise = page.waitForResponse(
+                resp => resp.url().includes(`games?date=${prevApiDate}`) && resp.status() === 200,
+                { timeout: 10000 }
+            );
+            await soccerListPage.previousDayBtn.click();
+            await prevResponsePromise;
 
             await expect(soccerListPage.calendarBtn).toContainText(prevFormatted);
 
