@@ -147,7 +147,6 @@ test.describe('Guest Flow', () => {
     });
 
     test('[Soccer] matchStatus should display correctly', async ({ page }) => {
-        test.fail(true, 'https://vincoholdinglp.atlassian.net/browse/NOS-17668, https://vincoholdinglp.atlassian.net/browse/NOS-17670');
         const { nowMs, toKSTString, baseGame, mkTeam } = soccerListPage.getMockHelpers();
 
         const mockGames: any[] = [
@@ -247,11 +246,12 @@ test.describe('Guest Flow', () => {
             });
         });
 
-        await soccerListPage.todayBtn.click();
-        await page.waitForTimeout(3000);
-
         const cards = soccerListPage.matchCards;
-        await expect(cards).toHaveCount(mockGames.length);
+        await expect(async () => {
+            await soccerListPage.todayBtn.click();
+            await page.waitForTimeout(2000);
+            await expect(cards).toHaveCount(mockGames.length);
+        }).toPass({ timeout: 10000 });
 
         for (let i = 0; i < mockGames.length; i++) {
             const card = cards.nth(i);

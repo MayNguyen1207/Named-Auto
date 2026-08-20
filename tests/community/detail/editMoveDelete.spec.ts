@@ -95,7 +95,6 @@ test.describe('Normal User Flow', () => {
             await writeFreePage.writePost(data.title, data.content);
             switch (data.id) {
                 case 'spaceTitle':
-                    test.fail(true, 'https://vincoholdinglp.atlassian.net/browse/NOS-17700');
                     await expect(writeFreePage.writeBtn).toBeDisabled();
                     await writeFreePage.titleInput.clear();
                     await expect(writeFreePage.titleErrorMsg).toBeVisible();

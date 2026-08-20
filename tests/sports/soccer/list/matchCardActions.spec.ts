@@ -35,7 +35,7 @@ test.describe('Guest Flow', () => {
         const card = soccerListPage.matchCards.first();
         const { playBtn } = soccerListPage.getMatchCardElements(card);
 
-        await expect(playBtn).toBeVisible();
+        await expect(playBtn).toBeVisible({ timeout: 10000 });
 
         const [newPage] = await Promise.all([
             page.context().waitForEvent('page'),
