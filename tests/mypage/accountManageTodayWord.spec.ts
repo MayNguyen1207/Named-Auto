@@ -66,7 +66,7 @@ test.describe('[MyInfo] Account Management Today Word Tests', () => {
             await test.step('Verify Today Word dialog input validation messages', async () => {
                 for (const scenario of mypageData.todayWord.validations) {
                     await myInfoPage.fillTodayWordInput(scenario.input);
-                    await expect(page.getByText(scenario.message, { exact: true })).toBeVisible();
+                    await expect(page.locator('p').filter({ hasText: scenario.message })).toBeVisible();
                 }
             });
 

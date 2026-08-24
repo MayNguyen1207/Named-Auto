@@ -11,7 +11,7 @@ test.describe('[MyInfo] Account Management Nickname Tests', () => {
     });
 
     test.describe('[MyInfo] User without Nickname item', () => {
-        test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/user.json') });
+        test.use({ storageState: path.resolve(__dirname, '../../playwright/.auth/non-verified-user.json') });
 
         test.beforeEach(async ({ page }) => {
             await page.goto('/mypage/info?');

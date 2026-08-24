@@ -81,7 +81,7 @@ export class LoginPage {
     // Inactive-account dialog
     this.inactiveAccountDialog = page.getByRole('dialog', { name: 'Inactive Account' });
     this.inactiveAccountDialogContent = page.getByTestId('dialog-content');
-    this.inactiveAccountActivateButton = page.getByTestId('inactive-account-activate-button');
+    this.inactiveAccountActivateButton = page.getByTestId('unauthorized-ip-verify-button');
     this.goToMainPageButton = page.getByRole('button', { name: '메인페이지로 이동' });
 
     // IP-verification dialog

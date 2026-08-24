@@ -123,6 +123,37 @@ export class MyInfoPage extends BasePage {
     readonly bgImagePurchaseButton: Locator;
     readonly bgImageFileInput: Locator;
 
+    //IP
+    readonly addIPButton: Locator;
+    readonly deleteIPButton: Locator;
+    readonly ipAddDialogHeading: Locator;
+    readonly ipSettingLabel: Locator;
+    readonly autoInputRadio: Locator;
+    readonly manualInputRadio: Locator;
+    readonly ipNameTextbox: Locator;
+    readonly ipNameLabel: Locator;
+    readonly ipDialogCancelBtn: Locator;
+    readonly ipDialogSubmitBtn: Locator;
+
+    // Login History
+    readonly loginHistoryLink: Locator;
+    readonly loginHistoryHeading: Locator;
+    readonly loginHistoryCalendarButton: Locator;
+    readonly loginHistoryTable: Locator;
+    readonly loginHistorySelectTrigger: Locator;
+    readonly loginHistoryChevronLeft: Locator;
+    readonly loginHistoryChevronRight: Locator;
+    readonly loginHistoryMorePages: Locator;
+    readonly loginHistoryLastPageButton: Locator;
+    readonly loginHistoryCalendarPopover: Locator;
+    readonly loginHistoryCloseButton: Locator;
+    readonly loginHistoryDateFilterTrigger: Locator;
+    readonly loginHistoryTodayButton: Locator;
+    readonly loginHistoryItemsPerPageCombo: Locator;
+    readonly loginHistoryScrollThumb: Locator;
+
+
+
     constructor(page: Page) {
         super(page);
 
@@ -210,7 +241,7 @@ export class MyInfoPage extends BasePage {
 
         // Today Word
         this.todayWordInput = page.getByRole('textbox', { name: '오늘의 한마디' });
-        this.todayWordPurchaseButton = page.getByRole('button', { name: '구매하기' }).nth(1);
+        this.todayWordPurchaseButton = page.getByRole('button', { name: '구매하기' }).first();
         this.todayWordPurchaseLink = page.locator('a').filter({ hasText: '구매하기' }).nth(2);
         this.todayWordChangeButton = page.locator('button').filter({ hasText: '변경하기' }).nth(2);
         this.todayWordDialogInput = page.getByRole('textbox', { name: '오늘의 한마디를 입력해 주세요.' });
@@ -226,10 +257,10 @@ export class MyInfoPage extends BasePage {
         this.profileImageHeading = page.getByRole('heading', { name: '프로필 이미지' });
         this.profileImageChangeItemText = page.getByText('프로필 이미지 변경권 x1', { exact: true });
         this.profileImageItemIcon = page.getByRole('img', { name: '프로필 이미지 변경권' });
-        this.profileImageCountText = page.locator('span').filter({ hasText: /\(보유: \d+개\)/ }).first();
-        this.profileImagePurchaseButton = page.locator('button').filter({ hasText: '구매하기' }).nth(2);
+        this.profileImageCountText = page.locator('span').filter({ hasText: /\(보유: \d+개\)/ }).nth(4);
+        this.profileImagePurchaseButton = page.locator('button').filter({ hasText: '구매하기' }).nth(1);
         this.pfImageFileInput = page.getByRole('button', { name: 'Choose File' }).nth(2);
-        
+
 
         // Background Image
         this.bgImage = page.locator('img.object-cover.rounded-full').nth(1);
@@ -238,7 +269,7 @@ export class MyInfoPage extends BasePage {
         this.bgImageChangeItemText = page.getByText('프로필 배경 이미지 변경권 x1', { exact: true });
         this.bgImageItemIcon = page.getByRole('img', { name: '프로필 배경 이미지 변경권' });
         this.bgImageCountText = page.getByText(/\(보유: \d+개\)/).nth(5);
-        this.bgImagePurchaseButton = page.locator('button').filter({ hasText: '구매하기' }).nth(3);
+        this.bgImagePurchaseButton = page.locator('button').filter({ hasText: '구매하기' }).nth(2);
 
         // Image Upload Options
         this.ImageUploadOption = page.getByText('업로드하기');
@@ -250,8 +281,34 @@ export class MyInfoPage extends BasePage {
         this.cropImage = page.locator('img.reactEasyCrop_Image');
         this.pfImageFileInput = page.getByRole('button', { name: 'Choose File' }).nth(2);
         this.bgImageFileInput = page.getByRole('button', { name: 'Choose File' }).nth(3);
-        
 
+        // IP
+        this.addIPButton = page.getByRole('button', { name: '추가하기' });
+        this.deleteIPButton = page.locator('.tabler-icon.tabler-icon-trash');
+        this.ipAddDialogHeading = page.getByRole('heading', { name: 'IP 추가하기' });
+        this.ipSettingLabel = page.getByText('IP 설정', { exact: true });
+        this.autoInputRadio = page.getByRole('radio', { name: '자동 입력' });
+        this.manualInputRadio = page.getByRole('radio', { name: '수동 입력' });
+        this.ipNameTextbox = page.getByRole('textbox', { name: '등록 IP명 - 예: 집, 사무실 등' });
+        this.ipNameLabel = page.getByLabel('등록 IP명 - 예: 집, 사무실 등');
+        this.ipDialogCancelBtn = page.getByRole('button', { name: '취소' });
+        this.ipDialogSubmitBtn = page.locator('button').filter({ hasText: '추가하기' }).nth(1);
+
+        // Login History
+        this.loginHistoryLink = page.getByText('로그인 기록 보기', { exact: true });
+        this.loginHistoryHeading = page.getByRole('heading', { name: '로그인 기록' });
+        this.loginHistoryCalendarButton = page.getByRole('button', { name: '달력' });
+        this.loginHistoryTable = page.locator('table.w-full.caption-bottom.text-xs');
+        this.loginHistorySelectTrigger = page.getByTestId('select-trigger');
+        this.loginHistoryChevronLeft = page.locator('.tabler-icon.tabler-icon-chevron-left');
+        this.loginHistoryChevronRight = page.locator('.tabler-icon.tabler-icon-chevron-right');
+        this.loginHistoryMorePages = page.getByText('More pages', { exact: true });
+        this.loginHistoryLastPageButton = page.getByRole('button', { name: /^[0-9]+$/ }).last();
+        this.loginHistoryCalendarPopover = page.getByTestId('popover-content');
+        this.loginHistoryCloseButton = page.getByRole('dialog').locator('svg.cursor-pointer');
+        this.loginHistoryDateFilterTrigger = page.getByTestId('scroll-area-viewport').getByTestId('popover-trigger');
+        this.loginHistoryTodayButton = page.getByRole('button', { name: '오늘' });
+        this.loginHistoryScrollThumb = page.getByTestId('scroll-area-thumb');
     }
 
     // Private Helpers 
@@ -624,7 +681,6 @@ export class MyInfoPage extends BasePage {
         if (input !== '') {
             await this.todayWordDialogInput.fill(input);
         }
-        await this.todayWordDialogSubmitButton.click();
     }
 
     // Background Image
@@ -640,6 +696,37 @@ export class MyInfoPage extends BasePage {
             this.bgImageCountText,
             this.bgImagePurchaseButton
         );
+    }
+
+    async verifyAddIPDialogUI(expectedTexts: {
+        dialogHeading: string;
+        ipSetting: string;
+        autoInput: string;
+        manualInput: string;
+        ipNamePlaceholder: string;
+        notice1: string;
+        notice2: string;
+        notice3: string;
+        cancelBtn: string;
+        submitBtn: string;
+    }, currentIpParts: string[]) {
+        await expect(this.dialog).toBeVisible();
+        await expect(this.ipAddDialogHeading).toHaveText(expectedTexts.dialogHeading);
+        await expect(this.ipSettingLabel).toBeVisible();
+        await expect(this.autoInputRadio).toBeVisible();
+        await expect(this.manualInputRadio).toBeVisible();
+
+        for (const part of currentIpParts) {
+            await expect(this.page.locator(`input[value='${part}']`)).toBeVisible();
+        }
+
+        await expect(this.ipNameTextbox).toBeVisible();
+        await expect(this.ipNameLabel).toBeVisible();
+        await expect(this.page.getByText(expectedTexts.notice1, { exact: true })).toBeVisible();
+        await expect(this.page.getByText(expectedTexts.notice2, { exact: true })).toBeVisible();
+        await expect(this.page.getByText(expectedTexts.notice3, { exact: true })).toBeVisible();
+        await expect(this.ipDialogCancelBtn).toBeVisible();
+        await expect(this.ipDialogSubmitBtn).toBeVisible();
     }
 
 }
