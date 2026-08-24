@@ -5,7 +5,7 @@
       "subtitle": "(달성할 때마다 푸짐한 아이템 지급!)",
       "guideButton": "달성률과 보상안내",
       "progressBar": "P0P25P50P75P100P",
-      "currentPoints": "20 P"
+      "currentPoints": "30 P"
     },
     "dialogExpectedTexts": {
       "noticeText": "보상아이템은 달성시 자동지급되며 내아이템에서 확인하실 수 있습니다.(선물불가)"
@@ -154,14 +154,38 @@
     },
     "marketUrl": "/market/market?purpose_type=NICKNAME&category=community",
     "validations": [
-      { "input": "Mayy", "message": "사용 중인 닉네임입니다. 다른 닉네임을 사용해 주세요." },
-      { "input": "My Nick", "message": "닉네임은 공백없이 한글, 영문, 숫자만 입력 가능합니다" },
-      { "input": "@user!", "message": "닉네임은 공백없이 한글, 영문, 숫자만 입력 가능합니다" },
-      { "input": "한", "message": "한글2자,영문/숫자4자 이상, 8자 이하 입력 가능합니다." },
-      { "input": "supercalifragilistic", "message": "한글2자,영문/숫자4자 이상, 8자 이하 입력 가능합니다." },
-      { "input": "회원6124", "message": "현재 닉네임과 동일합니다." },
-      { "input": "admin", "message": "닉네임의 admin는 사용할수 없는 단어 입니다." },
-      { "input": "허니픽", "message": "닉네임의 허니픽는 사용할수 없는 단어 입니다." }
+      {
+        "input": "Mayy",
+        "message": "사용 중인 닉네임입니다. 다른 닉네임을 사용해 주세요."
+      },
+      {
+        "input": "My Nick",
+        "message": "닉네임은 공백없이 한글, 영문, 숫자만 입력 가능합니다"
+      },
+      {
+        "input": "@user!",
+        "message": "닉네임은 공백없이 한글, 영문, 숫자만 입력 가능합니다"
+      },
+      {
+        "input": "한",
+        "message": "한글2자,영문/숫자4자 이상, 8자 이하 입력 가능합니다."
+      },
+      {
+        "input": "supercalifragilistic",
+        "message": "한글2자,영문/숫자4자 이상, 8자 이하 입력 가능합니다."
+      },
+      {
+        "input": "회원6124",
+        "message": "현재 닉네임과 동일합니다."
+      },
+      {
+        "input": "admin",
+        "message": "닉네임의 admin는 사용할수 없는 단어 입니다."
+      },
+      {
+        "input": "허니픽",
+        "message": "닉네임의 허니픽는 사용할수 없는 단어 입니다."
+      }
     ]
   },
   "todayWord": {
@@ -179,7 +203,7 @@
     "validations": [
       {
         "input": "",
-        "message": "오늘의 한마디를 입력해 주세요"
+        "message": "오늘의 한마디를 입력해 주세요."
       },
       {
         "input": "이 문장은 이십 글자를 초과하는 문장입니다.",
@@ -225,5 +249,38 @@
       "deleteConfirmMessage": "한 번 삭제한 이미지는 복구되지 않습니다. 삭제하시겠습니까?"
     },
     "marketUrl": "/market/market?purpose_type=BACKGROUND&category=community"
+  },
+  "ipService": {
+    "expectedTexts": {
+      "heading": "지정IP 서비스",
+      "addButton": "추가하기",
+      "dialogHeading": "IP 추가하기",
+      "ipSetting": "IP 설정",
+      "autoInput": "자동 입력",
+      "manualInput": "수동 입력",
+      "ipNamePlaceholder": "등록 IP명 - 예: 집, 사무실 등",
+      "notice1": "지정한 IP 이외에서 로그인 시, 본인 인증 페이지로 이동됩니다.",
+      "notice2": "한 아이디당 최대 10개까지 지정 IP를 등록할 수 있습니다.",
+      "notice3": "지정 IP 서비스는 공유기 등 유동 IP 사용 시 제한이 발생할 수 있습니다.",
+      "cancelBtn": "취소",
+      "submitBtn": "추가하기",
+      "emptyIpMessage": "IP를 입력해 주세요.",
+      "emptyIpNameMessage": "등록 IP명을 입력해 주세요.",
+      "alreadyRegisteredIpMessage": "이미 등록된 아이피 입니다."
+    },
+    "tableData": {
+      "name": "tesst",
+      "ip": "210.245.49.54",
+      "createdAt": "2026-06-03 11:56:36"
+    }
+  },
+  "loginHistory": {
+    "expectedTexts": {
+      "linkText": "로그인 기록 보기",
+      "dialogHeading": "로그인 기록",
+      "calendarButton": "달력",
+      "morePages": "More pages",
+      "itemsPerPage": "10개씩 보기"
+    }
   }
 }

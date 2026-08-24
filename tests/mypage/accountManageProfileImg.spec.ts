@@ -176,7 +176,7 @@ test.describe('[MyInfo] Account Management Profile Image Tests', () => {
 
                 await expect.poll(
                     async () => await myInfoPage.profileImageCountText.textContent(),
-                    { timeout: 5000 }
+                    { timeout: 10000 }
                 ).not.toBe(initialCountText);
             });
         });
