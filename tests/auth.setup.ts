@@ -80,4 +80,3 @@ setup('Authenticate as Non phone user', async ({ page }) => {
     const nonPhoneStatePath = path.resolve(__dirname, '../playwright/.auth/non-phone-user.json');
     await page.context().storageState({ path: nonPhoneStatePath });
 });
-
