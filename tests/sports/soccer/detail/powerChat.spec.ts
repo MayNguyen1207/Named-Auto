@@ -1,7 +1,6 @@
 import { test, expect } from '../../../../utils/fixtures';
 import { LoginPage } from '../../../../pages/LoginPage';
 import { SoccerDetailChatPage } from '../../../../pages/sports/soccer/SoccerDetailChatPage';
-import matchData from '../../../../data-test/match-detail-data.json';
 import loginData from '../../../../data-test/login-data.json';
 import chatData from '../../../../data-test/cheer-chat-data.json';
 
