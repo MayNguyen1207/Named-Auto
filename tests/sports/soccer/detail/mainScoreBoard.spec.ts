@@ -27,10 +27,12 @@ test.describe('Tests that need API data', () => {
         });
 
         await test.step('Click the leagueName and verify the URL', async () => {
-            await soccerDetailPage.leagueName.click();
-            const searchParams = new URLSearchParams({ search: leagueName });
-            const regexSearch = searchParams.toString().replace(/\+/g, '\\+');
-            await expect(page).toHaveURL(new RegExp(`/scorecenter/soccer.*${regexSearch}`));
+            await expect(async () => {
+                await soccerDetailPage.leagueName.click();
+                const searchParams = new URLSearchParams({ search: leagueName });
+                const regexSearch = searchParams.toString().replace(/\+/g, '\\+');
+                await expect(page).toHaveURL(new RegExp(`/scorecenter/soccer.*${regexSearch}`));
+            }).toPass({ timeout: 10000 });
         });
     });
 

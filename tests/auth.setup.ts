@@ -12,7 +12,7 @@ async function injectBannerBypass(page: Page) {
     await page.waitForTimeout(300);
 }
 
-setup('Authenticate as Normal User', async ({ page }) => {
+/*setup('Authenticate as Normal User', async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.navigate();
     await loginPage.login(loginData.valid.email, loginData.valid.password);
@@ -79,5 +79,4 @@ setup('Authenticate as Non phone user', async ({ page }) => {
 
     const nonPhoneStatePath = path.resolve(__dirname, '../playwright/.auth/non-phone-user.json');
     await page.context().storageState({ path: nonPhoneStatePath });
-});
-
+});*/

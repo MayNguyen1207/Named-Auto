@@ -1,0 +1,66 @@
+{
+    "matchId": "11752597",
+    "message": {
+        "valid": "Auto message: random teest sentence for checking the text length limit here.",
+        "invalid": [
+            {
+                "name": "maxLength",
+                "msg": "Auto max length message: random teest sentence for checking the text length limit here.........",
+                "toastMsg": "내용은 최대 90자 까지 입력 가능합니다."
+            },
+            {
+                "name": "forbiddenMsg",
+                "msg": "test",
+                "toastMsg": "응원글에 금지단어 'test'가 포함되어 있습니다."
+            },
+            {
+                "name": "onlySpace",
+                "msg": "              ",
+                "toastMsg": "메세지를 입력해주세요."
+            },
+            {
+                "name": "duplicateMsg",
+                "msg": "aaa",
+                "toastMsg": "반복된 메세지는 입력할 수 없습니다."
+            },
+            {
+                "name": "xss",
+                "msg": "<script>alert('x')</script>",
+                "expectedMsg": "<script>alert('x')</script>"
+            },
+            {
+                "name": "symbolEmoji",
+                "msg": "Message with symbols & emojis! ★ ✓ → #QA 🚀 🧪 🎯",
+                "expectedMsg": "Message with symbols & emojis! ★ ✓ → #QA ? ? ?"
+            }
+        ]
+    },
+    "image": {
+        "valid": "data-test/image-data/small-size-100x100.jpg",
+        "invalid": [
+            {
+                "invalidFormat": "data-test/image-data/invalid-format-img.tif",
+                "msg": "이미지 파일만 업로드 가능합니다."
+            }
+        ]
+    },
+    "powerChat": {
+        "valid": {
+            "msg": "Auto message: random sentence for checking power chat message max length. 🚀🧪",
+            "expectedPinMsg": "Auto message: random sentence for checking power chat message max length. ??"
+        },
+        "invalid": [
+            {
+                "name": "onlySpace",
+                "msg": "              ",
+                "toastMsg": "메세지를 입력해주세요."
+            },
+            {
+                "name": "maxLength",
+                "msg": "Auto max length message: random teest sentence for checking the text length limit here..............",
+                "toastMsg": "내용은 최대 90자 까지 입력 가능합니다."
+            }
+        ],
+        "lackPointMsg": "보유 포인트가 부족합니다."
+    }
+}
