@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 import path from 'path';
 import { MyInfoPage } from '../../pages/MyInfoPage';
 
+const formatDate = (date: Date): string => date.toLocaleDateString('sv-SE');
+
 test.describe('[MyInfo] Login History Tests', () => {
     let myInfoPage: MyInfoPage;
 
@@ -43,18 +45,18 @@ test.describe('[MyInfo] Login History Tests', () => {
         await myInfoPage.loginHistoryDateFilterTrigger.click();
         await myInfoPage.loginHistoryTodayButton.click();
 
-        const today = new Date().toLocaleDateString('sv-SE');
-        const todayDateRegex = new RegExp(today);
-
-        await expect(page.getByRole('cell', { name: todayDateRegex }).first()).toBeVisible();
+        const todayStr = formatDate(new Date());
+        await expect(page.getByRole('cell', { name: new RegExp(todayStr) }).first()).toBeVisible();
     });
 
     test('First record data remains consistent after clicking refresh button', async ({ page }) => {
-        const firstDateCell = page.getByRole('cell', { name: /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ }).first();
+        const datePattern = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/;
+        const firstDateCell = page.getByRole('cell', { name: datePattern }).first();
+
         const initialText = await firstDateCell.textContent();
         await page.getByRole('dialog').getByRole('button').nth(1).click();
-        const afterText = await page.getByRole('cell', { name: /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ }).first().textContent();
-        expect(afterText).toBe(initialText);
+
+        await expect(firstDateCell).toHaveText(initialText ?? '');
     });
 
     test('Scroll thumb appears when changing items per page to 20', async ({ page }) => {
@@ -67,4 +69,46 @@ test.describe('[MyInfo] Login History Tests', () => {
         const rowCount = await page.locator('tbody tr').count();
         expect(rowCount).toBeGreaterThan(10);
     });
+
+    test('Check if the < and > properly navigate to the previous and next month', async ({ page }) => {
+        await myInfoPage.loginHistoryCalendarButton.click();
+        await expect(myInfoPage.loginHistoryCalendarPopover).toBeVisible();
+
+        const currentMonthLocator = page.getByTestId('calendar-current-month');
+        const initialMonthText = await currentMonthLocator.textContent();
+
+        // Navigate to previous month
+        await page.getByTestId('calendar-previous-month').click();
+        const prevMonthText = await currentMonthLocator.textContent();
+        expect(prevMonthText).not.toBe(initialMonthText);
+
+        // Navigate to next month
+        await page.getByTestId('calendar-next-month').click();
+        const nextMonthText = await currentMonthLocator.textContent();
+        expect(nextMonthText).not.toBe(prevMonthText);
+    });
+
+    test('Check calendar date ranges for 1 week, 1 month, and 3 months', async ({ page }) => {
+        const today = new Date();
+        const todayStr = formatDate(today);
+
+        await myInfoPage.loginHistoryDateFilterTrigger.click();
+
+        // 1 week = last 7 days (today - 6)
+        const oneWeekAgo = new Date(today);
+        oneWeekAgo.setDate(today.getDate() - 6);
+        await page.getByRole('button', { name: '주일' }).click();
+        await expect(page.getByText(`${formatDate(oneWeekAgo)} - ${todayStr}`)).toBeVisible();
+
+        // 1 month = last 30 days (today - 29)
+        const oneMonthAgo = new Date(today);
+        oneMonthAgo.setDate(today.getDate() - 29);
+        await page.getByRole('button', { name: '1개월' }).click();
+        await expect(page.getByText(`${formatDate(oneMonthAgo)} - ${todayStr}`)).toBeVisible();
+
+        // 3 months = dynamic start date
+        await page.getByRole('button', { name: '3개월' }).click();
+        await expect(page.getByText(new RegExp(`\\d{4}-\\d{2}-\\d{2} - ${todayStr}`))).toBeVisible();
+    });
+
 });
