@@ -77,12 +77,10 @@ test.describe('[MyInfo] Login History Tests', () => {
         const currentMonthLocator = page.getByTestId('calendar-current-month');
         const initialMonthText = await currentMonthLocator.textContent();
 
-        // Navigate to previous month
         await page.getByTestId('calendar-previous-month').click();
         const prevMonthText = await currentMonthLocator.textContent();
         expect(prevMonthText).not.toBe(initialMonthText);
 
-        // Navigate to next month
         await page.getByTestId('calendar-next-month').click();
         const nextMonthText = await currentMonthLocator.textContent();
         expect(nextMonthText).not.toBe(prevMonthText);
@@ -94,19 +92,16 @@ test.describe('[MyInfo] Login History Tests', () => {
 
         await myInfoPage.loginHistoryDateFilterTrigger.click();
 
-        // 1 week = last 7 days (today - 6)
         const oneWeekAgo = new Date(today);
         oneWeekAgo.setDate(today.getDate() - 6);
         await page.getByRole('button', { name: '주일' }).click();
         await expect(page.getByText(`${formatDate(oneWeekAgo)} - ${todayStr}`)).toBeVisible();
 
-        // 1 month = last 30 days (today - 29)
         const oneMonthAgo = new Date(today);
         oneMonthAgo.setDate(today.getDate() - 29);
         await page.getByRole('button', { name: '1개월' }).click();
         await expect(page.getByText(`${formatDate(oneMonthAgo)} - ${todayStr}`)).toBeVisible();
 
-        // 3 months = dynamic start date
         await page.getByRole('button', { name: '3개월' }).click();
         await expect(page.getByText(new RegExp(`\\d{4}-\\d{2}-\\d{2} - ${todayStr}`))).toBeVisible();
     });

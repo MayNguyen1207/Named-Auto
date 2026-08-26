@@ -27,29 +27,24 @@ test.describe('[MyInfo] Account Delete Tests', () => {
                 '이메일 또는 핸드폰 인증을 통해 탈퇴가 진행되며, 위 내용을 모두 확인하고 동의하신 경우, [위 항목에 동의 및 탈퇴] 버튼을 눌러 탈퇴를 진행'
             ];
 
-            // Verify all warning texts are visible
             for (const text of expectedTexts) {
                 await expect(page.getByText(text)).toBeVisible();
             }
 
-            // Verify and click the agree & withdraw button
             const agreeAndDeleteButton = page.getByRole('button', { name: '위 항목에 동의 및 탈퇴' });
             await expect(agreeAndDeleteButton).toBeVisible();
             await agreeAndDeleteButton.click();
 
-            // Verify pre-filled email and complete OTP flow
             await expect(page.locator('input[name="email"]')).toHaveValue('test_acc4@yopmail.com');
             await myInfoPage.otpSendButton.click();
             await myInfoPage.otpInput.click();
             await myInfoPage.otpInput.fill('123456');
             await page.getByRole('button', { name: '인증완료' }).click();
 
-            // Verify final confirmation dialog
             await expect(page.getByText('탈퇴할 경우 재사용 및 복구가 불가능하며 추가 회원가입은 탈퇴일로부터 30일 후에 가능합니다. 정말 탈퇴하시겠습니까?')).toBeVisible();
             await expect(page.getByRole('button', { name: '확인' })).toBeVisible();
             await expect(page.getByRole('button', { name: '취소' })).toBeVisible();
 
-            // Cancel and verify notification is hidden
             await page.getByRole('button', { name: '취소' }).click();
             await expect(page.locator('span').filter({ hasText: '알림' }).first()).toBeHidden();
         });
