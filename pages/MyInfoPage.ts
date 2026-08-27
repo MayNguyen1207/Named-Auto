@@ -149,7 +149,6 @@ export class MyInfoPage extends BasePage {
     readonly loginHistoryCloseButton: Locator;
     readonly loginHistoryDateFilterTrigger: Locator;
     readonly loginHistoryTodayButton: Locator;
-    readonly loginHistoryItemsPerPageCombo: Locator;
     readonly loginHistoryScrollThumb: Locator;
 
 
