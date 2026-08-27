@@ -1,5 +1,4 @@
 {
-    "matchId": "11752597",
     "message": {
         "valid": "Auto message: random teest sentence for checking the text length limit here.",
         "invalid": [
@@ -62,5 +61,6 @@
             }
         ],
         "lackPointMsg": "보유 포인트가 부족합니다."
-    }
+    },
+    "voteSuccessMsg": "결과 예측이 접수되었습니다."
 }

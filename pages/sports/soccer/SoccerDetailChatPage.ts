@@ -29,6 +29,20 @@ export class SoccerDetailChatPage extends BasePage {
     readonly sendPowerChatBtn: Locator;
     readonly pinPowerChat: Locator;
 
+    readonly voteWinBtn: Locator;
+    readonly voteDrawBtn: Locator;
+    readonly voteLoseBtn: Locator;
+
+    readonly msgActionMenu: Locator;
+    readonly starCandyBtn: Locator;
+    readonly voteUpBtn: Locator;
+    readonly voteDownBtn: Locator;
+    readonly replyBtn: Locator;
+    readonly threeDotsBtn: Locator;
+
+    readonly replyLabel: Locator;
+    readonly closeReplyLableBtn: Locator;
+
     constructor(page: Page) {
         super(page);
         this.page = page;
@@ -57,6 +71,20 @@ export class SoccerDetailChatPage extends BasePage {
         this.powerChatInput = this.powerChatArea.getByPlaceholder('메세지를 입력해 관심을 받아보세요.', { exact: true });
         this.sendPowerChatBtn = this.powerChatArea.locator('button:has-text("파워챗 보내기")');
         this.pinPowerChat = page.getByTestId('carousel-item');
+
+        this.voteWinBtn = page.getByTestId('vote-win-button');
+        this.voteDrawBtn = page.getByTestId('vote-draw-button');
+        this.voteLoseBtn = page.getByTestId('vote-lose-button');
+
+        this.msgActionMenu = page.getByTestId('popover-content');
+        this.starCandyBtn = this.msgActionMenu.getByTestId('star-candy-send-button');
+        this.voteUpBtn = this.msgActionMenu.getByTestId('vote-real-button');
+        this.voteDownBtn = this.msgActionMenu.getByTestId('vote-fake-button');
+        this.replyBtn = this.msgActionMenu.locator('button').nth(2);
+        this.threeDotsBtn = this.msgActionMenu.locator('button').nth(3);
+
+        this.replyLabel = page.locator('div.w-full.flex.flex-row.justify-between.items-center.px-2.overflow-hidden');
+        this.closeReplyLableBtn = this.replyLabel.locator('svg');
     }
 
     async navigate(id: number) {
@@ -77,11 +105,19 @@ export class SoccerDetailChatPage extends BasePage {
     async getChatItemElements(chatItem: Locator) {
         return {
             userAvatar: chatItem.locator('img').first(),
-            userNick: chatItem.locator('p.text-sm.font-medium'),
+            userNick: chatItem.locator('p.text-sm.font-medium').first(),
+            votedOption: chatItem.locator('p.text-sm.font-medium').last(),
             message: chatItem.getByTestId('popover-trigger'),
             time: chatItem.locator('time'),
             starCandyBtn: chatItem.getByTestId('star-candy-send-button'),
             awardTxt: chatItem.getByText('획득!')
         };
+    }
+
+    async openMsgActionMenu(chatItem: Locator) {
+        const trigger = chatItem.getByTestId('popover-trigger');
+        await trigger.scrollIntoViewIfNeeded();
+        await trigger.click();
+        await expect(this.msgActionMenu).toBeVisible();
     }
 }
