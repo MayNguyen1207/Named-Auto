@@ -191,7 +191,7 @@ test.describe('[Homepage] Main Chat UI Tests (Guest)', () => {
         await expect(page.getByRole('button', { name: '확인' })).toBeVisible();
         await expect(page.getByText('아직! 네임드 회원이 아니신가요? 간편 회원 가입하러 가기', { exact: true })).toBeVisible();
         await page.getByRole('link', { name: '간편 회원 가입하러 가기' }).click();
-        await expect(page).toHaveURL('http://dev-v2.named.net/register');
+        await expect(page).toHaveURL('/register');
     });
 });
 
