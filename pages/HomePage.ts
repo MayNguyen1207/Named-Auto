@@ -5,7 +5,6 @@ export class HomePage {
   readonly page: Page;
   readonly loginLink: Locator;
 
-  // Chat UI
   readonly chatInput: Locator;
   readonly chatSendBtn: Locator;
   readonly chatMenuBtn: Locator;
@@ -16,11 +15,10 @@ export class HomePage {
     this.page = page;
     this.loginLink = page.getByRole('link', { name: '로그인' });
 
-    // Chat UI
-    this.chatInput   = page.getByTestId('input-field');
+    this.chatInput = page.getByTestId('input-field');
     this.chatSendBtn = page.locator('.tabler-icon.tabler-icon-send-2');
     this.chatMenuBtn = page.getByRole('button', { name: '채팅', exact: true });
-    this.tabSports   = page.getByRole('radio', { name: '스포츠' });
+    this.tabSports = page.getByRole('radio', { name: '스포츠' });
     this.tabMiniGame = page.getByRole('radio', { name: '미니게임' });
   }
 
@@ -44,7 +42,6 @@ export class HomePage {
     await expect(this.loginLink).toBeHidden();
   }
 
-  // Chat helpers
   async sendChatMessage(message: string) {
     await this.chatInput.fill(message);
     await this.chatInput.press('Enter');
