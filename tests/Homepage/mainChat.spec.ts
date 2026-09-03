@@ -1,4 +1,4 @@
-﻿import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import path from 'path';
 import { HomePage } from '../../pages/HomePage';
 
@@ -17,7 +17,7 @@ test.describe('[Homepage] Main Chat UI Tests', () => {
         await expect(home.tabMiniGame).toBeVisible();
         await expect(home.chatMenuBtn).toBeVisible();
         await expect(page.getByRole('button', { name: '테마 채팅' })).toBeVisible();
-        await expect(page.getByPlaceholder('메시지 입력하기')).toBeVisible();
+        await expect(home.chatInput).toBeVisible();
         await expect(home.chatSendBtn).toBeVisible();
         await expect(home.chatSendBtn).toBeDisabled();
     });
@@ -140,8 +140,7 @@ test.describe('[Homepage] 1-on-1 Chat Request Settings', () => {
             await home.navigate();
             await page.waitForTimeout(3000);
 
-            await page.getByRole('button', { name: '채팅', exact: true }).click();
-            await page.getByRole('menuitem', { name: '수신 설정' }).click();
+            await home.openChatMenu('수신 설정');
             await page.getByRole('radio', { name: setting }).click();
             await page.getByTestId('dialog-close').click();
 
@@ -182,8 +181,9 @@ test.describe('[Homepage] Main Chat UI Tests (Guest)', () => {
     });
 
     test('Guest user is prompted to login when sending chat', async ({ page }) => {
-        await page.getByTestId('input-field').fill('Nolog');
-        await page.locator('.tabler-icon.tabler-icon-send-2').click();
+        const home = new HomePage(page);
+        await home.chatInput.fill('Nolog');
+        await home.chatSendBtn.click();
         await expect(page.locator('span').filter({ hasText: '로그인 화면으로 이동' }).first()).toBeVisible();
         await expect(page.locator("img[alt='require login']")).toBeVisible();
         await expect(page.locator('p.wrap-break-word.overflow-wrap-anywhere')).toBeVisible();
@@ -205,36 +205,30 @@ test.describe('[Homepage] Main Chat UI Tests (Admin)', () => {
     });
 
     test('Admin can freeze and unfreeze chat room', async ({ page }) => {
-        const chatMenu = page.getByRole('button', { name: '채팅', exact: true });
-        await chatMenu.click();
-        await page.getByRole('menuitem', { name: '채팅방 얼리기' }).click();
+        const home = new HomePage(page);
+        await home.openChatMenu('채팅방 얼리기');
         await expect(page.getByText('관리자가 채팅방을 얼렸습니다. 개인 채팅이 금지됩니다')).toBeVisible();
-        await chatMenu.click();
-        await page.getByRole('menuitem', { name: '채팅방 녹이기' }).click();
+        await home.openChatMenu('채팅방 녹이기');
         await expect(page.getByText('관리자가 방을 녹였습니다. 이제 채팅이 가능합니다')).toBeVisible();
     });
 
     test('Chat messages should be isolated between Minigame and Sports tabs', async ({ page }) => {
         const home = new HomePage(page);
 
-        await page.getByRole('button', { name: '일반 채팅' }).click();
-        await page.getByTestId('dropdown-menu-sub-trigger').click();
-        await page.getByRole('menuitem', { name: '미니게임' }).click();
-
+        await home.switchChatChannel('미니게임');
+        
         await home.sendChatMessage('minigame');
         await expect(page.getByText('minigame')).toBeVisible();
-
-        await page.getByRole('radio', { name: '스포츠' }).click();
+        
+        await home.tabSports.click();
         await expect(page.getByText('minigame')).toBeHidden();
 
-        await page.getByRole('button', { name: '공지 > 미니게임' }).click();
-        await page.getByTestId('dropdown-menu-sub-trigger').click();
-        await page.getByRole('menuitem', { name: '스포츠' }).click();
-
+        await home.switchChatChannel('스포츠', '공지 > 미니게임');
+        
         await home.sendChatMessage('sport');
         await expect(page.getByText('sport')).toBeVisible();
-
-        await page.getByRole('radio', { name: '미니게임' }).click();
+        
+        await home.tabMiniGame.click();
         await expect(page.getByText('sport')).toBeHidden();
     });
 
@@ -251,11 +245,9 @@ test.describe('[Homepage] Main Chat UI Tests (Admin)', () => {
         await sportChatHome.navigate();
         await sportChat.waitForTimeout(3000);
 
-        await sportChat.getByRole('radio', { name: '스포츠' }).click();
+        await sportChatHome.tabSports.click();
 
-        await minigameChat.getByRole('button', { name: '일반 채팅' }).click();
-        await minigameChat.getByTestId('dropdown-menu-sub-trigger').click();
-        await minigameChat.getByRole('menuitem', { name: '전체' }).click();
+        await minigameChatHome.switchChatChannel('전체');
 
         await minigameChatHome.sendChatMessage('all');
 

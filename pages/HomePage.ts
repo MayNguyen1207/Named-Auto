@@ -54,4 +54,10 @@ export class HomePage {
     await this.chatMenuBtn.click();
     await this.page.getByRole('menuitem', { name: menuItem }).click();
   }
+
+  async switchChatChannel(channelName: string, currentButtonName: string | RegExp = '일반 채팅') {
+    await this.page.getByRole('button', { name: currentButtonName }).first().click();
+    await this.page.getByTestId('dropdown-menu-sub-trigger').click();
+    await this.page.getByRole('menuitem', { name: channelName }).click();
+  }
 }
