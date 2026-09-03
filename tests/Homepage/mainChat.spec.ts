@@ -50,7 +50,7 @@ test.describe('[Homepage] Main Chat UI Tests', () => {
         await page.waitForTimeout(1000);
         const { chatInput: input, chatSendBtn: send } = home;
 
-        await input.fill('saaaaaaaaaaaassssádsadasdasdasdasdasdsssssssssssssssssssssssssssssssssssssaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaas');
+        await input.fill('This is a long message created to test the maximum character limit of the message input field. The content is intentionally extended with multiple sentences and paragraphs to simulate a real user message containing a large amount of text');
         await send.click();
         await expect(page.getByText('채팅 최대 글자를 초과하였습니다.', { exact: true })).toBeVisible();
 
