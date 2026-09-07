@@ -18,14 +18,11 @@ test.describe('[MyInfo] Account Management Profile Image Tests', () => {
         });
 
         test('Profile image management UI and purchase navigation', async ({ page }) => {
+            const { heading, sizeNotice, contentNotice, changeItemText, countText } =
+                mypageData.profileImage.expectedTexts;
+
             await test.step('Verify profile image UI elements are visible', async () => {
-                await myInfoPage.verifyProfileImageUI({
-                    heading: mypageData.profileImage.expectedTexts.heading,
-                    sizeNotice: mypageData.profileImage.expectedTexts.sizeNotice,
-                    contentNotice: mypageData.profileImage.expectedTexts.contentNotice,
-                    changeItemText: mypageData.profileImage.expectedTexts.changeItemText,
-                    countText: mypageData.profileImage.expectedTexts.countText,
-                });
+                await myInfoPage.verifyProfileImageUI({ heading, sizeNotice, contentNotice, changeItemText, countText });
             });
 
             await test.step('Click purchase button and verify navigation to market', async () => {
@@ -35,6 +32,8 @@ test.describe('[MyInfo] Account Management Profile Image Tests', () => {
         });
 
         test('Profile image management options', async ({ page }) => {
+            const { noItemMessage, deleteConfirmMessage } = mypageData.profileImage.expectedTexts;
+
             await test.step('Verify profile image management options are visible', async () => {
                 await myInfoPage.profileImageEditIcon.click();
                 await expect(myInfoPage.ImageUploadOption).toBeVisible();
@@ -43,11 +42,12 @@ test.describe('[MyInfo] Account Management Profile Image Tests', () => {
 
             await test.step('Click upload option and verify no-item message is shown', async () => {
                 await myInfoPage.ImageUploadOption.click();
-                await expect(page.getByText(mypageData.profileImage.expectedTexts.noItemMessage)).toBeVisible();
+                await expect(page.getByText(noItemMessage)).toBeVisible();
             });
 
             await test.step('Click delete option and verify confirmation dialog is shown', async () => {
-                await expect(page.getByText(mypageData.profileImage.expectedTexts.noItemMessage)).toBeHidden();
+                await expect(page.getByText(noItemMessage)).toBeHidden();
+
                 const isDeleteOptionVisible = await myInfoPage.ImageDeleteOption.isVisible();
                 if (!isDeleteOptionVisible) {
                     await myInfoPage.profileImageEditIcon.click();
@@ -56,7 +56,7 @@ test.describe('[MyInfo] Account Management Profile Image Tests', () => {
                 await expect(myInfoPage.ImageDeleteOption).toBeVisible();
                 await myInfoPage.ImageDeleteOption.click();
 
-                await expect(page.getByText(mypageData.profileImage.expectedTexts.deleteConfirmMessage, { exact: true })).toBeVisible();
+                await expect(page.getByText(deleteConfirmMessage, { exact: true })).toBeVisible();
                 await expect(myInfoPage.dialogCancelBtn).toBeVisible();
                 await expect(myInfoPage.dialogConfirmBtn).toBeVisible();
 

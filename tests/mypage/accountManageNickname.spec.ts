@@ -18,11 +18,10 @@ test.describe('[MyInfo] Account Management Nickname Tests', () => {
         });
 
         test('Nickname management and purchase navigation', async ({ page }) => {
+            const { countText, changeItemText } = mypageData.nickname.expectedTexts;
+
             await test.step('Verify nickname management UI elements are visible', async () => {
-                await myInfoPage.verifyNicknameManagementUI(
-                    mypageData.nickname.expectedTexts.countText,
-                    mypageData.nickname.expectedTexts.changeItemText
-                );
+                await myInfoPage.verifyNicknameManagementUI(countText, changeItemText);
             });
 
             await test.step('Click purchase button and verify navigation to market', async () => {
@@ -40,11 +39,11 @@ test.describe('[MyInfo] Account Management Nickname Tests', () => {
         });
 
         test('Verify nickname UI with item and compare level icon', async ({ page }) => {
+            const { countTextWithItem, changeItemText, dialogNotice1, dialogNotice2, dialogNotice3 } =
+                mypageData.nickname.expectedTexts;
+
             await test.step('Verify nickname UI elements are visible when user has item', async () => {
-                await myInfoPage.verifyNicknameManagementUIWithItem(
-                    mypageData.nickname.expectedTexts.countTextWithItem,
-                    mypageData.nickname.expectedTexts.changeItemText
-                );
+                await myInfoPage.verifyNicknameManagementUIWithItem(countTextWithItem, changeItemText);
             });
 
             await test.step('Compare level icon src with nickname icon src', async () => {
@@ -55,10 +54,8 @@ test.describe('[MyInfo] Account Management Nickname Tests', () => {
 
             await test.step('Open change nickname dialog and verify UI', async () => {
                 await myInfoPage.verifyChangeNicknameDialogUI({
-                    notice1: mypageData.nickname.expectedTexts.dialogNotice1,
-                    notice2: mypageData.nickname.expectedTexts.dialogNotice2,
-                    notice3: mypageData.nickname.expectedTexts.dialogNotice3,
-                    changeItemText: mypageData.nickname.expectedTexts.changeItemText
+                    notice1: dialogNotice1, notice2: dialogNotice2,
+                    notice3: dialogNotice3, changeItemText,
                 });
             });
 
@@ -71,7 +68,7 @@ test.describe('[MyInfo] Account Management Nickname Tests', () => {
 
             await test.step('Verify dialog closes with cancel button', async () => {
                 await myInfoPage.dialogCancelBtn.click();
-                await expect(page.locator('span').filter({ hasText: mypageData.nickname.expectedTexts.countTextWithItem }).first()).toBeVisible();
+                await expect(page.locator('span').filter({ hasText: countTextWithItem }).first()).toBeVisible();
             });
         });
     });

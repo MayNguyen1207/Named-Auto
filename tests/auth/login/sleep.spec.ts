@@ -15,16 +15,17 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep', () => {
     { method: 'email', data: loginData.inactiveEmail },
     { method: 'phone', data: loginData.inactivePhone }
   ] as const;
-  for (const testData of sleepAccountData) {
-    test(`[Auth] Sleep account - ${testData.method.toUpperCase()} verification flow`, async ({ page }) => {
-      await loginPage.login(testData.data.email, testData.data.password);
-      await loginPage.verifyInactiveAccountDialog(testData.data.expectedTexts);
 
-      await loginPage.proceedToVerification(testData.method);
-      if (testData.method === 'email') {
-        await expect(loginPage.verificationEmailInput).toHaveValue(testData.data.email);
+  for (const { method, data } of sleepAccountData) {
+    test(`[Auth] Sleep account - ${method.toUpperCase()} verification flow`, async ({ page }) => {
+      await loginPage.login(data.email, data.password);
+      await loginPage.verifyInactiveAccountDialog(data.expectedTexts);
+
+      await loginPage.proceedToVerification(method);
+      if (method === 'email') {
+        await expect(loginPage.verificationEmailInput).toHaveValue(data.email);
         await expect(loginPage.verificationEmailInput).not.toBeEditable();
-      } else if (testData.method === 'phone') {
+      } else if (method === 'phone') {
         await expect(loginPage.verificationPhoneInput).not.toHaveValue('');
         await expect(loginPage.verificationPhoneInput).not.toBeEditable();
 
@@ -33,9 +34,9 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep', () => {
         await expect(countryDropdown.locator('svg').first()).toBeVisible();
         await expect(countryDropdown).toBeDisabled();
       }
-      await loginPage.verifyVerificationDefaultUI(testData.method, testData.data.email);
+      await loginPage.verifyVerificationDefaultUI(method, data.email);
       await loginPage.sendOtpButton.click();
-      if (testData.method === 'phone') {
+      if (method === 'phone') {
         await expect(
           page.getByText('입력하신 휴대폰 번호로 코드가 전송되었습니다. 문자 메세지를 확인해 주세요.', { exact: true })
         ).toBeVisible();
@@ -54,7 +55,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep', () => {
       await loginPage.resendOtp();
 
       await loginPage.goBackButton.click();
-      await loginPage.verifyVerificationDefaultUI(testData.method, testData.data.email);
+      await loginPage.verifyVerificationDefaultUI(method, data.email);
       await loginPage.sendOtpButton.click();
       try {
         await expect(loginPage.confirmButton).toBeVisible({ timeout: 3000 });
@@ -66,11 +67,7 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep', () => {
     });
   }
 
-  const inactiveTestData = [
-    { method: 'email', data: loginData.inactiveEmail },
-    { method: 'phone', data: loginData.inactivePhone }
-  ] as const;
-  for (const { method, data } of inactiveTestData) {
+  for (const { method, data } of sleepAccountData) {
     test(`[Auth] Check OTP countdown time, Resend OTP and Go Back button - ${method.toUpperCase()}`, async ({ page }) => {
       await loginPage.login(data.email, data.password);
       await loginPage.proceedToVerification(method);
@@ -121,7 +118,6 @@ test.describe('[Auth] Normal User Login Feature Tests - Sleep', () => {
     { method: 'phone', data: loginData.reactivePhone }
   ] as const;
   for (const { method, data } of reactiveTestData) {
-
     test(`[Auth] Inactive account reactivation flow only runs on Chromium - ${method.toUpperCase()}`, async ({ page, browserName }) => {
       test.skip(browserName !== 'chromium', 'Chromium is required for this test due to specific browser behavior.');
 
