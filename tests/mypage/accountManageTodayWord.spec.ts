@@ -40,16 +40,9 @@ test.describe('[MyInfo] Account Management Today Word Tests', () => {
         });
 
         test('Verify Today Word UI with item', async ({ page }) => {
-            const {
-                countTextWithItem,
-                todayWordValue,
-                changeItemText,
-                dialogHeading,
-                dialogNotice1,
-                dialogNotice2,
-                dialogNotice3,
-                deleteConfirmMessage,
-            } = mypageData.todayWord.expectedTexts;
+            const { countTextWithItem, todayWordValue, changeItemText,
+                dialogHeading, dialogNotice1, dialogNotice2,
+                dialogNotice3, deleteConfirmMessage, } = mypageData.todayWord.expectedTexts;
             const { validations } = mypageData.todayWord;
 
             await test.step('Verify Today Word UI elements are visible when user has item', async () => {
@@ -57,11 +50,7 @@ test.describe('[MyInfo] Account Management Today Word Tests', () => {
                 await expect(myInfoPage.todayWordPurchaseLink).toBeVisible();
                 await expect(myInfoPage.todayWordChangeButton).toBeVisible();
                 await expect(page.getByRole('img', { name: '오늘의 한마디' })).toBeVisible();
-                await myInfoPage.openTodayWordChangeDialog(
-                    countTextWithItem,
-                    todayWordValue,
-                    changeItemText
-                );
+                await myInfoPage.openTodayWordChangeDialog(countTextWithItem, todayWordValue, changeItemText);
                 await expect(page.getByRole('heading', { name: dialogHeading })).toBeVisible();
                 await expect(myInfoPage.todayWordDialogInput).toBeVisible();
                 await expect(myInfoPage.todayWordDialogInput).toHaveValue(todayWordValue);
