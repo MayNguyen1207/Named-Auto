@@ -54,10 +54,8 @@ test.describe('[MyInfo] Account Management Nickname Tests', () => {
 
             await test.step('Open change nickname dialog and verify UI', async () => {
                 await myInfoPage.verifyChangeNicknameDialogUI({
-                    notice1: dialogNotice1,
-                    notice2: dialogNotice2,
-                    notice3: dialogNotice3,
-                    changeItemText,
+                    notice1: dialogNotice1, notice2: dialogNotice2,
+                    notice3: dialogNotice3, changeItemText,
                 });
             });
 
