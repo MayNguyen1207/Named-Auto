@@ -18,14 +18,11 @@ test.describe('[MyInfo] Account Management Background Image Tests', () => {
         });
 
         test('Background image management UI and purchase navigation', async ({ page }) => {
+            const { heading, sizeNotice, contentNotice, changeItemText, countText } =
+                mypageData.bgImage.expectedTexts;
+
             await test.step('Verify background image UI elements are visible', async () => {
-                await myInfoPage.verifyBgImageUI({
-                    heading: mypageData.bgImage.expectedTexts.heading,
-                    sizeNotice: mypageData.bgImage.expectedTexts.sizeNotice,
-                    contentNotice: mypageData.bgImage.expectedTexts.contentNotice,
-                    changeItemText: mypageData.bgImage.expectedTexts.changeItemText,
-                    countText: mypageData.bgImage.expectedTexts.countText,
-                });
+                await myInfoPage.verifyBgImageUI({ heading, sizeNotice, contentNotice, changeItemText, countText });
             });
 
             await test.step('Click purchase button and verify navigation to market', async () => {
@@ -33,7 +30,10 @@ test.describe('[MyInfo] Account Management Background Image Tests', () => {
                 await expect(page).toHaveURL(mypageData.bgImage.marketUrl);
             });
         });
+
         test('Background image management options', async ({ page }) => {
+            const { noItemMessage } = mypageData.bgImage.expectedTexts;
+
             await test.step('Verify background image management options are visible', async () => {
                 await myInfoPage.bgImageEditIcon.click();
                 await expect(myInfoPage.ImageUploadOption).toBeVisible();
@@ -42,7 +42,7 @@ test.describe('[MyInfo] Account Management Background Image Tests', () => {
 
             await test.step('Click upload option and verify no-item message is shown', async () => {
                 await myInfoPage.ImageUploadOption.click();
-                await expect(page.getByText(mypageData.bgImage.expectedTexts.noItemMessage)).toBeVisible();
+                await expect(page.getByText(noItemMessage)).toBeVisible();
             });
         });
 
@@ -61,6 +61,7 @@ test.describe('[MyInfo] Account Management Background Image Tests', () => {
             test('Upload valid background image and verify crop behavior', async ({ page }) => {
                 await test.step('Upload valid img and verify crop UI elements are shown', async () => {
                     await myInfoPage.bgImageFileInput.setInputFiles(path.resolve(__dirname, '../../data-test/image-data/bg-valid-img.jpg'));
+
                     await expect(myInfoPage.cropContainer).toBeVisible();
                     await expect(myInfoPage.cropSliderTrack).toBeVisible();
                     await expect(myInfoPage.cropSliderThumb).toBeVisible();
@@ -112,6 +113,8 @@ test.describe('[MyInfo] Account Management Background Image Tests', () => {
                 });
 
                 await test.step('Click delete option and verify confirmation dialog is shown', async () => {
+                    const { deleteConfirmMessage } = mypageData.bgImage.expectedTexts;
+
                     await page.getByRole('button', { name: '아니오' }).click();
                     const isDeleteOptionVisible = await myInfoPage.ImageDeleteOption.isVisible();
                     if (!isDeleteOptionVisible) {
@@ -121,7 +124,7 @@ test.describe('[MyInfo] Account Management Background Image Tests', () => {
                     await expect(myInfoPage.ImageDeleteOption).toBeVisible();
                     await myInfoPage.ImageDeleteOption.click();
 
-                    await expect(page.getByText(mypageData.bgImage.expectedTexts.deleteConfirmMessage, { exact: true })).toBeVisible();
+                    await expect(page.getByText(deleteConfirmMessage, { exact: true })).toBeVisible();
                     await expect(myInfoPage.dialogCancelBtn).toBeVisible();
                     await expect(myInfoPage.dialogConfirmBtn).toBeVisible();
 
