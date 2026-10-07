@@ -185,7 +185,8 @@
   },
   "nonverifiedUser": {
     "email": "ruistpwjd148@yopmail.com",
-    "password": "Named@123"
+    "password": "Named@123",
+    "expectedUserName": "타이키"
   },
   "userB": {
     "email": "qavn10@yopmail.com",

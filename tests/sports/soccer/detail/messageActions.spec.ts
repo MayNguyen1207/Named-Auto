@@ -1,8 +1,6 @@
 import { test, expect } from '../../../../utils/fixtures';
-import { LoginPage } from '../../../../pages/LoginPage';
 import { SoccerDetailChatPage } from '../../../../pages/sports/soccer/SoccerDetailChatPage';
 import loginData from '../../../../data-test/login-data.json';
-import chatData from '../../../../data-test/cheer-chat-data.json';
 import fs from 'fs';
 import path from 'path';
 
@@ -45,40 +43,111 @@ test.describe('User Flow', () => {
 
     test('[Soccer] User can turn on/off Star Candy of other users', async ({ page }) => {
         const chatItem = soccerDetailChatPage.chatItems.filter({ hasText: postedMsgContent }).last();
-        const starCandyImg = soccerDetailChatPage.starCandyBtn.locator('img');
+        const starCandyImg = soccerDetailChatPage.starCandyBtn.locator('img').first();
+        let expectedAfterSecondClick = '';
 
         await soccerDetailChatPage.openMsgActionMenu(chatItem);
-        await soccerDetailChatPage.starCandyBtn.click();
-        const stateAfterFirstClick = await starCandyImg.getAttribute('alt');
-        const expectedAfterSecondClick = stateAfterFirstClick === 'star_candy-active' ? 'star_candy-inactive' : 'star_candy-active';
+        await test.step('Click star candy button for the 1st time', async () => {
+            await soccerDetailChatPage.starCandyBtn.click();
+            await expect(starCandyImg).toHaveAttribute('alt', /star_candy-(active|inactive)/);
 
-        await page.waitForTimeout(1000);
-        await soccerDetailChatPage.starCandyBtn.click();
-        await expect(starCandyImg).toHaveAttribute('alt', expectedAfterSecondClick);
+            const stateAfterFirstClick = await starCandyImg.getAttribute('alt');
+            expectedAfterSecondClick = stateAfterFirstClick === 'star_candy-active' ? 'star_candy-inactive' : 'star_candy-active';
+        });
+
+        await test.step('Click star candy button for the 2nd time', async () => {
+            await page.waitForTimeout(1000);
+            await soccerDetailChatPage.starCandyBtn.click();
+            await expect(starCandyImg).toHaveAttribute('alt', expectedAfterSecondClick);
+        });
     });
 
     test('[Soccer] User can vote up and vote down message', async () => {
         const chatItem = soccerDetailChatPage.chatItems.filter({ hasText: postedMsgContent }).last();
-
-        // Click voteUpBtn => voteUpBtn gets opacity-20, voteDownBtn stays normal
         await soccerDetailChatPage.openMsgActionMenu(chatItem);
-        await soccerDetailChatPage.voteUpBtn.click();
-        await expect(soccerDetailChatPage.voteUpBtn).toHaveClass(/opacity-20/);
-        await expect(soccerDetailChatPage.voteDownBtn).not.toHaveClass(/opacity-20/);
 
-        // Click voteUpBtn again => toggle off, both return to normal
-        await soccerDetailChatPage.voteUpBtn.click();
-        await expect(soccerDetailChatPage.voteUpBtn).not.toHaveClass(/opacity-20/);
-        await expect(soccerDetailChatPage.voteDownBtn).not.toHaveClass(/opacity-20/);
+        await test.step('Click voteUpBtn => voteUpBtn gets opacity-20, voteDownBtn stays normal', async () => {
+            await soccerDetailChatPage.voteUpBtn.click();
+            await expect(soccerDetailChatPage.voteUpBtn).toHaveClass(/opacity-20/);
+            await expect(soccerDetailChatPage.voteDownBtn).not.toHaveClass(/opacity-20/);
+        });
 
-        // Click voteDownBtn => voteDownBtn gets opacity-20, voteUpBtn stays normal
-        await soccerDetailChatPage.voteDownBtn.click();
-        await expect(soccerDetailChatPage.voteDownBtn).toHaveClass(/opacity-20/);
-        await expect(soccerDetailChatPage.voteUpBtn).not.toHaveClass(/opacity-20/);
+        await test.step('Click voteUpBtn again => toggle off, both return to normal', async () => {
+            await soccerDetailChatPage.voteUpBtn.click();
+            await expect(soccerDetailChatPage.voteUpBtn).not.toHaveClass(/opacity-20/);
+            await expect(soccerDetailChatPage.voteDownBtn).not.toHaveClass(/opacity-20/);
+        });
 
-        // Click voteDownBtn again => toggle off, both return to normal
-        await soccerDetailChatPage.voteDownBtn.click();
-        await expect(soccerDetailChatPage.voteUpBtn).not.toHaveClass(/opacity-20/);
-        await expect(soccerDetailChatPage.voteDownBtn).not.toHaveClass(/opacity-20/);
+        await test.step('Click voteDownBtn => voteDownBtn gets opacity-20, voteUpBtn stays normal', async () => {
+            await soccerDetailChatPage.voteDownBtn.click();
+            await expect(soccerDetailChatPage.voteDownBtn).toHaveClass(/opacity-20/);
+            await expect(soccerDetailChatPage.voteUpBtn).not.toHaveClass(/opacity-20/);
+        });
+
+        await test.step('Click voteDownBtn again => toggle off, both return to normal', async () => {
+            await soccerDetailChatPage.voteDownBtn.click();
+            await expect(soccerDetailChatPage.voteUpBtn).not.toHaveClass(/opacity-20/);
+            await expect(soccerDetailChatPage.voteDownBtn).not.toHaveClass(/opacity-20/);
+        });
+    });
+
+    test('[Soccer] User can reply a message', async ({ page }) => {
+        test.fail(true, "Temporarily use production API");
+        const expectedUserName = loginData.nonverifiedUser.expectedUserName;
+        const replyMsg = `Reply-${Date.now()}`;
+        const chatItem = soccerDetailChatPage.chatItems.filter({ hasText: postedMsgContent }).last();
+
+        await test.step('Open action menu on the non-verified-user message and click replyBtn', async () => {
+            await soccerDetailChatPage.openMsgActionMenu(chatItem);
+            await page.waitForTimeout(300);
+            await soccerDetailChatPage.replyBtn.click();
+        });
+
+        await test.step('Verify replyLabel shows "@{expectedUserName} 님에게 답장"', async () => {
+            await expect(soccerDetailChatPage.replyLabel).toBeVisible();
+            await expect(soccerDetailChatPage.replyLabel).toContainText(`@${expectedUserName} 님에게 답장`);
+        });
+
+        await test.step('Type reply message and send it', async () => {
+            await soccerDetailChatPage.sendMsg(replyMsg);
+        });
+
+        await test.step('Verify the sent message has msgToReply containing the original message content', async () => {
+            const sentChatItem = soccerDetailChatPage.chatItems.filter({ hasText: replyMsg }).last();
+            const { msgToReply } = await soccerDetailChatPage.getChatItemElements(sentChatItem);
+            await expect(msgToReply).toBeVisible();
+            await expect(msgToReply).toContainText(postedMsgContent);
+
+            await test.step('Click msgToReply => the original replied message is visible in chat', async () => {
+                await msgToReply.click();
+                await expect(chatItem).toBeVisible();
+            });
+        });
+    });
+
+    test('[Soccer] User can cancel the reply action', async ({ page }) => {
+        const chatItem = soccerDetailChatPage.chatItems.filter({ hasText: postedMsgContent }).last();
+        await soccerDetailChatPage.openMsgActionMenu(chatItem);
+        await page.waitForTimeout(300);
+
+        await soccerDetailChatPage.replyBtn.click();
+        await expect(soccerDetailChatPage.replyLabel).toBeVisible();
+
+        await soccerDetailChatPage.closeReplyLableBtn.click();
+        await expect(soccerDetailChatPage.replyLabel).toBeHidden();
+    });
+
+    test('[Soccer] Dropdown menu content is shown when user clicks threeDotsBtn', async () => {
+        const chatItem = soccerDetailChatPage.chatItems.filter({ hasText: postedMsgContent }).last();
+        await soccerDetailChatPage.openMsgActionMenu(chatItem);
+        await soccerDetailChatPage.threeDotsBtn.click();
+
+        await expect(soccerDetailChatPage.threeDotsMenu).toBeVisible();
+        await expect(soccerDetailChatPage.menuStarCandyBtn).toBeVisible();
+        await expect(soccerDetailChatPage.menuVoteUpBtn).toBeVisible();
+        await expect(soccerDetailChatPage.menuVoteDownBtn).toBeVisible();
+        await expect(soccerDetailChatPage.menuReplyBtn).toBeVisible();
+        await expect(soccerDetailChatPage.menuReportBtn).toBeVisible();
+        await expect(soccerDetailChatPage.menuBlockBtn).toBeVisible();
     })
 })

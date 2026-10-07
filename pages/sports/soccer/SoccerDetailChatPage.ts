@@ -9,6 +9,7 @@ export class SoccerDetailChatPage extends BasePage {
     readonly chatCount: Locator;
     readonly chatList: Locator;
     readonly chatItems: Locator;
+    readonly scrollToLastMsgBtn: Locator;
 
     readonly msgInput: Locator;
     readonly sendMsgBtn: Locator;
@@ -43,6 +44,18 @@ export class SoccerDetailChatPage extends BasePage {
     readonly replyLabel: Locator;
     readonly closeReplyLableBtn: Locator;
 
+    readonly threeDotsMenu: Locator;
+    readonly menuStarCandyBtn: Locator;
+    readonly menuVoteUpBtn: Locator;
+    readonly menuVoteDownBtn: Locator;
+    readonly menuReplyBtn: Locator;
+    readonly menuReportBtn: Locator;
+    readonly menuBlockBtn: Locator;
+
+    readonly starCandyActiveBtn: Locator;
+    readonly starCandyRevokeBtn: Locator;
+    readonly eyeBtn: Locator;
+
     constructor(page: Page) {
         super(page);
         this.page = page;
@@ -52,6 +65,7 @@ export class SoccerDetailChatPage extends BasePage {
         this.chatCount = this.chatBox.locator('span.absolute.text-white.text-xs.font-medium');
         this.chatList = page.getByTestId('virtuoso-item-list');
         this.chatItems = this.chatList.locator('> div');
+        this.scrollToLastMsgBtn = page.locator('button.rounded-full.text-white.shadow-lg.p-2');
 
         this.msgInput = page.getByPlaceholder('메세지를 입력하세요');
         this.sendMsgBtn = page.getByTestId('send-message-button');
@@ -80,11 +94,23 @@ export class SoccerDetailChatPage extends BasePage {
         this.starCandyBtn = this.msgActionMenu.getByTestId('star-candy-send-button');
         this.voteUpBtn = this.msgActionMenu.getByTestId('vote-real-button');
         this.voteDownBtn = this.msgActionMenu.getByTestId('vote-fake-button');
-        this.replyBtn = this.msgActionMenu.locator('button').nth(2);
-        this.threeDotsBtn = this.msgActionMenu.locator('button').nth(3);
+        this.replyBtn = page.locator("//button[@class='aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive gap-2 whitespace-nowrap text-sm font-medium outline-hidden transition-all focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-border px-4 py-2 has-[>svg]:px-3 w-full flex-1 flex flex-row h-6 p-0.75! items-center justify-center rounded-sm hover:cursor-pointer hover:bg-white']");
+        this.threeDotsBtn = this.msgActionMenu.locator('button').nth(4);
 
-        this.replyLabel = page.locator('div.w-full.flex.flex-row.justify-between.items-center.px-2.overflow-hidden');
+        this.replyLabel = page.locator('div.w-full.flex.flex-row.bg-light-blue.justify-between.items-center.px-2.overflow-hidden');
         this.closeReplyLableBtn = this.replyLabel.locator('svg');
+
+        this.threeDotsMenu = page.getByTestId('dropdown-menu-content');
+        this.menuStarCandyBtn = this.threeDotsMenu.getByTestId('star-candy-send-button');
+        this.menuVoteUpBtn = this.threeDotsMenu.getByTestId('vote-real-button');
+        this.menuVoteDownBtn = this.threeDotsMenu.getByTestId('vote-fake-button');
+        this.menuReplyBtn = this.threeDotsMenu.getByRole('menuitem', { name: '답글 쓰기' });
+        this.menuReportBtn = this.threeDotsMenu.getByRole('menuitem', { name: '신고' });
+        this.menuBlockBtn = this.threeDotsMenu.getByRole('menuitem', { name: '차단' });
+
+        this.starCandyActiveBtn = page.locator("//img[@alt='star_candy-active']");
+        this.starCandyRevokeBtn = page.locator("//img[@alt='star_candy-revoke']");
+        this.eyeBtn = page.getByTestId('eye-button');
     }
 
     async navigate(id: number) {
@@ -110,14 +136,20 @@ export class SoccerDetailChatPage extends BasePage {
             message: chatItem.getByTestId('popover-trigger'),
             time: chatItem.locator('time'),
             starCandyBtn: chatItem.getByTestId('star-candy-send-button'),
-            awardTxt: chatItem.getByText('획득!')
+            awardTxt: chatItem.getByText('획득!'),
+            msgToReply: chatItem.locator('div.flex.w-full.items-center.gap-1.pl-8.line-clamp-1.hover\\:cursor-pointer')
         };
     }
 
     async openMsgActionMenu(chatItem: Locator) {
         const trigger = chatItem.getByTestId('popover-trigger');
-        await trigger.scrollIntoViewIfNeeded();
-        await trigger.click();
-        await expect(this.msgActionMenu).toBeVisible();
+        if (await this.scrollToLastMsgBtn.isVisible()) {
+            await this.scrollToLastMsgBtn.click();
+            await this.scrollToLastMsgBtn.waitFor({ state: 'hidden', timeout: 3000 }).catch(() => { });
+        }
+        await expect(async () => {
+            await trigger.click();
+            await expect(this.msgActionMenu).toBeVisible();
+        }).toPass({ timeout: 10000 });
     }
 }
