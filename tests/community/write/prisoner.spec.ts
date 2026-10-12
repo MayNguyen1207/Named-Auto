@@ -1,5 +1,5 @@
 import { test, expect } from '../../../utils/fixtures';
-import { WriteFreePage } from '../../../pages/WriteFreePage';
+import { WriteFreePage } from '../../../pages/community/WriteFreePage';
 import loginData from '../../../data-test/login-data.json';
 import fs from 'fs';
 import path from 'path';

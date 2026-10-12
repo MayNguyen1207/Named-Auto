@@ -1,5 +1,5 @@
 import { test, expect } from '../../../utils/fixtures';
-import { FreeListPage } from '../../../pages/FreeListPage';
+import { FreeListPage } from '../../../pages/community/FreeListPage';
 import loginData from '../../../data-test/login-data.json';
 import freeListData from '../../../data-test/free-list-data.json';
 

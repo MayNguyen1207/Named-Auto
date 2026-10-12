@@ -1,5 +1,5 @@
 import { test, expect } from '../../../utils/fixtures';
-import { DetailFreePage } from '../../../pages/DetailFreePage';
+import { DetailFreePage } from '../../../pages/community/DetailFreePage';
 import freePostData from '../../../data-test/free-post-data.json';
 
 const flows: { role: string; storageState?: string }[] = [

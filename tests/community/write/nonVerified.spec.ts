@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { WriteFreePage } from '../../../pages/WriteFreePage';
+import { WriteFreePage } from '../../../pages/community/WriteFreePage';
 import postData from '../../../data-test/write-post-data.json';
 
 test.describe('Phone number Non-verified User Flow', () => {

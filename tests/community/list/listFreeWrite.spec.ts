@@ -1,6 +1,6 @@
 import { test, expect } from '../../../utils/fixtures';
 import { LoginPage } from '../../../pages/LoginPage';
-import { FreeListPage } from '../../../pages/FreeListPage';
+import { FreeListPage } from '../../../pages/community/FreeListPage';
 import loginData from '../../../data-test/login-data.json';
 import fs from 'fs';
 import path from 'path';

@@ -1,5 +1,5 @@
 import { test, expect } from '../../../utils/fixtures';
-import { DetailFreePage } from '../../../pages/DetailFreePage';
+import { DetailFreePage } from '../../../pages/community/DetailFreePage';
 import freePostData from '../../../data-test/free-post-data.json';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';

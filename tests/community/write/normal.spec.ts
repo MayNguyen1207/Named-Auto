@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../../pages/LoginPage';
-import { WriteFreePage } from '../../../pages/WriteFreePage';
-import { DetailFreePage } from '../../../pages/DetailFreePage';
+import { WriteFreePage } from '../../../pages/community/WriteFreePage';
+import { DetailFreePage } from '../../../pages/community/DetailFreePage';
 import loginData from '../../../data-test/login-data.json';
 import postData from '../../../data-test/write-post-data.json';
 import imageData from '../../../data-test/image-data/.image-data.json';
