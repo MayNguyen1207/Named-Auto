@@ -1,0 +1,94 @@
+{
+    "emptyList": {
+        "list": []
+    },
+
+    "defaultList": {
+        "list": [
+            {
+                "me_id": "1",
+                "me_send_datetime": "2026-10-14 16:05:00",
+                "me_memo": "Normal read memo - type 1",
+                "memosub": "",
+                "me_get_yn": "",
+                "memo_type": "1",
+                "memo_reward_type": "",
+                "me_get_point": 0,
+                "sender_nick": "[NM]Named001",
+                "is_read": true
+            },
+            {
+                "me_id": "2",
+                "me_send_datetime": "2026-10-13 16:04:00",
+                "me_memo": "Normal unread memo - type 2",
+                "memosub": "",
+                "me_get_yn": "",
+                "memo_type": "2",
+                "memo_reward_type": "ITEM",
+                "me_get_point": 0,
+                "sender_nick": "회원_68f85b3a7ea3a",
+                "is_read": false
+            },
+            {
+                "me_id": "3",
+                "me_send_datetime": "2026-10-12 16:03:00",
+                "me_memo": "Gift memo - received and read - type 3",
+                "memosub": "Gift memo - received and read",
+                "me_get_yn": "Y",
+                "memo_type": "3",
+                "memo_reward_type": "EXP",
+                "me_get_point": 100,
+                "sender_nick": "2072v2",
+                "is_read": true
+            },
+            {
+                "me_id": "4",
+                "me_send_datetime": "2026-10-11 16:02:00",
+                "me_memo": "Gift memo - not received and unread - type 4",
+                "memosub": "Gift memo - not received and unread",
+                "me_get_yn": "N",
+                "memo_type": "4",
+                "memo_reward_type": "POINT",
+                "me_get_point": 50,
+                "sender_nick": "NamedTester",
+                "is_read": false
+            },
+            {
+                "me_id": "5",
+                "me_send_datetime": "2026-10-10 16:01:00",
+                "me_memo": "Gift memo - not received and read - type 5",
+                "memosub": "Gift memo - not received and read",
+                "me_get_yn": "N",
+                "memo_type": "5",
+                "memo_reward_type": "MEDAL",
+                "me_get_point": 2,
+                "sender_nick": "TestUser05",
+                "is_read": true
+            },
+            {
+                "me_id": "6",
+                "me_send_datetime": "2026-10-09 16:00:00",
+                "me_memo": "Bulletin board memo - type 88",
+                "memosub": "",
+                "me_get_yn": "",
+                "memo_type": "88",
+                "memo_reward_type": "",
+                "me_get_point": 0,
+                "sender_nick": "BoardUser",
+                "is_read": false
+            },
+            {
+                "me_id": "7",
+                "me_send_datetime": "2026-10-08 15:59:00",
+                "me_memo": "Free reply memo - type 99",
+                "memosub": "",
+                "me_get_yn": "",
+                "memo_type": "99",
+                "memo_reward_type": "",
+                "me_get_point": 0,
+                "sender_nick": "ReplyUser",
+                "is_read": true
+            }
+        ]
+    }
+}
