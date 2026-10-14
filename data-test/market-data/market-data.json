@@ -1,0 +1,64 @@
+{
+    "purchaseErrorCases": [
+        {
+            "caseName": "out of stock",
+            "code": 1311,
+            "apiMessage": "아이템 재고가 부족합니다.",
+            "uiMessage": "아이템 재고가 부족합니다.",
+            "action": "close"
+        },
+        {
+            "caseName": "lack of bread",
+            "code": 1312,
+            "apiMessage": "보유한 받은 건빵이 부족합니다.",
+            "uiMessage": "보유하신 건빵이 부족합니다.",
+            "action": "navigate",
+            "expectedUrl": "/mypage/bread"
+        },
+        {
+            "caseName": "lack of point",
+            "code": 1119,
+            "apiMessage": "포인트가 부족합니다.",
+            "uiMessage": "보유하신 포인트가 부족합니다.",
+            "action": "navigate",
+            "expectedUrl": "/mypage/point"
+        },
+        {
+            "caseName": "lack of cash",
+            "code": 1303,
+            "apiMessage": "캐쉬가 부족합니다.",
+            "uiMessage": "보유하신 캐쉬가 부족합니다.",
+            "action": "close"
+        }
+    ],
+    "giftErrorCases": [
+        {
+            "testName": "user lack of cash",
+            "paymentMethod": "CASH",
+            "paymentRadioTestId": "market-payment-method-gold-radio",
+            "code": 1303,
+            "apiMessage": "캐쉬가 부족합니다.",
+            "alertMessage": "보유하신 캐쉬가 부족합니다.",
+            "action": "close"
+        },
+        {
+            "testName": "user lack of bread",
+            "paymentMethod": "BREAD",
+            "paymentRadioTestId": "market-payment-method-medal-radio",
+            "code": 1312,
+            "apiMessage": "보유한 받은 건빵이 부족합니다.",
+            "alertMessage": "보유하신 건빵이 부족합니다.",
+            "action": "navigate",
+            "expectedUrl": "/mypage/bread"
+        },
+        {
+            "testName": "item is out of stock",
+            "paymentMethod": "BREAD",
+            "paymentRadioTestId": "market-payment-method-medal-radio",
+            "code": 1311,
+            "apiMessage": "아이템 재고가 부족합니다.",
+            "alertMessage": "아이템 재고가 부족합니다.",
+            "action": "close"
+        }
+    ]
+}
