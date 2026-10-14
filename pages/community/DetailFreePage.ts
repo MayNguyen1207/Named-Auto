@@ -1,6 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from './BasePage';
-import loginData from '../data-test/login-data.json';
+import { BasePage } from '../BasePage';
 
 export class DetailFreePage extends BasePage {
     readonly page: Page;

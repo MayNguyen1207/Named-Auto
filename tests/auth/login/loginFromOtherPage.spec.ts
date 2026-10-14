@@ -70,6 +70,14 @@ test.describe('[Auth] Login from pages with callback redirect', () => {
         await loginPage.handleLoginRequiredDialog(email, password, /\/login/, /\/trustedsites\/4147/);
     });
 
+    test('[Auth] Login from Market page when clicking My Item button', async ({ page }) => {
+        await page.goto('/market/market');
+        await page.getByRole('link', { name: '내 아이템' }).click();
+
+        await loginPage.login(email, password);
+        await expect(page).toHaveURL('mypage/item')
+    });
+
     test('[Auth] Login from Market page when action is restricted (Purchase)', async ({ page }) => {
         await page.goto('/market/market');
         await page.getByTestId('market-list-item-purchase-button').first().click();

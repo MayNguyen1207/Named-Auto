@@ -1,6 +1,6 @@
 import { expect, Locator, Page, APIRequestContext } from '@playwright/test';
-import { formatPostDate } from '../utils/testRelativeTime';
-import { BasePage } from './BasePage';
+import { formatPostDate } from '../../utils/testRelativeTime';
+import { BasePage } from '../BasePage';
 
 export class FreeListPage extends BasePage {
     readonly allTab: Locator;

@@ -1,6 +1,6 @@
 import { test, expect } from '../../../utils/fixtures';
-import { WriteFreePage } from '../../../pages/WriteFreePage';
-import { DetailFreePage } from '../../../pages/DetailFreePage';
+import { WriteFreePage } from '../../../pages/community/WriteFreePage';
+import { DetailFreePage } from '../../../pages/community/DetailFreePage';
 import postData from '../../../data-test/write-post-data.json';
 
 test.describe('Admin Flow', () => {

@@ -1,0 +1,35 @@
+{
+    "total_cnt": 3,
+    "list": [
+        {
+            "notify_id": 96850144,
+            "rel_type": "GIFT_ITEM",
+            "rel_table": "mkt_item_myitem",
+            "rel_id": 25155310,
+            "message": "선물이 도착하였습니다.",
+            "is_read": "Y",
+            "reg_date": "2026-10-07 15:40:57",
+            "rel_id_is_deleted": false
+        },
+        {
+            "notify_id": 96850011,
+            "rel_type": "COMMENT_WRITE",
+            "rel_table": "free",
+            "rel_id": 10938243,
+            "message": "자유의 글에 댓글이 등록되었습니다.",
+            "is_read": "N",
+            "reg_date": "2026-09-15 16:22:09",
+            "rel_id_is_deleted": false
+        },
+        {
+            "notify_id": 96850000,
+            "rel_type": "COMMENT_REPLY",
+            "rel_table": "free",
+            "rel_id": 10938363,
+            "message": "자유의 댓글에 답글이 등록되었습니다.",
+            "is_read": "N",
+            "reg_date": "2026-09-08 15:58:14",
+            "rel_id_is_deleted": false
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 import { test, expect } from '../../../utils/fixtures';
-import { DetailFreePage } from '../../../pages/DetailFreePage';
-import { WriteFreePage } from '../../../pages/WriteFreePage';
+import { DetailFreePage } from '../../../pages/community/DetailFreePage';
+import { WriteFreePage } from '../../../pages/community/WriteFreePage';
 import loginData from '../../../data-test/login-data.json';
 import freePostData from '../../../data-test/free-post-data.json';
 import postData from '../../../data-test/write-post-data.json';
