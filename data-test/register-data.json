@@ -1,0 +1,43 @@
+{
+  "validPassword": "chau1207@",
+  "validOtp": "123456",
+  "invalidOtp": "654321",
+  "maxIdentityAttempts": 3,
+  "resendTimeoutMs": 210000,
+  "autoRedirectTimeoutMs": 20000,
+  "messages": {
+    "emailFormat": "유효한 이메일 주소를 입력해 주세요.",
+    "emailUsed": "이미 사용 중인 이메일입니다. 다른 이메일을 입력해 주세요.",
+    "passwordLength": "비밀번호는 6~18자여야 합니다.",
+    "passwordComposition": "영문, 숫자, 특수문자를 모두 포함해야 합니다.",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다. 다시 확인해 주세요.",
+    "phoneUsed": "해당 휴대폰 번호는 이미 다른 계정에 등록되어 있습니다.",
+    "otpIncorrect": "입력하신 인증 코드가 잘못되었습니다. 다시 시도해 주세요."
+  },
+  "invalidEmails": [
+    { "id": "NMD-REG-NEG-005", "name": "Missing @", "value": "narah.buisoftflex.co" },
+    { "id": "NMD-REG-NEG-006", "name": "Missing domain", "value": "narah.bui@" },
+    { "id": "NMD-REG-NEG-007", "name": "Missing username", "value": "@softflex.co" },
+    { "id": "NMD-REG-NEG-008", "name": "Special character per product requirement", "value": "narah!bui@softflex.co" },
+    { "id": "NMD-REG-NEG-009", "name": "Double @", "value": "narah.bui@@softflex.co" },
+    { "id": "NMD-REG-NEG-010", "name": "Double domain dot", "value": "narah.bui@softflex..co" },
+    { "id": "NMD-REG-NEG-012", "name": "Internal spaces", "value": "narah.bui   @softflex.co" },
+    { "id": "NMD-REG-NEG-015", "name": "Empty after focus and blur", "value": "" },
+    { "id": "NMD-REG-NEG-016", "name": "Korean per product requirement", "value": "나라하라@named.com" },
+    { "id": "REG-S1-EMAIL-INVALID-DOMAIN", "name": "Provided invalid domain example", "value": "12@.com" }
+  ],
+  "passwordRules": [
+    { "id": "NMD-REG-FUNC-020", "value": "chau1207@", "length": true, "composition": true },
+    { "id": "NMD-REG-NEG-023", "value": "abc@1", "length": false, "composition": true },
+    { "id": "NMD-REG-NEG-024", "value": "a@12345678901234567", "length": false, "composition": true },
+    { "id": "NMD-REG-NEG-025", "value": "Test1234", "length": true, "composition": false },
+    { "id": "NMD-REG-NEG-026", "value": "Test@word", "length": true, "composition": false },
+    { "id": "NMD-REG-NEG-033-PASSWORD", "value": "123456@!", "length": true, "composition": false },
+    { "id": "REG-S1-PASSWORD-BOUNDARY-6", "value": "Abc@12", "length": true, "composition": true },
+    { "id": "REG-S1-PASSWORD-BOUNDARY-18", "value": "a@1234567890123456", "length": true, "composition": true }
+  ],
+  "alternateCountry": {
+    "name": "가이아나",
+    "displayCode": "+592"
+}
+}
